@@ -1,0 +1,50 @@
+---
+name: Social ecological system
+alias:
+- "social-ecological system"
+ch: 社会-生态系统
+tags:
+- concept
+framework:
+- "#S"
+---
+## Description
+
+## 相关论文
+```dataviewjs
+let name = dv.current().file.name
+
+dv.table(["论文","期刊","年份"],
+dv.pages(`#paper`)
+	.where(b => b.concepts.includes(name))
+	.map(b => [b.file.link, b.journal, b.paper_date])
+	.sort(b => b.paper_date, 'desc')
+)
+```
+## 相关想法
+```dataviewjs
+
+let folderChoicePath = "00 - 每日日记/DailyNote"
+const files = app.vault.getMarkdownFiles().filter(file => file.path.includes(folderChoicePath))
+
+let names = dv.current().alias ? dv.current().alias : [];
+names.push(dv.current().name)
+names.push(dv.current().ch)
+
+
+let arr = files.map(async(file) => { 
+    const content = await app.vault.cachedRead(file) 
+    let lines = await content.split("\n").filter(line => names.some(name => line.includes(name)))
+    //console.log(lines) 
+    return ["[["+file.name.split(".")[0]+"]]", lines] 
+}) 
+
+Promise.all(arr).then(values => { 
+    const beautify = values.map(value => { 
+        const temp = value[1].map(line => { return line }) //美化要重写
+        return [value[0],temp] 
+    }) 
+    const exists = beautify.filter(value => value[1][0] && value[0] != "[[未命名 10]]") .sort(value => value[0],'desc') 
+    dv.table(["日期", "动态"], exists) 
+})
+```
