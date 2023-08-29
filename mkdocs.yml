@@ -1,0 +1,18 @@
+site_name: PaperBell
+nav:
+  - Home: index.md
+  - About: swm/README.md
+
+
+theme:
+    name: "material"
+    # logo: "https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/logo_abses.svg"
+    palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+plugins:
+    - search

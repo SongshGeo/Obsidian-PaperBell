@@ -37,38 +37,31 @@ authors: {% for creator in creators %}
 tags:
 - paper
 ---
-
 ## Information
 {{bibliography}}
 {{ pdfZoteroLink }}
-
 ### Tags
 `=link(this.concepts)`
-
 ### Authors
 `=link(this.authors)`
-
 {% if abstractNote %}
 ### Abstract
 {{abstractNote}}
 {% endif %}
-
 ## 注释
-
 ### KeyPoints
-
 {% for annotation in annotations %}{% if annotation.annotatedText and annotation.colorCategory in ["Yellow", "Red"] %}- ==[{{annotation.annotatedText}}]({{annotation.attachment.desktopURI}})==: {%if annotation.comment %}{{annotation.comment}}{%endif%}
 {% endif %}{% endfor %}
-
 ### Sentences
 {% for annotation in annotations %}{% if annotation.annotatedText and annotation.colorCategory in ["Green"] %}- ==[{{annotation.annotatedText}}]({{annotation.attachment.desktopURI}})==: {%if annotation.comment %}{{annotation.comment}}{%endif%}
 {% endif %}{% endfor %}
-
 ### Questions
-{% for annotation in annotations %}{% if annotation.annotatedText and annotation.colorCategory in ["Purple"] %}
+{% for annotation in annotations %}{% if annotation.annotatedText and annotation.colorCategory in ["Blue"] %}
 - [{{annotation.annotatedText}}]({{annotation.attachment.desktopURI}}): {%if annotation.comment %}{{annotation.comment}}{%endif%} #Q {% endif %}{% endfor %} 
+## Concepts
+{% for annotation in annotations %}{% if annotation.annotatedText and annotation.colorCategory in ["Gray"] %}
+- [{{annotation.annotatedText}}]({{annotation.attachment.desktopURI}}): {%if annotation.comment %}{{annotation.comment}}{%endif%} #concept  {% endif %}{% endfor %} 
 
 ## 附件
-
 {% for attachment in attachments %} {% if ".pdf" not in attachment %}
 - [{{attachment.title}}]({{attachment.desktopURI}}) {% endif %} {% endfor %}

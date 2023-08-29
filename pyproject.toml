@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "paperbell"
+version = "0.1.0"
+description = "An obsidian template vault for tracking your academic life."
+authors = ["SongshGeo <songshgeo@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.5.2"
+mkdocs-material = "^9.2.5"
+mkdocs-git-revision-date-localized-plugin = "^1.2.0"
+mkdocs-minify-plugin = "^0.7.1"
+mkdocs-redirects = "^1.2.1"
+mkdocs-awesome-pages-plugin = "^2.9.2"
+mkdocs-git-authors-plugin = "^0.7.2"
+mkdocstrings = {extras = ["python"], version = "^0.22.0"}
+mkdocs-bibtex = "^2.11.0"
+mkdocs-macros-plugin = "^1.0.4"
+mkdocs-callouts = "^1.9.0"
+mkdocs-glightbox = "^0.3.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
