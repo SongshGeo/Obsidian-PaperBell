@@ -2,6 +2,7 @@
     "conventionalCommits.scopes": [
         "project",
         "feature",
-        "notes"
+        "notes",
+        "docs"
     ]
 }

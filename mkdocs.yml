@@ -1,7 +1,7 @@
 site_name: PaperBell
 nav:
   - Home: index.md
-  - About: swm/README.md
+  - About: docs/readme.ifkoqk01.sw.md
 
 
 theme:
@@ -16,3 +16,30 @@ theme:
         name: Switch to dark mode
 plugins:
     - search
+    - callouts
+markdown_extensions:
+  - abbr
+  - attr_list
+  - admonition
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: "!!python/name:pymdownx.superfences.fence_code_format"
+  - pymdownx.tabbed:
+      alternate_style: true
+  - footnotes
+  - toc:
+      permalink: "#"
+      baselevel: 2
+      separator: "-"
+  - attr_list
+  - md_in_html
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.snippets:
+      auto_append:
+        - abbreviations.md

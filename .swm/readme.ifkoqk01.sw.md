@@ -5,33 +5,49 @@ file_version: 1.1.3
 app_version: 1.15.0
 ---
 
-An obsidian template vault for tracking your academic life.
+**PaperBell, an obsidian template vault for tracking your academic life.**
 
 <br/>
 
-<!--MERMAID {width:100}-->
-```mermaid
-
-```
-<!--MCONTENT {content: "<br/>"} --->
+<div align="center"><img src="https://firebasestorage.googleapis.com/v0/b/swimmio.appspot.com/o/repositories%2FZ2l0aHViJTNBJTNBUGFwZXJCZWxsJTNBJTNBU29uZ3NoR2Vv%2Fec47d268-80c8-4df5-bf62-1c37a2f43a3b.gif?alt=media&token=bb7fe1a8-5a44-4364-9032-fe20a563bad4" style="width:'100%'"/></div>
 
 <br/>
 
-## 设计理念
+## Tracking your academic life
 
-一共有五种实例要素：
+科研工作常常需要我们同时应对许多项目，追踪项目进展。🔔**PaperBell**是一个基于[笔记管理软件Obsidian](https://obsidian.md/)的示例仓库，旨在帮助使用者追踪科研生活。PaperBell 一共有五种实例要素：
 
-🧑‍🔬 **学者：**
+🧑‍🔬 **学者** [Scholar](scholar.1qh4zo7q.sw.md)**：**学术共同体是一个小圈子，随着研究生活的持续，你会遇见并记住很多学者——包括你自己。有必要为所有学者建立一个档案，持续追踪感兴趣学者的动态。
 
-🤔️ **概念**：
+🤔️ **概念**：概念是一个学术共同体频繁讨论到的术语，是构成学术殿堂的拼图。某个学者可能终其一生在某个概念相关领域深挖，某个概念也可能与许多论文相关联。收集那些你感兴趣的概念，它们会逐渐将你指引到你自己的学术领域。
 
-📑 **论文**：
+📑 **论文**：论文是学者发表声音、积攒声望的。「**Publish or Perish**」绝非一句玩笑话。读过的所有论文都将成为你产生自己自己想法。
 
-📁 **项目**：每个项目都有
+📁 **项目**：每个项目都可能持续数年，并产生一系列研究成果。有时候你会主持项目，有时候你会参与项目，当许多项目同步推进时，你会需要PaperBell 帮助你追踪每一个项目的状态、进度、待办事项、以及项目资产......
 
-🗺️ **地点**：学术人参加一系列事件，属于一系列机构，这些都会发生在具体的地点
+🗺️ **地点**：学术人参加一系列事件，属于一系列机构，这些都会发生在某个时间的某个具体的地点。保持对地点的积累，并在每日/每周的笔记中进行记录，PaperBell 会帮你自动呈现出一个学者的学术生涯。
 
 每一个实例要素都将拥有一个自己的页面，使用时间维度对项目和论文进行组织。每天只需要在自己的当天日记里进行科研记录，就可以轻松追踪每个项目的进展。
+
+## Quick preview
+
+<br/>
+
+<div align="center"><img src="https://firebasestorage.googleapis.com/v0/b/swimmio.appspot.com/o/repositories%2FZ2l0aHViJTNBJTNBUGFwZXJCZWxsJTNBJTNBU29uZ3NoR2Vv%2Fb80101ff-c7f3-4d89-8739-f5dc01a1730b.png?alt=media&token=8635b26c-05af-421c-b27b-73034ab529ed" style="width:'100%'"/></div>
+
+<br/>
+
+**目前，PaperBell 将帮助你实现以下功能**：
+
+### 记录/追踪学者动态
+
+### 导入文献笔记并关联学者/概念
+
+### 记录/追踪项目进展
+
+感兴趣？欢迎在这里查看本项目的文档。
+
+## Contact me
 
 <br/>
 
