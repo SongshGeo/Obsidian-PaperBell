@@ -4,20 +4,15 @@
     "type": "split",
     "children": [
       {
-        "id": "a94ec6e6a9fe4998",
+        "id": "5164dbc380619fcd",
         "type": "tabs",
         "children": [
           {
-            "id": "ab99c698a31dfb81",
+            "id": "3c51ab886f717346",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "00 - 每日日记/DailyNote/2023年09月07日.md",
-                "mode": "preview",
-                "backlinks": false,
-                "source": false
-              }
+              "type": "empty",
+              "state": {}
             }
           }
         ]
@@ -79,9 +74,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "00 - 每日日记/DailyNote/2023年09月07日.md"
-              }
+              "state": {}
             }
           },
           {
@@ -135,7 +128,7 @@
       {
         "id": "4294f9e389e0008a",
         "type": "tabs",
-        "dimension": 36.87089715536105,
+        "dimension": 48.81516587677725,
         "children": [
           {
             "id": "6ad73b7dcf2a71b6",
@@ -143,7 +136,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "00 - 每日日记/DailyNote/2023年09月07日.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -171,12 +163,12 @@
             }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       },
       {
         "id": "4fce416981e6cec9",
         "type": "tabs",
-        "dimension": 63.12910284463894,
+        "dimension": 51.18483412322274,
         "children": [
           {
             "id": "3191225bb556d597",
@@ -229,16 +221,21 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "ab99c698a31dfb81",
+  "active": "3c51ab886f717346",
   "lastOpenFiles": [
-    "40 - Obsidian/主页/00. 导航.md",
+    "Outputs/结果探讨.md",
+    "Outputs/01 - Introduction/卷死了.md",
+    "Outputs/03 - Results/当今民工.md",
+    "Outputs/01 - Introduction",
+    "Outputs/04 - Discussion/关于科研生活的探讨.md",
+    "Outputs/引言讨论.md",
     "40 - Obsidian/主页/00. 主页.md",
+    "Inputs/00. 图书馆.md",
+    "40 - Obsidian/主页/00. 导航.md",
     "Inputs/Zotero/A framework for mapping and comparing behavioural theories in models of social-ecological systems.md",
     "Cards/概念墙.md",
     "Outputs/02 - Methods/多主体建模的ODD框架.md",
     "Persons/学者列表.md",
-    "Outputs/引言讨论.md",
-    "Inputs/00. 图书馆.md",
     "Locations/Places/Cotacachi.md",
     "Locations/Institutes/Universidad San Francisco de Quito.md",
     "40 - Obsidian/模板/地点模板.md",
@@ -249,15 +246,11 @@
     "Outputs/02 - Methods/多主体建模的包.md",
     "Locations/机构列表.md",
     "Outputs/数据方法.md",
-    "Outputs/结果探讨.md",
     "40 - Obsidian/主页/00. 文件管理.md",
     "Cards/Methods/agent-based model.md",
     "Projects/Scholar/参与的项目.md",
     "Cards/Methods",
-    "Outputs/04 - Discussion/关于科研生活的探讨.md",
-    "Outputs/03 - Results/当今民工.md",
     "00 - 每日日记/DailyNote/2023年09月07日.md",
-    "Locations/Institutes/中国科学院大学.md",
     "40 - Obsidian/脚本/QuickAdd/moviefromdouban.js",
     "40 - Obsidian/脚本/QuickAdd/bookfromdouban.js",
     "40 - Obsidian/脚本/moviefromdouban.js",
@@ -268,7 +261,6 @@
     "Projects/Supporter",
     "Projects/SongshGeo",
     "Outputs/04 - Discussion",
-    "Outputs/02 - Methods",
     "40 - Obsidian/附件/banners/global-tracking-banner.jpg",
     "40 - Obsidian/附件/banners/book-banner.gif",
     "40 - Obsidian/附件/100911654141903_.pic.jpg",

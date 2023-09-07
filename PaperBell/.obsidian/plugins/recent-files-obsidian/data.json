@@ -1,16 +1,36 @@
 {
   "recentFiles": [
     {
+      "basename": "结果探讨",
+      "path": "Outputs/结果探讨.md"
+    },
+    {
+      "basename": "卷死了",
+      "path": "Outputs/01 - Introduction/卷死了.md"
+    },
+    {
+      "basename": "当今民工",
+      "path": "Outputs/03 - Results/当今民工.md"
+    },
+    {
+      "basename": "关于科研生活的探讨",
+      "path": "Outputs/04 - Discussion/关于科研生活的探讨.md"
+    },
+    {
+      "basename": "引言讨论",
+      "path": "Outputs/引言讨论.md"
+    },
+    {
+      "basename": "00. 主页",
+      "path": "40 - Obsidian/主页/00. 主页.md"
+    },
+    {
       "basename": "2023年09月07日",
       "path": "00 - 每日日记/DailyNote/2023年09月07日.md"
     },
     {
       "basename": "00. 导航",
       "path": "40 - Obsidian/主页/00. 导航.md"
-    },
-    {
-      "basename": "00. 主页",
-      "path": "40 - Obsidian/主页/00. 主页.md"
     },
     {
       "basename": "A framework for mapping and comparing behavioural theories in models of social-ecological systems",
@@ -49,28 +69,12 @@
       "path": "Cards/Methods/agent-based model.md"
     },
     {
-      "basename": "结果探讨",
-      "path": "Outputs/结果探讨.md"
-    },
-    {
-      "basename": "引言讨论",
-      "path": "Outputs/引言讨论.md"
-    },
-    {
       "basename": "数据方法",
       "path": "Outputs/数据方法.md"
     },
     {
       "basename": "参与的项目",
       "path": "Projects/Scholar/参与的项目.md"
-    },
-    {
-      "basename": "关于科研生活的探讨",
-      "path": "Outputs/04 - Discussion/关于科研生活的探讨.md"
-    },
-    {
-      "basename": "当今民工",
-      "path": "Outputs/03 - Results/当今民工.md"
     },
     {
       "basename": "机构列表",
@@ -195,10 +199,6 @@
     {
       "basename": "Zotero论文导入模板",
       "path": "40 - Obsidian/模板/Zotero论文导入模板.md"
-    },
-    {
-      "basename": "贺舟",
-      "path": "Persons/Scholars/贺舟.md"
     }
   ],
   "omittedPaths": [],
