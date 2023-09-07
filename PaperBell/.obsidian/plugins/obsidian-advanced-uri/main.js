@@ -4294,16 +4294,20 @@ var Tools = class {
     const fileContent = await app.vault.read(file);
     const isYamlEmpty = (!frontmatter || frontmatter.length === 0) && !fileContent.match(/^-{3}\s*\n*\r*-{3}/);
     let splitContent = fileContent.split("\n");
+    const key = `${this.plugin.settings.idField}:`;
     if (isYamlEmpty) {
       splitContent.unshift("---");
-      splitContent.unshift(`${this.plugin.settings.idField}: ${uid}`);
+      splitContent.unshift(`${key} ${uid}`);
       splitContent.unshift("---");
     } else {
-      splitContent.splice(
-        1,
-        0,
-        `${this.plugin.settings.idField}: ${uid}`
+      const lineIndexOfKey = splitContent.findIndex(
+        (line) => line.startsWith(key)
       );
+      if (lineIndexOfKey != -1) {
+        splitContent[lineIndexOfKey] = `${key} ${uid}`;
+      } else {
+        splitContent.splice(1, 0, `${key} ${uid}`);
+      }
     }
     const newFileContent = splitContent.join("\n");
     await app.vault.modify(file, newFileContent);

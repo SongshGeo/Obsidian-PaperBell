@@ -31,19 +31,12 @@
       }
     },
     {
-      "ruleName": "#trip-water",
+      "ruleName": "#university",
       "preset": false,
       "iconDetails": {
         "prefix": "fas",
-        "markerColor": "blue"
-      }
-    },
-    {
-      "ruleName": "#dogs",
-      "preset": false,
-      "iconDetails": {
-        "prefix": "fas",
-        "icon": "fa-paw"
+        "icon": "fa-school-flag",
+        "markerColor": "pink"
       }
     }
   ],

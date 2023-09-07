@@ -40,8 +40,8 @@ institute:
 
 ````
 ## 研究兴趣
-- [[Social ecological system]]
-- [[Agent-based model]]
+- [[social ecological system]]
+- [[agent-based model]]
 ## 相关论文
 ```dataviewjs
 let names = dv.current().alias ? dv.current().alias : [];

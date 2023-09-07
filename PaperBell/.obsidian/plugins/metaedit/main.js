@@ -4402,11 +4402,12 @@ class MetaEditParser {
         return mTags;
     }
     async parseFrontmatter(file) {
-        var _a;
-        const frontmatter = (_a = this.app.metadataCache.getFileCache(file)) === null || _a === void 0 ? void 0 : _a.frontmatter;
+        const fileCache = this.app.metadataCache.getFileCache(file);
+        const frontmatter = fileCache === null || fileCache === void 0 ? void 0 : fileCache.frontmatter;
         if (!frontmatter)
             return [];
-        const { position: { start, end } } = frontmatter;
+        //@ts-ignore - this is part of the new Obsidian API as of v1.4.1
+        const { start, end } = fileCache === null || fileCache === void 0 ? void 0 : fileCache.frontmatterPosition;
         const filecontent = await this.app.vault.cachedRead(file);
         const yamlContent = filecontent.split("\n").slice(start.line, end.line).join("\n");
         const parsedYaml = obsidian.parseYaml(yamlContent);
@@ -4917,7 +4918,26 @@ class MetaController {
         }
         return null;
     }
+    updateYamlProperty(property, newValue, file) {
+        const fileCache = this.app.metadataCache.getFileCache(file);
+        const frontMatter = fileCache.frontmatter;
+        frontMatter[property.key] = newValue;
+        return obsidian.stringifyYaml(frontMatter);
+    }
     async updatePropertyInFile(property, newValue, file) {
+        // I'm aware this is hacky. Didn't want to spend a bunch of time rewriting old logic.
+        // This uses the new frontmatter API to update the frontmatter. Later TODO: rewrite old logic to just do this & clean.
+        if (property.type === MetaType.YAML) {
+            const updatedMetaData = `---\n${this.updateYamlProperty(property, newValue, file)}\n---`;
+            //@ts-ignore
+            const frontmatterPosition = this.app.metadataCache.getFileCache(file).frontmatterPosition;
+            const fileContents = await this.app.vault.read(file);
+            const deleteFrom = frontmatterPosition.start.offset;
+            const deleteTo = frontmatterPosition.end.offset;
+            const newFileContents = fileContents.substring(0, deleteFrom) + updatedMetaData + fileContents.substring(deleteTo);
+            await this.app.vault.modify(file, newFileContents);
+            return;
+        }
         const fileContent = await this.app.vault.read(file);
         const newFileContent = fileContent.split("\n").map(line => {
             if (this.lineMatch(property, line)) {
@@ -4942,7 +4962,7 @@ class MetaController {
         let newLine;
         switch (property.type) {
             case MetaType.Dataview:
-                const propertyRegex = new RegExp(`([\\(\\[]?)${this.escapeSpecialCharacters(property.key)}::[ ]*[^\\)\\]\n\r]*([\\]\\)]?)`, 'g');
+                const propertyRegex = new RegExp(`([\\(\\[]?)${this.escapeSpecialCharacters(property.key)}::[ ]*[^\\)\\]\n\r]*(?:\\]\])?([\\]\\)]?)`, 'g');
                 newLine = line.replace(propertyRegex, `$1${property.key}:: ${newValue}$2`);
                 break;
             case MetaType.YAML:
@@ -5358,7 +5378,7 @@ class KanbanHelper extends OnFileModifyAutomator {
     }
     getLinkFile(link) {
         const markdownFiles = this.app.vault.getMarkdownFiles();
-        return markdownFiles.find(f => f.path.includes(`${link.link}.md`));
+        return markdownFiles.find(f => f.path.endsWith(`/${link.link}.md`) || f.path === `${link.link}.md`);
     }
     async updateFilesInBoard(links, board, kanbanBoardFileContent) {
         for (const link of links) {
@@ -5366,7 +5386,7 @@ class KanbanHelper extends OnFileModifyAutomator {
             const linkIsMarkdownFile = !!abstractFileToMarkdownTFile(linkFile);
             if (!linkFile || !linkIsMarkdownFile) {
                 log.logMessage(`${link.link} is not updatable for the KanbanHelper.`);
-                return;
+                continue;
             }
             await this.updateFileInBoard(link, linkFile, board, kanbanBoardFileContent);
         }
@@ -5374,7 +5394,7 @@ class KanbanHelper extends OnFileModifyAutomator {
     async updateFileInBoard(link, linkFile, board, kanbanBoardFileContent) {
         const heading = this.getTaskHeading(link.original, kanbanBoardFileContent);
         if (!heading) {
-            log.logWarning("found linked file but could not get heading for task.");
+            log.logMessage(`found linked file ${link.link} but could not get heading for task.`);
             return;
         }
         const fileProperties = await this.plugin.controller.getPropertiesInFile(linkFile);

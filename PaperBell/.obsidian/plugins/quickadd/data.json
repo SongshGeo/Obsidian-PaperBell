@@ -127,27 +127,28 @@
       "command": false,
       "choices": [
         {
-          "id": "245d64d1-046e-4929-a2c0-de1cdadc59f3",
-          "name": "学术项目 (copy)",
-          "type": "Macro",
-          "command": true,
-          "macroId": "38b50e25-951b-4c63-a1ec-e63e205d89cd"
-        },
-        {
           "id": "37648506-0791-4ed5-ab22-315fc6643628",
           "name": "学术项目",
           "type": "Macro",
           "command": true,
           "macroId": "38b50e25-951b-4c63-a1ec-e63e205d89cd"
-        },
-        {
-          "id": "00a6492d-99e0-4bb4-803c-8c8a66b38e6b",
-          "name": "学术项目 (copy) (copy)",
-          "type": "Macro",
-          "command": true,
-          "macroId": "38b50e25-951b-4c63-a1ec-e63e205d89cd"
         }
-      ]
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "17482caf-7b7c-43cf-a81d-4944cc8c19cc",
+      "name": "豆瓣读书",
+      "type": "Macro",
+      "command": true,
+      "macroId": "37101f53-b505-422d-a356-0694b31c0d67"
+    },
+    {
+      "id": "e6b084c1-451d-47fb-b1df-82a93b7163a8",
+      "name": "添加术语",
+      "type": "Macro",
+      "command": true,
+      "macroId": "e3f026bd-2ae8-4fea-aa51-8033b4bed5d5"
     }
   ],
   "macros": [
@@ -437,6 +438,143 @@
               "insertAtEnd": false,
               "considerSubsections": false,
               "createIfNotFound": false,
+              "createIfNotFoundLocation": "top"
+            },
+            "prepend": false,
+            "task": false,
+            "openFileInNewTab": {
+              "enabled": false,
+              "direction": "vertical",
+              "focus": true
+            },
+            "openFile": false,
+            "openFileInMode": "default"
+          }
+        }
+      ],
+      "runOnStartup": false
+    },
+    {
+      "name": "Douban Book",
+      "id": "37101f53-b505-422d-a356-0694b31c0d67",
+      "commands": [
+        {
+          "name": "bookfromdouban",
+          "type": "UserScript",
+          "id": "af736b53-cac6-4de3-be70-04a4b5c83eb1",
+          "path": "40 - Obsidian/脚本/QuickAdd/bookfromdouban.js",
+          "settings": {}
+        },
+        {
+          "name": "豆瓣读书笔记",
+          "type": "NestedChoice",
+          "id": "e1ccd4be-bf0b-4fa1-80f0-264fdb011ba7",
+          "choice": {
+            "id": "0d2c6a3a-f8c2-40ec-96f5-d7f55cc59e54",
+            "name": "豆瓣读书笔记",
+            "type": "Template",
+            "command": false,
+            "templatePath": "40 - Obsidian/模板/douban_book.md",
+            "fileNameFormat": {
+              "enabled": true,
+              "format": "{{VALUE:bookname}}"
+            },
+            "folder": {
+              "enabled": true,
+              "folders": [
+                "Inputs/Books"
+              ],
+              "chooseWhenCreatingNote": false,
+              "createInSameFolderAsActiveFile": false,
+              "chooseFromSubfolders": false
+            },
+            "appendLink": false,
+            "openFileInNewTab": {
+              "enabled": true,
+              "direction": "vertical",
+              "focus": true
+            },
+            "openFile": true,
+            "openFileInMode": "default",
+            "fileExistsMode": "Increment the file name",
+            "setFileExistsBehavior": true
+          }
+        }
+      ],
+      "runOnStartup": false
+    },
+    {
+      "name": "添加术语",
+      "id": "e3f026bd-2ae8-4fea-aa51-8033b4bed5d5",
+      "commands": [
+        {
+          "name": "创建术语模板",
+          "type": "NestedChoice",
+          "id": "963bff7f-00e0-4acf-8dbe-16d353e08d3c",
+          "choice": {
+            "id": "2c0ef45d-2434-4b6d-83cf-28614bdce6be",
+            "name": "创建术语模板",
+            "type": "Template",
+            "command": false,
+            "templatePath": "40 - Obsidian/模板/术语模板.md",
+            "fileNameFormat": {
+              "enabled": true,
+              "format": "{{VALUE:name}}"
+            },
+            "folder": {
+              "enabled": true,
+              "folders": [
+                "Cards/Concepts"
+              ],
+              "chooseWhenCreatingNote": false,
+              "createInSameFolderAsActiveFile": false,
+              "chooseFromSubfolders": false
+            },
+            "appendLink": false,
+            "openFileInNewTab": {
+              "enabled": false,
+              "direction": "vertical",
+              "focus": true
+            },
+            "openFile": true,
+            "openFileInMode": "default",
+            "fileExistsMode": "Nothing",
+            "setFileExistsBehavior": true
+          }
+        },
+        {
+          "name": "Wait",
+          "type": "Wait",
+          "id": "5e123e2b-758b-40d7-96de-88f2b49dc4b5",
+          "time": 100
+        },
+        {
+          "name": "添加元信息",
+          "type": "NestedChoice",
+          "id": "b6c03612-3b4e-4715-bf34-6c006a9196a6",
+          "choice": {
+            "id": "ba5784cd-efbc-4f4e-9296-006a1492155e",
+            "name": "添加元信息",
+            "type": "Capture",
+            "command": false,
+            "appendLink": false,
+            "captureTo": "",
+            "captureToActiveFile": true,
+            "createFileIfItDoesntExist": {
+              "enabled": false,
+              "createWithTemplate": false,
+              "template": ""
+            },
+            "format": {
+              "enabled": true,
+              "format": "---\nname: {{VALUE:name}}\nalias:\nch: {{VALUE:中文名}}\nframework:\n"
+            },
+            "insertAfter": {
+              "enabled": true,
+              "after": "",
+              "insertAtEnd": false,
+              "considerSubsections": false,
+              "createIfNotFound": true,
               "createIfNotFoundLocation": "top"
             },
             "prepend": false,

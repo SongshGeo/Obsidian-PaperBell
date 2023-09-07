@@ -7,6 +7,7 @@ alias:
 - 科塔卡奇
 tags:
 - city
+- trip
 ---
 
 ```mapview

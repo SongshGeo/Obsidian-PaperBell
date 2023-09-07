@@ -10,80 +10,7 @@
             "type": "tabs",
             "children": [
               {
-                "id": "53c2b5d46760f3a1",
-                "type": "leaf",
-                "state": {
-                  "type": "memos_view",
-                  "state": {}
-                }
-              },
-              {
-                "id": "0effad2a807def2f",
-                "type": "leaf",
-                "state": {
-                  "type": "markdown",
-                  "state": {
-                    "file": "Cards/Concepts/Social ecological system.md",
-                    "mode": "source",
-                    "backlinks": false,
-                    "source": false
-                  }
-                }
-              },
-              {
-                "id": "fe6d26dc89213d4c",
-                "type": "leaf",
-                "state": {
-                  "type": "markdown",
-                  "state": {
-                    "file": "40 - Obsidian/模板/项目模板.md",
-                    "mode": "source",
-                    "backlinks": false,
-                    "source": false
-                  }
-                }
-              },
-              {
-                "id": "37d8efe8ab074fd6",
-                "type": "leaf",
-                "state": {
-                  "type": "markdown",
-                  "state": {
-                    "file": "Projects/Scholar/华南农业生计模式演变.md",
-                    "mode": "preview",
-                    "backlinks": false,
-                    "source": false
-                  }
-                }
-              },
-              {
-                "id": "fc2ba661d67a48f8",
-                "type": "leaf",
-                "state": {
-                  "type": "markdown",
-                  "state": {
-                    "file": "Projects/Scholar/黄河流域历史时期社会-水文互馈过程与系统动力学模拟.md",
-                    "mode": "source",
-                    "backlinks": false,
-                    "source": false
-                  }
-                }
-              },
-              {
-                "id": "06ca211d996ef4c4",
-                "type": "leaf",
-                "state": {
-                  "type": "markdown",
-                  "state": {
-                    "file": "Projects/Supporter/博士后.md",
-                    "mode": "preview",
-                    "backlinks": false,
-                    "source": false
-                  }
-                }
-              },
-              {
-                "id": "023c863d54b8cc74",
+                "id": "ab99c698a31dfb81",
                 "type": "leaf",
                 "state": {
                   "type": "markdown",
@@ -95,8 +22,7 @@
                   }
                 }
               }
-            ],
-            "currentTab": 6
+            ]
           }
         ],
         "direction": "vertical"
@@ -237,6 +163,14 @@
                   "type": "calendar",
                   "state": {}
                 }
+              },
+              {
+                "id": "6783ab816b124685",
+                "type": "leaf",
+                "state": {
+                  "type": "ReferenceListView",
+                  "state": {}
+                }
               }
             ],
             "currentTab": 1
@@ -271,13 +205,8 @@
                 "id": "4354bd31fa04df0e",
                 "type": "leaf",
                 "state": {
-                  "type": "markdown",
-                  "state": {
-                    "file": "40 - Obsidian/侧边栏/侧边栏天气预报.md",
-                    "mode": "preview",
-                    "backlinks": false,
-                    "source": false
-                  }
+                  "type": "empty",
+                  "state": {}
                 }
               }
             ]
@@ -288,6 +217,7 @@
       },
       "left-ribbon": {
         "hiddenItems": {
+          "obsidian-excalidraw-plugin:新建 Excalidraw 绘图": false,
           "switcher:打开快速切换": false,
           "graph:查看关系图谱": false,
           "canvas:新建白板": false,
@@ -301,7 +231,7 @@
           "templater-obsidian:Templater": false
         }
       },
-      "active": "023c863d54b8cc74"
+      "active": "ab99c698a31dfb81"
     }
   },
   "active": "主工作区"

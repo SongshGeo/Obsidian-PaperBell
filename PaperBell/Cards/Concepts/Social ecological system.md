@@ -1,14 +1,14 @@
 ---
-name: Social ecological system
+name: social ecological system
 alias:
-- "social-ecological system"
+- "Social-ecological system"
+- 社会-生态系统
 ch: 社会-生态系统
 tags:
 - concept
-framework:
-- "#S"
 ---
 ## Description
+社会-生态系统是典型的复杂系统 #S
 
 ## 相关论文
 ```dataviewjs
