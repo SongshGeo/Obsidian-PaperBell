@@ -1,6 +1,6 @@
 {
-  "sharetype@@sharetype2-color@@light": "#F4D8AC",
-  "sharetype@@sharetype-color@@light": "#FCB9C8",
+  "sharetype@@sharetype2-color@@light": "#64CCC5",
+  "sharetype@@sharetype-color@@light": "#053B50",
   "blue-topaz-theme@@color-scheme-options": "color-scheme-options-avocado-topaz",
   "blue-topaz-theme@@muted-activeline-bg": false,
   "blue-topaz-theme@@folder-style-change-options-colorful": true,
@@ -10,5 +10,8 @@
   "blue-topaz-theme@@list-style-change-options": "list-vertical-line-one",
   "minimal-style@@embed-strict": false,
   "blue-topaz-theme@@naked-embed": true,
-  "blue-topaz-theme@@embed-title": true
+  "sharetype@@sharetype-color@@dark": "#176B87",
+  "sharetype@@sharetype2-color@@dark": "#64CCC5",
+  "time@@time-color@@light": "#64CCC5",
+  "time@@time-color@@dark": "#64CCC5"
 }

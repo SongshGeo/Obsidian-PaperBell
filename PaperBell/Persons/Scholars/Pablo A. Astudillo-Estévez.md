@@ -1,18 +1,19 @@
 ---
-name: 贺舟
 alias:
-- Zhou He
+- Pablo
 gender: 男
 birthday:
 email: 
-- hezhou@ucas.ac.cn
+- pastudillo@usfq.edu.ec
 title:
-- 副教授
-website: http://www.agentlab.cn/cv/zhouhe.html
-photo: "https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/XZKCpL.jpg"
+- Assistant Professor
+website: https://www.pastudillo.com
+photo: "https://static.wixstatic.com/media/d6dc58_95a32ff8e79a451e80aa25ef8d83cd26~mv2.jpeg/v1/fill/w_974,h_974,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/69751614_10157721109604180_4909437572570.jpeg"
 tags: scholar
 institute:
-- 中国科学院大学
+- Universidad San Francisco de Quito
+name: Pablo A. Astudillo-Estévez
+following_date: 2023-09-07
 ---
 ## 基本信息
 ````ad-flex
@@ -39,7 +40,7 @@ institute:
 
 ````
 ## 研究兴趣
-- [[agent-based model]]
+- 
 ## 相关论文
 ```dataviewjs
 let names = dv.current().alias ? dv.current().alias : [];

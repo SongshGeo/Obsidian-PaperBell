@@ -5,7 +5,7 @@
     justify-content: space-between; /* 确保子元素之间有一些间距 */
     align-items: center;       /* 垂直居中 */
     white-space: pre-wrap;
-    background: #ffd3d36d;
+    background: #D2E9E9;
     border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -14,7 +14,7 @@
     flex: 1;                   /* 使其占据可用空间的一半 */
     font-size: 9px;
     padding: 5px 9px;
-    border: 1px solid #eb0b0b;
+    border: 1px solid #053B50;
     border-radius: 5px;
     cursor: pointer;
     margin-right: 10px;        /* 为了添加一些右边距 */
@@ -28,7 +28,7 @@
 
 
 audio::-webkit-media-controls-panel {
-    background-color: #ffd3d357; /* Change this color to whatever you want */
+    background-color: #EEEEEE; /* Change this color to whatever you want */
 }
 
 

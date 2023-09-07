@@ -1,6 +1,46 @@
 {
   "recentFiles": [
     {
+      "basename": "个人履历",
+      "path": "Persons/个人履历.md"
+    },
+    {
+      "basename": "Pablo A. Astudillo-Estévez",
+      "path": "Persons/Scholars/Pablo A. Astudillo-Estévez.md"
+    },
+    {
+      "basename": "00. 导航",
+      "path": "40 - Obsidian/主页/00. 导航.md"
+    },
+    {
+      "basename": "00. 主页",
+      "path": "40 - Obsidian/主页/00. 主页.md"
+    },
+    {
+      "basename": "学者列表",
+      "path": "Persons/学者列表.md"
+    },
+    {
+      "basename": "侧边栏音乐播放器",
+      "path": "40 - Obsidian/侧边栏/侧边栏音乐播放器.md"
+    },
+    {
+      "basename": "00. 文件管理",
+      "path": "40 - Obsidian/主页/00. 文件管理.md"
+    },
+    {
+      "basename": "参与的项目",
+      "path": "Projects/Scholar/参与的项目.md"
+    },
+    {
+      "basename": "2023年09月07日",
+      "path": "00 - 每日日记/DailyNote/2023年09月07日.md"
+    },
+    {
+      "basename": "00. 图书馆",
+      "path": "Inputs/00. 图书馆.md"
+    },
+    {
       "basename": "结果探讨",
       "path": "Outputs/结果探讨.md"
     },
@@ -19,18 +59,6 @@
     {
       "basename": "引言讨论",
       "path": "Outputs/引言讨论.md"
-    },
-    {
-      "basename": "00. 主页",
-      "path": "40 - Obsidian/主页/00. 主页.md"
-    },
-    {
-      "basename": "2023年09月07日",
-      "path": "00 - 每日日记/DailyNote/2023年09月07日.md"
-    },
-    {
-      "basename": "00. 导航",
-      "path": "40 - Obsidian/主页/00. 导航.md"
     },
     {
       "basename": "A framework for mapping and comparing behavioural theories in models of social-ecological systems",
@@ -73,10 +101,6 @@
       "path": "Outputs/数据方法.md"
     },
     {
-      "basename": "参与的项目",
-      "path": "Projects/Scholar/参与的项目.md"
-    },
-    {
       "basename": "机构列表",
       "path": "Locations/机构列表.md"
     },
@@ -85,20 +109,8 @@
       "path": "Locations/Institutes/中国科学院大学.md"
     },
     {
-      "basename": "00. 文件管理",
-      "path": "40 - Obsidian/主页/00. 文件管理.md"
-    },
-    {
       "basename": "Design concepts",
       "path": "Design concepts.md"
-    },
-    {
-      "basename": "学者列表",
-      "path": "Persons/学者列表.md"
-    },
-    {
-      "basename": "00. 图书馆",
-      "path": "Inputs/00. 图书馆.md"
     },
     {
       "basename": "逃避主义",
@@ -111,10 +123,6 @@
     {
       "basename": "douban_book",
       "path": "40 - Obsidian/模板/douban_book.md"
-    },
-    {
-      "basename": "个人履历",
-      "path": "Persons/个人履历.md"
     },
     {
       "basename": "博士生",
@@ -177,10 +185,6 @@
       "path": "Features Road Maps.md"
     },
     {
-      "basename": "侧边栏音乐播放器",
-      "path": "40 - Obsidian/侧边栏/侧边栏音乐播放器.md"
-    },
-    {
       "basename": "社会—生态系统适应性治理研究进展与展望",
       "path": "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md"
     },
@@ -195,10 +199,6 @@
     {
       "basename": "Improving representation of collective memory in socio‐hydrological models and new insights into flood risk management",
       "path": "Inputs/Zotero/Improving representation of collective memory in socio‐hydrological models and new insights into flood risk management.md"
-    },
-    {
-      "basename": "Zotero论文导入模板",
-      "path": "40 - Obsidian/模板/Zotero论文导入模板.md"
     }
   ],
   "omittedPaths": [],

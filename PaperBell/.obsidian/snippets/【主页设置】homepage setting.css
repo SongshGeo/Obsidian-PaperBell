@@ -96,7 +96,7 @@ button:hover {
 }
 
 button {
-  background-color: #acacac80;
+  background-color: #053B50;
 }
 
 /* dataview 背景设置 */
@@ -222,7 +222,7 @@ a, .markdown-preview-view .internal-link {
   display: flex;
   width: 100%;
   display: block;
-  background-color: #f7b2b280 !important ;
+  background-color: #176B87 !important ;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -301,7 +301,7 @@ a, .markdown-preview-view .internal-link {
 
 
 .myhome ul ul li:nth-child(even) {
-  background-color: #fffbed !important;
+  background-color: #EEEEEE !important;
 }
 
 .myhome ul>li:hover {
@@ -315,8 +315,8 @@ a, .markdown-preview-view .internal-link {
 }
 
 .theme-dark .myhome ul ul li:hover {
-  border-color: #696969e1 !important;
-  border-left: 1px solid #696969e1 !important;
+  border-color: #176B87 !important;
+  border-left: 1px solid #176B87 !important;
 }
 
 .myhome ul ul li .task-list-item-checkbox {
@@ -488,7 +488,7 @@ a, .markdown-preview-view .internal-link {
   overflow: visible ;
   margin:0;
   break-inside: avoid;
-  column-rule: 1px solid #d4d2d2; 
+  column-rule: 1px solid #176B87; 
 }
 .admonition-col3>.admonition-content-holder>.admonition-content ol {	
   margin-top: -0.25em;
