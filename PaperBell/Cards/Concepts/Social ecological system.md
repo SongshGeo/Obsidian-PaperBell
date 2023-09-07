@@ -1,7 +1,7 @@
 ---
 name: social ecological system
 alias:
-- "Social-ecological system"
+- "social-ecological system"
 - 社会-生态系统
 ch: 社会-生态系统
 tags:
@@ -12,11 +12,16 @@ tags:
 
 ## 相关论文
 ```dataviewjs
-let name = dv.current().file.name
+let names = dv.current().alias ? dv.current().alias : [];
+names.push(dv.current().name)
+
+// 参考 https://forum.obsidian.md/t/for-loops-and-dataviewjs/46284
+// every: 每个要素都在；
+// some: 某个要素在
 
 dv.table(["论文","期刊","年份"],
 dv.pages(`#paper`)
-	.where(b => b.concepts.includes(name))
+	.where(t => names.some(x => t.concepts.includes(x)))
 	.map(b => [b.file.link, b.journal, b.paper_date])
 	.sort(b => b.paper_date, 'desc')
 )

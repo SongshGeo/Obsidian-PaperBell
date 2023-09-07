@@ -4,32 +4,23 @@
     "type": "split",
     "children": [
       {
-        "id": "48236c2cf41c1c4a",
+        "id": "28355f7117df885a",
         "type": "tabs",
         "children": [
           {
-            "id": "19e699e12d6d06cc",
-            "type": "leaf",
-            "state": {
-              "type": "memos_view",
-              "state": {}
-            }
-          },
-          {
-            "id": "0fa2d4c5cf3f8c14",
+            "id": "a2f042e32115d0ea",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Persons/个人履历.md",
-                "mode": "preview",
+                "file": "README.md",
+                "mode": "source",
                 "backlinks": false,
                 "source": false
               }
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -89,7 +80,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Persons/个人履历.md"
+                "file": "README.md"
               }
             }
           },
@@ -144,7 +135,7 @@
       {
         "id": "4294f9e389e0008a",
         "type": "tabs",
-        "dimension": 36.87089715536105,
+        "dimension": 54.80880648899189,
         "children": [
           {
             "id": "6ad73b7dcf2a71b6",
@@ -152,7 +143,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Persons/个人履历.md",
+                "file": "README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -185,7 +176,7 @@
       {
         "id": "4fce416981e6cec9",
         "type": "tabs",
-        "dimension": 63.12910284463894,
+        "dimension": 45.19119351100811,
         "children": [
           {
             "id": "3191225bb556d597",
@@ -238,53 +229,52 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "0fa2d4c5cf3f8c14",
+  "active": "a2f042e32115d0ea",
   "lastOpenFiles": [
-    "Persons/Scholars/Pablo A. Astudillo-Estévez.md",
-    "40 - Obsidian/主页/00. 导航.md",
-    "40 - Obsidian/主页/00. 主页.md",
-    "Persons/学者列表.md",
-    "Locations/机构列表.md",
+    "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md",
     "Persons/个人履历.md",
-    "Persons/Scholars/贺舟.md",
-    "40 - Obsidian/侧边栏/侧边栏音乐播放器.md",
-    "40 - Obsidian/主页/00. 文件管理.md",
+    "README.md",
+    "40 - Obsidian/img/文献阅读笔记.png",
+    "完善路线.md",
+    "Projects/Scholar/博士后.md",
+    "Projects/Scholar/博士生.md",
+    "Projects/Scholar/本科生.md",
+    "40 - Obsidian/主页/00. 导航.md",
+    "快速开始.md",
+    "40 - Obsidian/img/主页追踪进度.png",
+    "40 - Obsidian/img/个人履历.png",
+    "是否适用于你.md",
+    "Locations/机构列表.md",
+    "Cards/Concepts/social ecological system.md",
+    "设计理念.md",
+    "40 - Obsidian/img/阅读论文标注方法.png",
+    "40 - Obsidian/img/追踪项目进度和动态.png",
+    "40 - Obsidian/img/学者关联相关论文.png",
+    "40 - Obsidian/img/概念墙.png",
+    "40 - Obsidian/img/写作与参考.png",
+    "40 - Obsidian/img/概念关联论文与想法.png",
+    "40 - Obsidian/img/整理追踪的学者.png",
+    "40 - Obsidian/img",
     "Projects/Scholar/参与的项目.md",
-    "00 - 每日日记/DailyNote/2023年09月07日.md",
-    "Inputs/00. 图书馆.md",
-    "00 - 每日日记/DailyNote/2023年08月29日.md",
-    "秦某.md",
-    "Inputs/Zotero/Improving representation of collective memory in socio‐hydrological models and new insights into flood risk management.md",
-    "Outputs/结果探讨.md",
-    "Inputs/Books/逃避主义.md",
+    "Projects/Scholar/我的第一个项目.md",
+    "Inputs/Zotero/A framework for mapping and comparing behavioural theories in models of social-ecological systems.md",
+    "Persons/Scholars/Marco A. Janssen.md",
+    "Cards/Methods/agent-based model.md",
+    "Locations/Institutes/中山大学.md",
+    "40 - Obsidian/主页/00. 主页.md",
+    "40 - Obsidian/主页/00. 文件管理.md",
+    "Outputs/数据方法.md",
     "Cards/概念墙.md",
-    "Outputs/01 - Introduction/卷死了.md",
-    "Outputs/03 - Results/当今民工.md",
-    "Outputs/01 - Introduction",
     "Outputs/04 - Discussion/关于科研生活的探讨.md",
     "Outputs/引言讨论.md",
-    "Inputs/Zotero/A framework for mapping and comparing behavioural theories in models of social-ecological systems.md",
-    "Outputs/02 - Methods/多主体建模的ODD框架.md",
-    "Locations/Places/Cotacachi.md",
-    "Locations/Institutes/Universidad San Francisco de Quito.md",
+    "Outputs/01 - Introduction",
     "Cards/Methods",
     "40 - Obsidian/脚本/QuickAdd/moviefromdouban.js",
     "40 - Obsidian/脚本/QuickAdd/bookfromdouban.js",
     "40 - Obsidian/脚本/moviefromdouban.js",
     "40 - Obsidian/脚本/bookfromdouban.js",
-    "40 - Obsidian/附件/科学革命的结构.jpg",
     "未命名",
-    "40 - Obsidian/附件/banners/library.gif",
     "Projects/Supporter",
-    "Projects/SongshGeo",
-    "Outputs/04 - Discussion",
-    "40 - Obsidian/附件/banners/global-tracking-banner.jpg",
-    "40 - Obsidian/附件/banners/book-banner.gif",
-    "40 - Obsidian/附件/100911654141903_.pic.jpg",
-    "40 - Obsidian/附件/50021653820977_.jpg.jpg",
-    "40 - Obsidian/附件/Screen Shot 2022-06-02 at 15.08.21.png",
-    "40 - Obsidian/附件/Screen Shot 2022-06-02 at 15.10.29.png",
-    "40 - Obsidian/附件/百里守约绝影神枪.png",
-    "40 - Obsidian/附件/163081654582741_.pic.jpg"
+    "Projects/SongshGeo"
   ]
 }
