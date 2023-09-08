@@ -6,6 +6,9 @@
 2. 🙋 如果你确定这个仓库适用于你，让我们试着从这里[快速开始](PaperBell/快速开始.md)
 3. 🎓 最后，决定如果长期使用本库，这里有一些关于本仓库的[设计理念](PaperBell/设计理念.md)
 4. 🗺️ 如果你决定使用`PaperBell`长期管理学术笔记，欢迎关注我的[完善路线](PaperBell/完善路线.md)
+
+[仓库最新下载地址](https://github.com/SongshGeo/Obsidian-PaperBell/releases)
+
 ## Features
 1. **主页**：
 	- 追踪项目进度
