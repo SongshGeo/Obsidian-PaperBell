@@ -4,17 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "a94ec6e6a9fe4998",
+        "id": "5f03452e98bf1d0a",
         "type": "tabs",
         "children": [
           {
-            "id": "ab99c698a31dfb81",
+            "id": "6bfed2bb764704b3",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Cards/概念墙.md",
-                "mode": "preview",
+                "file": "README.md",
+                "mode": "source",
                 "backlinks": false,
                 "source": false
               }
@@ -32,7 +32,7 @@
       {
         "id": "404b714244a12346",
         "type": "tabs",
-        "dimension": 49.57805907172996,
+        "dimension": 62.83422459893048,
         "children": [
           {
             "id": "7408259d9b92b5f4",
@@ -64,7 +64,7 @@
       {
         "id": "98f0d4a0722ccaa3",
         "type": "tabs",
-        "dimension": 29.324894514767934,
+        "dimension": 37.165775401069524,
         "children": [
           {
             "id": "a2ea7e19451c5b4f",
@@ -80,7 +80,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Cards/概念墙.md"
+                "file": "README.md"
               }
             }
           },
@@ -95,28 +95,6 @@
                 "mode": "preview",
                 "backlinks": false,
                 "source": true
-              },
-              "pinned": true
-            }
-          }
-        ]
-      },
-      {
-        "id": "844b639bf0c617ef",
-        "type": "tabs",
-        "dimension": 21.097046413502106,
-        "children": [
-          {
-            "id": "40d7cbe7945b1b5c",
-            "type": "leaf",
-            "pinned": true,
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "40 - Obsidian/侧边栏/侧边栏音乐播放器.md",
-                "mode": "preview",
-                "backlinks": false,
-                "source": false
               },
               "pinned": true
             }
@@ -142,7 +120,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Cards/概念墙.md",
+                "file": "README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -160,14 +138,6 @@
               "type": "calendar",
               "state": {}
             }
-          },
-          {
-            "id": "6783ab816b124685",
-            "type": "leaf",
-            "state": {
-              "type": "ReferenceListView",
-              "state": {}
-            }
           }
         ],
         "currentTab": 1
@@ -177,27 +147,6 @@
         "type": "tabs",
         "dimension": 63.12910284463894,
         "children": [
-          {
-            "id": "3191225bb556d597",
-            "type": "leaf",
-            "state": {
-              "type": "tasks_timeline_view",
-              "state": {}
-            }
-          },
-          {
-            "id": "2eb6db1a0dabc006",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "40 - Obsidian/侧边栏/收件箱.md",
-                "mode": "preview",
-                "backlinks": false,
-                "source": false
-              }
-            }
-          },
           {
             "id": "4354bd31fa04df0e",
             "type": "leaf",
@@ -214,49 +163,51 @@
   },
   "left-ribbon": {
     "hiddenItems": {
-      "obsidian-excalidraw-plugin:新建 Excalidraw 绘图": false,
       "switcher:打开快速切换": false,
       "graph:查看关系图谱": false,
       "canvas:新建白板": false,
       "command-palette:打开命令面板": false,
       "markdown-importer:打开 Markdown 格式转换器": false,
       "workspaces:管理工作区布局": false,
-      "obsidian-map-view:Open map view": false,
-      "obsidian-memos:Memos": false,
       "periodic-notes:Open today": false,
+      "templater-obsidian:Templater": false,
+      "obsidian-projects:Open projects": false,
+      "obsidian-excalidraw-plugin:新建绘图文件": false,
+      "soundscapes:Soundscapes: My Music": false,
+      "obsidian-map-view:Open map view": false,
       "homepage:Open homepage": false,
-      "templater-obsidian:Templater": false
+      "obsidian-memos:Thino": false
     }
   },
-  "active": "ab99c698a31dfb81",
+  "active": "6bfed2bb764704b3",
   "lastOpenFiles": [
-    "Cards/Concepts/Social ecological system.md",
-    "Cards/概念墙.md",
-    "Cards/Methods/agent-based model.md",
-    "Inputs/Zotero/Sediment transport under increasing anthropogenic stress - Regime shifts within the Yellow River, China.md",
-    "Persons/个人履历.md",
-    "Inputs/Zotero/Improving representation of collective memory in socio‐hydrological models and new insights into flood risk management.md",
-    "Projects/Scholar/我的第一个项目.md",
-    "Projects/Scholar/参与的项目.md",
-    "Projects/Scholar/博士生.md",
-    "Projects/Scholar/博士后.md",
-    "快速开始.md",
-    "40 - Obsidian/主页/00. 主页.md",
-    "Outputs/04 - Discussion/关于科研生活的探讨.md",
-    "40 - Obsidian/主页/00. 导航.md",
     "完善路线.md",
     "README.md",
-    "Inputs/00. 图书馆.md",
-    "Inputs/Cubox/从福岛核废水排放危机，看公众科学的困境.md",
-    "设计理念.md",
+    "Persons/Scholars/Marco A. Janssen.md",
+    "Persons/Scholars/宋爽.md",
+    "Locations/Institutes/北京师范大学.md",
+    "Locations/Institutes/Arizona State University.md",
     "Locations/机构列表.md",
-    "是否适用于你.md",
-    "社会-生态系统.md",
-    "Outputs/02 - Methods/多主体建模的包.md",
-    "Outputs/03 - Results/当今民工.md",
-    "Locations/Institutes/中山大学.md",
+    "40 - Obsidian/模板/机构模板.md",
+    "40 - Obsidian/模板/季度OKR模板.md",
+    "40 - Obsidian/模板/每周周记模板.md",
+    "40 - Obsidian/模板/每日日记模板.md",
+    "Inputs/Zotero/song2023a.md",
+    "40 - Obsidian/模板/Zotero论文导入模板.md",
+    "40 - Obsidian/侧边栏/收件箱.md",
+    "40 - Obsidian/react组件/music and birthday countdown 1.md",
+    "40 - Obsidian/react组件/00. React使用说明.md",
+    "40 - Obsidian/侧边栏/侧边栏音乐播放器.md",
+    "Cards/概念墙.md",
+    "40 - Obsidian/模板/zt-colored.eta.md",
+    "40 - Obsidian/模板/zt-cite2.eta.md",
+    "40 - Obsidian/模板/zt-cite.eta.md",
+    "40 - Obsidian/模板/zt-annot.eta.md",
+    "40 - Obsidian/模板/zt-annots.eta.md",
+    "40 - Obsidian/模板/zt-field.eta.md",
+    "40 - Obsidian/模板/zt-note.eta.md",
+    "Cards/Concepts/Social ecological system.md",
     "40 - Obsidian/附件/1ED114F3-09B9-4A83-B2ED-E921F0F47344_1_105_c.jpeg",
-    "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md",
     "40 - Obsidian/img/文献阅读笔记.png",
     "40 - Obsidian/img/主页追踪进度.png",
     "40 - Obsidian/img/个人履历.png",

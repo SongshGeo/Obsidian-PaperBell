@@ -1,0 +1,25 @@
+{
+  "debounceTimeout": 300,
+  "ignoreOpenFiles": false,
+  "ignoreForceViewAll": false,
+  "folders": [
+    {
+      "folder": "Inputs/Zotero",
+      "viewMode": "obsidianUIMode: preview"
+    },
+    {
+      "folder": "Locations/Institutes",
+      "viewMode": "obsidianUIMode: preview"
+    },
+    {
+      "folder": "",
+      "viewMode": ""
+    }
+  ],
+  "files": [
+    {
+      "filePattern": "",
+      "viewMode": ""
+    }
+  ]
+}

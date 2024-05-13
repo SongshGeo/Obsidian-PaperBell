@@ -23,10 +23,11 @@
   "tasks-calendar-wrapper",
   "obsidian-minimal-settings",
   "obsidian-map-view",
-  "obsidian-zotero-desktop-connector",
   "tag-wrangler",
   "obsidian-pandoc-reference-list",
   "obsidian-excalidraw-plugin",
   "obsidian-projects",
-  "zotlit"
+  "zotlit",
+  "soundscapes",
+  "obsidian-view-mode-by-frontmatter"
 ]

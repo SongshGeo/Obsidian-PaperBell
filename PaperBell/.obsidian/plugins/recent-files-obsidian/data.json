@@ -1,16 +1,92 @@
 {
   "recentFiles": [
     {
+      "basename": "README",
+      "path": "README.md"
+    },
+    {
+      "basename": "Marco A. Janssen",
+      "path": "Persons/Scholars/Marco A. Janssen.md"
+    },
+    {
+      "basename": "宋爽",
+      "path": "Persons/Scholars/宋爽.md"
+    },
+    {
+      "basename": "北京师范大学",
+      "path": "Locations/Institutes/北京师范大学.md"
+    },
+    {
+      "basename": "Arizona State University",
+      "path": "Locations/Institutes/Arizona State University.md"
+    },
+    {
+      "basename": "机构列表",
+      "path": "Locations/机构列表.md"
+    },
+    {
+      "basename": "机构模板",
+      "path": "40 - Obsidian/模板/机构模板.md"
+    },
+    {
+      "basename": "季度OKR模板",
+      "path": "40 - Obsidian/模板/季度OKR模板.md"
+    },
+    {
+      "basename": "每周周记模板",
+      "path": "40 - Obsidian/模板/每周周记模板.md"
+    },
+    {
+      "basename": "每日日记模板",
+      "path": "40 - Obsidian/模板/每日日记模板.md"
+    },
+    {
+      "basename": "song2023a",
+      "path": "Inputs/Zotero/song2023a.md"
+    },
+    {
+      "basename": "music and birthday countdown 1",
+      "path": "40 - Obsidian/react组件/music and birthday countdown 1.md"
+    },
+    {
+      "basename": "00. React使用说明",
+      "path": "40 - Obsidian/react组件/00. React使用说明.md"
+    },
+    {
       "basename": "概念墙",
       "path": "Cards/概念墙.md"
     },
     {
-      "basename": "Sediment transport under increasing anthropogenic stress - Regime shifts within the Yellow River, China",
-      "path": "Inputs/Zotero/Sediment transport under increasing anthropogenic stress - Regime shifts within the Yellow River, China.md"
+      "basename": "zt-colored.eta",
+      "path": "40 - Obsidian/模板/zt-colored.eta.md"
     },
     {
-      "basename": "个人履历",
-      "path": "Persons/个人履历.md"
+      "basename": "zt-cite2.eta",
+      "path": "40 - Obsidian/模板/zt-cite2.eta.md"
+    },
+    {
+      "basename": "zt-cite.eta",
+      "path": "40 - Obsidian/模板/zt-cite.eta.md"
+    },
+    {
+      "basename": "zt-annot.eta",
+      "path": "40 - Obsidian/模板/zt-annot.eta.md"
+    },
+    {
+      "basename": "zt-annots.eta",
+      "path": "40 - Obsidian/模板/zt-annots.eta.md"
+    },
+    {
+      "basename": "zt-field.eta",
+      "path": "40 - Obsidian/模板/zt-field.eta.md"
+    },
+    {
+      "basename": "zt-note.eta",
+      "path": "40 - Obsidian/模板/zt-note.eta.md"
+    },
+    {
+      "basename": "Sediment transport under increasing anthropogenic stress - Regime shifts within the Yellow River, China",
+      "path": "Inputs/Zotero/Sediment transport under increasing anthropogenic stress - Regime shifts within the Yellow River, China.md"
     },
     {
       "basename": "快速开始",
@@ -29,10 +105,6 @@
       "path": "完善路线.md"
     },
     {
-      "basename": "README",
-      "path": "README.md"
-    },
-    {
       "basename": "00. 图书馆",
       "path": "Inputs/00. 图书馆.md"
     },
@@ -43,10 +115,6 @@
     {
       "basename": "设计理念",
       "path": "设计理念.md"
-    },
-    {
-      "basename": "机构列表",
-      "path": "Locations/机构列表.md"
     },
     {
       "basename": "是否适用于你",
@@ -101,10 +169,6 @@
       "path": "Inputs/Zotero/A framework for mapping and comparing behavioural theories in models of social-ecological systems.md"
     },
     {
-      "basename": "Marco A. Janssen",
-      "path": "Persons/Scholars/Marco A. Janssen.md"
-    },
-    {
       "basename": "agent-based model",
       "path": "Cards/Methods/agent-based model.md"
     },
@@ -133,72 +197,8 @@
       "path": "Persons/Scholars/Pablo A. Astudillo-Estévez.md"
     },
     {
-      "basename": "侧边栏音乐播放器",
-      "path": "40 - Obsidian/侧边栏/侧边栏音乐播放器.md"
-    },
-    {
       "basename": "2023年09月07日",
       "path": "00 - 每日日记/DailyNote/2023年09月07日.md"
-    },
-    {
-      "basename": "结果探讨",
-      "path": "Outputs/结果探讨.md"
-    },
-    {
-      "basename": "卷死了",
-      "path": "Outputs/01 - Introduction/卷死了.md"
-    },
-    {
-      "basename": "Cotacachi",
-      "path": "Locations/Places/Cotacachi.md"
-    },
-    {
-      "basename": "中山大学",
-      "path": "Locations/Institutes/中山大学.md"
-    },
-    {
-      "basename": "Universidad San Francisco de Quito",
-      "path": "Locations/Institutes/Universidad San Francisco de Quito.md"
-    },
-    {
-      "basename": "中国科学院大学",
-      "path": "Locations/Institutes/中国科学院大学.md"
-    },
-    {
-      "basename": "逃避主义",
-      "path": "Inputs/Books/逃避主义.md"
-    },
-    {
-      "basename": "科学革命的结构",
-      "path": "Inputs/Books/科学革命的结构.md"
-    },
-    {
-      "basename": "douban_book",
-      "path": "40 - Obsidian/模板/douban_book.md"
-    },
-    {
-      "basename": "2023年06月22日",
-      "path": "00 - 每日日记/DailyNote/2023年06月22日.md"
-    },
-    {
-      "basename": "2023年05月19日",
-      "path": "00 - 每日日记/DailyNote/2023年05月19日.md"
-    },
-    {
-      "basename": "项目模板",
-      "path": "40 - Obsidian/模板/项目模板.md"
-    },
-    {
-      "basename": "术语模板",
-      "path": "40 - Obsidian/模板/术语模板.md"
-    },
-    {
-      "basename": "当今民工 2023-09-06 21.42.36.excalidraw",
-      "path": "40 - Obsidian/附件/当今民工 2023-09-06 21.42.36.excalidraw.md"
-    },
-    {
-      "basename": "论文库",
-      "path": "Inputs/论文库.md"
     }
   ],
   "omittedPaths": [],

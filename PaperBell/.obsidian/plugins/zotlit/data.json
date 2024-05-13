@@ -1,0 +1,27 @@
+{
+  "logLevel": "INFO",
+  "citationEditorSuggester": true,
+  "showCitekeyInSuggester": true,
+  "literatureNoteFolder": "Inputs/Zotero",
+  "enableServer": false,
+  "serverPort": 9091,
+  "serverHostname": "127.0.0.1",
+  "template": {
+    "folder": "40 - Obsidian/模板",
+    "templates": {
+      "filename": "<%= it.citekey ?? it.DOI ?? it.title ?? it.key %>.md"
+    }
+  },
+  "updateAnnotBlock": false,
+  "updateOverwrite": false,
+  "autoPairEta": false,
+  "autoTrim": [
+    false,
+    false
+  ],
+  "autoRefresh": true,
+  "zoteroDataDir": "/Users/songshgeo/Zotero",
+  "citationLibrary": 1,
+  "imgExcerptImport": "symlink",
+  "imgExcerptPath": "ZtImgExcerpt"
+}

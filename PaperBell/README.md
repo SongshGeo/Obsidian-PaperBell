@@ -1,5 +1,7 @@
 <div align="center"><img src="https://firebasestorage.googleapis.com/v0/b/swimmio.appspot.com/o/repositories%2FZ2l0aHViJTNBJTNBUGFwZXJCZWxsJTNBJTNBU29uZ3NoR2Vv%2Fec47d268-80c8-4df5-bf62-1c37a2f43a3b.gif?alt=media&token=bb7fe1a8-5a44-4364-9032-fe20a563bad4" style="width:'100%'"/></div>
 
+`PaperBell`: Wisely
+
 👋 大家好，欢迎下载和使用 `PaperBell` 示例仓库。制作这个仓库的初衷，是将自己过去两年间使用 Obsidian 管理学术生活的思考整理分享给大家。
 
 1. 🤔️ 这个仓库是根据自己的需求建立的，请先判断他[[是否适用于你]]
@@ -39,3 +41,6 @@
 - 感谢 Obsidian 活跃的社区开发出一系列实用的插件，尤其是 `Dataview`, `QuickAdd`, `Tasks`, `Calendar`, `Map View`等...，让 `PaperBell` 的核心功能得以实现。
 - 感谢 [RainBell 示例仓库](https://github.com/Rainbell129/Obsidian-Homepage)的开发者允许本项目在其基础上进行二次开发。
 - 有任何问题欢迎联系我 songshgeo[at]gmail[dot]com
+
+## 关于作者
+
