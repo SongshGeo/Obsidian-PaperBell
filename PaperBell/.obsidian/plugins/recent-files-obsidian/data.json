@@ -1,20 +1,76 @@
 {
   "recentFiles": [
     {
-      "basename": "README",
-      "path": "README.md"
+      "basename": "概念墙",
+      "path": "Cards/概念墙.md"
     },
     {
-      "basename": "社会—生态系统适应性治理研究进展与展望",
-      "path": "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md"
+      "basename": "Sediment transport under increasing anthropogenic stress - Regime shifts within the Yellow River, China",
+      "path": "Inputs/Zotero/Sediment transport under increasing anthropogenic stress - Regime shifts within the Yellow River, China.md"
     },
     {
       "basename": "个人履历",
       "path": "Persons/个人履历.md"
     },
     {
+      "basename": "快速开始",
+      "path": "快速开始.md"
+    },
+    {
+      "basename": "00. 主页",
+      "path": "40 - Obsidian/主页/00. 主页.md"
+    },
+    {
+      "basename": "00. 导航",
+      "path": "40 - Obsidian/主页/00. 导航.md"
+    },
+    {
       "basename": "完善路线",
       "path": "完善路线.md"
+    },
+    {
+      "basename": "README",
+      "path": "README.md"
+    },
+    {
+      "basename": "00. 图书馆",
+      "path": "Inputs/00. 图书馆.md"
+    },
+    {
+      "basename": "从福岛核废水排放危机，看公众科学的困境",
+      "path": "Inputs/Cubox/从福岛核废水排放危机，看公众科学的困境.md"
+    },
+    {
+      "basename": "设计理念",
+      "path": "设计理念.md"
+    },
+    {
+      "basename": "机构列表",
+      "path": "Locations/机构列表.md"
+    },
+    {
+      "basename": "是否适用于你",
+      "path": "是否适用于你.md"
+    },
+    {
+      "basename": "Social ecological system",
+      "path": "Cards/Concepts/Social ecological system.md"
+    },
+    {
+      "basename": "多主体建模的ODD框架",
+      "path": "Outputs/02 - Methods/多主体建模的ODD框架.md"
+    },
+    {
+      "basename": "多主体建模的包",
+      "path": "Outputs/02 - Methods/多主体建模的包.md"
+    },
+    {
+      "basename": "当今民工",
+      "path": "Outputs/03 - Results/当今民工.md"
+    },
+    {
+      "basename": "社会—生态系统适应性治理研究进展与展望",
+      "path": "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md"
     },
     {
       "basename": "博士后",
@@ -29,28 +85,8 @@
       "path": "Projects/Scholar/本科生.md"
     },
     {
-      "basename": "00. 导航",
-      "path": "40 - Obsidian/主页/00. 导航.md"
-    },
-    {
-      "basename": "快速开始",
-      "path": "快速开始.md"
-    },
-    {
-      "basename": "机构列表",
-      "path": "Locations/机构列表.md"
-    },
-    {
       "basename": "social ecological system",
       "path": "Cards/Concepts/social ecological system.md"
-    },
-    {
-      "basename": "设计理念",
-      "path": "设计理念.md"
-    },
-    {
-      "basename": "是否适用于你",
-      "path": "是否适用于你.md"
     },
     {
       "basename": "参与的项目",
@@ -73,20 +109,12 @@
       "path": "Cards/Methods/agent-based model.md"
     },
     {
-      "basename": "00. 主页",
-      "path": "40 - Obsidian/主页/00. 主页.md"
-    },
-    {
       "basename": "00. 文件管理",
       "path": "40 - Obsidian/主页/00. 文件管理.md"
     },
     {
       "basename": "数据方法",
       "path": "Outputs/数据方法.md"
-    },
-    {
-      "basename": "概念墙",
-      "path": "Cards/概念墙.md"
     },
     {
       "basename": "关于科研生活的探讨",
@@ -113,24 +141,12 @@
       "path": "00 - 每日日记/DailyNote/2023年09月07日.md"
     },
     {
-      "basename": "00. 图书馆",
-      "path": "Inputs/00. 图书馆.md"
-    },
-    {
       "basename": "结果探讨",
       "path": "Outputs/结果探讨.md"
     },
     {
       "basename": "卷死了",
       "path": "Outputs/01 - Introduction/卷死了.md"
-    },
-    {
-      "basename": "当今民工",
-      "path": "Outputs/03 - Results/当今民工.md"
-    },
-    {
-      "basename": "多主体建模的ODD框架",
-      "path": "Outputs/02 - Methods/多主体建模的ODD框架.md"
     },
     {
       "basename": "Cotacachi",
@@ -143,10 +159,6 @@
     {
       "basename": "Universidad San Francisco de Quito",
       "path": "Locations/Institutes/Universidad San Francisco de Quito.md"
-    },
-    {
-      "basename": "多主体建模的包",
-      "path": "Outputs/02 - Methods/多主体建模的包.md"
     },
     {
       "basename": "中国科学院大学",
@@ -187,18 +199,6 @@
     {
       "basename": "论文库",
       "path": "Inputs/论文库.md"
-    },
-    {
-      "basename": "学术哲学的邀请—在学术中，何必恐惧飞翔！ 精选",
-      "path": "Inputs/Cubox/学术哲学的邀请—在学术中，何必恐惧飞翔！ 精选.md"
-    },
-    {
-      "basename": "北京师范大学",
-      "path": "Locations/Institutes/北京师范大学.md"
-    },
-    {
-      "basename": "从福岛核废水排放危机，看公众科学的困境",
-      "path": "Inputs/Cubox/从福岛核废水排放危机，看公众科学的困境.md"
     }
   ],
   "omittedPaths": [],

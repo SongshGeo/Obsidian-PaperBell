@@ -4,17 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "28355f7117df885a",
+        "id": "a94ec6e6a9fe4998",
         "type": "tabs",
         "children": [
           {
-            "id": "a2f042e32115d0ea",
+            "id": "ab99c698a31dfb81",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "README.md",
-                "mode": "source",
+                "file": "Cards/概念墙.md",
+                "mode": "preview",
                 "backlinks": false,
                 "source": false
               }
@@ -80,7 +80,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "README.md"
+                "file": "Cards/概念墙.md"
               }
             }
           },
@@ -99,8 +99,7 @@
               "pinned": true
             }
           }
-        ],
-        "currentTab": 2
+        ]
       },
       {
         "id": "844b639bf0c617ef",
@@ -126,7 +125,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 234.5
+    "width": 200.5
   },
   "right": {
     "id": "61191f8ea8fb7606",
@@ -135,7 +134,7 @@
       {
         "id": "4294f9e389e0008a",
         "type": "tabs",
-        "dimension": 54.80880648899189,
+        "dimension": 36.87089715536105,
         "children": [
           {
             "id": "6ad73b7dcf2a71b6",
@@ -143,7 +142,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "README.md",
+                "file": "Cards/概念墙.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -176,7 +175,7 @@
       {
         "id": "4fce416981e6cec9",
         "type": "tabs",
-        "dimension": 45.19119351100811,
+        "dimension": 63.12910284463894,
         "children": [
           {
             "id": "3191225bb556d597",
@@ -229,44 +228,45 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "a2f042e32115d0ea",
+  "active": "ab99c698a31dfb81",
   "lastOpenFiles": [
-    "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md",
+    "Cards/Concepts/Social ecological system.md",
+    "Cards/概念墙.md",
+    "Cards/Methods/agent-based model.md",
+    "Inputs/Zotero/Sediment transport under increasing anthropogenic stress - Regime shifts within the Yellow River, China.md",
     "Persons/个人履历.md",
-    "README.md",
-    "40 - Obsidian/img/文献阅读笔记.png",
-    "完善路线.md",
-    "Projects/Scholar/博士后.md",
+    "Inputs/Zotero/Improving representation of collective memory in socio‐hydrological models and new insights into flood risk management.md",
+    "Projects/Scholar/我的第一个项目.md",
+    "Projects/Scholar/参与的项目.md",
     "Projects/Scholar/博士生.md",
-    "Projects/Scholar/本科生.md",
-    "40 - Obsidian/主页/00. 导航.md",
+    "Projects/Scholar/博士后.md",
     "快速开始.md",
+    "40 - Obsidian/主页/00. 主页.md",
+    "Outputs/04 - Discussion/关于科研生活的探讨.md",
+    "40 - Obsidian/主页/00. 导航.md",
+    "完善路线.md",
+    "README.md",
+    "Inputs/00. 图书馆.md",
+    "Inputs/Cubox/从福岛核废水排放危机，看公众科学的困境.md",
+    "设计理念.md",
+    "Locations/机构列表.md",
+    "是否适用于你.md",
+    "社会-生态系统.md",
+    "Outputs/02 - Methods/多主体建模的包.md",
+    "Outputs/03 - Results/当今民工.md",
+    "Locations/Institutes/中山大学.md",
+    "40 - Obsidian/附件/1ED114F3-09B9-4A83-B2ED-E921F0F47344_1_105_c.jpeg",
+    "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md",
+    "40 - Obsidian/img/文献阅读笔记.png",
     "40 - Obsidian/img/主页追踪进度.png",
     "40 - Obsidian/img/个人履历.png",
-    "是否适用于你.md",
-    "Locations/机构列表.md",
-    "Cards/Concepts/social ecological system.md",
-    "设计理念.md",
     "40 - Obsidian/img/阅读论文标注方法.png",
     "40 - Obsidian/img/追踪项目进度和动态.png",
     "40 - Obsidian/img/学者关联相关论文.png",
     "40 - Obsidian/img/概念墙.png",
     "40 - Obsidian/img/写作与参考.png",
     "40 - Obsidian/img/概念关联论文与想法.png",
-    "40 - Obsidian/img/整理追踪的学者.png",
     "40 - Obsidian/img",
-    "Projects/Scholar/参与的项目.md",
-    "Projects/Scholar/我的第一个项目.md",
-    "Inputs/Zotero/A framework for mapping and comparing behavioural theories in models of social-ecological systems.md",
-    "Persons/Scholars/Marco A. Janssen.md",
-    "Cards/Methods/agent-based model.md",
-    "Locations/Institutes/中山大学.md",
-    "40 - Obsidian/主页/00. 主页.md",
-    "40 - Obsidian/主页/00. 文件管理.md",
-    "Outputs/数据方法.md",
-    "Cards/概念墙.md",
-    "Outputs/04 - Discussion/关于科研生活的探讨.md",
-    "Outputs/引言讨论.md",
     "Outputs/01 - Introduction",
     "Cards/Methods",
     "40 - Obsidian/脚本/QuickAdd/moviefromdouban.js",
