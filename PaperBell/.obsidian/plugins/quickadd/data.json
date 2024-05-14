@@ -2,9 +2,9 @@
   "choices": [
     {
       "id": "2610798c-4cdd-46bc-b2c0-a39f1f352efc",
-      "name": "每日日程",
+      "name": "每日总结",
       "type": "Capture",
-      "command": false,
+      "command": true,
       "appendLink": false,
       "captureTo": "00 - 每日日记/DailyNote/{{DATE:yyyy年MM月DD日}}.md",
       "captureToActiveFile": false,
@@ -15,11 +15,11 @@
       },
       "format": {
         "enabled": true,
-        "format": "- <time>{{DATE:HH:mm}}</time> {{VALUE}}"
+        "format": "- 总结:: {{VALUE}}"
       },
       "insertAfter": {
         "enabled": true,
-        "after": "## 日程",
+        "after": "## 概览",
         "insertAtEnd": true,
         "considerSubsections": false,
         "createIfNotFound": false,
@@ -34,70 +34,6 @@
       },
       "openFile": false,
       "openFileInMode": "default"
-    },
-    {
-      "id": "97a76d67-7e9b-4971-99e5-fdf0a5bdd1ee",
-      "name": "添加任务到收件箱",
-      "type": "Capture",
-      "command": false,
-      "appendLink": false,
-      "captureTo": "40 - Obsidian/侧边栏/收件箱.md",
-      "captureToActiveFile": false,
-      "createFileIfItDoesntExist": {
-        "enabled": false,
-        "createWithTemplate": false,
-        "template": ""
-      },
-      "format": {
-        "enabled": false,
-        "format": ""
-      },
-      "insertAfter": {
-        "enabled": false,
-        "after": "",
-        "insertAtEnd": false,
-        "considerSubsections": false,
-        "createIfNotFound": false,
-        "createIfNotFoundLocation": "top"
-      },
-      "prepend": false,
-      "task": true,
-      "openFileInNewTab": {
-        "enabled": false,
-        "direction": "vertical",
-        "focus": true
-      },
-      "openFile": false,
-      "openFileInMode": "source"
-    },
-    {
-      "id": "587ffde1-2d5d-4886-8257-ff6c7ab9d617",
-      "name": "新建代码",
-      "type": "Template",
-      "command": false,
-      "templatePath": "",
-      "fileNameFormat": {
-        "enabled": false,
-        "format": ""
-      },
-      "folder": {
-        "enabled": true,
-        "folders": [
-          "20 - 工作学习/代码库"
-        ],
-        "chooseWhenCreatingNote": false,
-        "createInSameFolderAsActiveFile": false
-      },
-      "appendLink": false,
-      "incrementFileName": false,
-      "openFileInNewTab": {
-        "enabled": false,
-        "direction": "vertical",
-        "focus": true
-      },
-      "openFile": true,
-      "openFileInMode": "default",
-      "fileExistsMode": "Nothing"
     },
     {
       "id": "70bc3b46-36b1-4ec1-9242-439eaba8f069",
@@ -119,22 +55,6 @@
       "type": "Macro",
       "command": true,
       "macroId": "ab5afef8-da82-4356-8c45-e7d89441273a"
-    },
-    {
-      "id": "2c3b6828-c13a-4d45-96c4-678118ce2101",
-      "name": "添加项目",
-      "type": "Multi",
-      "command": false,
-      "choices": [
-        {
-          "id": "37648506-0791-4ed5-ab22-315fc6643628",
-          "name": "学术项目",
-          "type": "Macro",
-          "command": true,
-          "macroId": "38b50e25-951b-4c63-a1ec-e63e205d89cd"
-        }
-      ],
-      "collapsed": false
     },
     {
       "id": "17482caf-7b7c-43cf-a81d-4944cc8c19cc",
@@ -230,7 +150,7 @@
             },
             "format": {
               "enabled": true,
-              "format": "---\nalias:\ngender: {{VALUE:性别}}\nbirthday:\nemail: \n- {{VALUE:邮箱}}\ntitle:\n- {{VALUE:称谓}}\nwebsite: {{VALUE:主页链接}}\nphoto: \"{{VALUE:照片链接}}\"\ntags: scholar\ninstitute:\n- {{VALUE:所在机构}}\n"
+              "format": "---\naliases:\ngender: {{VALUE:性别}}\nbirthday:\nemail: \n- {{VALUE:邮箱}}\ntitle:\n- {{VALUE:称谓}}\nwebsite: {{VALUE:主页链接}}\nphoto: \"{{VALUE:照片链接}}\"\ntags: scholar\ninstitute:\n- {{VALUE:所在机构}}\n"
             },
             "insertAfter": {
               "enabled": false,
@@ -567,11 +487,11 @@
             },
             "format": {
               "enabled": true,
-              "format": "---\nname: {{VALUE:name}}\nalias:\nch: {{VALUE:中文名}}\nframework:\n"
+              "format": "name: {{VALUE:name}}\nalias:\nch: {{VALUE:中文名}}\nframework:\n"
             },
             "insertAfter": {
               "enabled": true,
-              "after": "",
+              "after": "---",
               "insertAtEnd": false,
               "considerSubsections": false,
               "createIfNotFound": true,

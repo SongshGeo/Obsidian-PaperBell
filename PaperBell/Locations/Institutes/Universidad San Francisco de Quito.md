@@ -1,7 +1,7 @@
 
 ---
 abbr: USFQ
-alias:
+aliases:
 - 基多圣弗朗西斯科大学
 website: https://www.usfq.edu.ec/en
 location: [0.41219222429390345, -78.39830382347967]

@@ -1,7 +1,7 @@
 ---
 name: social ecological system
-alias:
-- "social-ecological system"
+aliases:
+- social-ecological system
 - 社会-生态系统
 ch: 社会-生态系统
 tags:
@@ -11,8 +11,10 @@ tags:
 社会-生态系统是典型的复杂系统 #S
 
 ## 相关论文
+
 ```dataviewjs
-let names = dv.current().alias ? dv.current().alias : [];
+
+let names = dv.current().aliases ? dv.current().aliases : [];
 names.push(dv.current().name)
 
 // 参考 https://forum.obsidian.md/t/for-loops-and-dataviewjs/46284
@@ -27,29 +29,41 @@ dv.pages(`#paper`)
 )
 ```
 ## 相关想法
+
 ```dataviewjs
 
-let folderChoicePath = "00 - 每日日记/DailyNote"
-const files = app.vault.getMarkdownFiles().filter(file => file.path.includes(folderChoicePath))
+let folderChoicePaths = ["00 - 每日日记/DailyNote", "Inputs", "Outputs", "Projects"];
+const specificTag = "#SC/想法"; // 指定要检查的标签，可以更改
 
-let names = dv.current().alias ? dv.current().alias : [];
-names.push(dv.current().name)
-names.push(dv.current().ch)
+const files = app.vault.getMarkdownFiles().filter(file => folderChoicePaths.some(path => file.path.includes(path)) );
 
+let names = dv.current().aliases ? dv.current().aliases : [];
+names.push(dv.current().name);
+names.push(dv.current().ch);
 
 let arr = files.map(async(file) => { 
-    const content = await app.vault.cachedRead(file) 
-    let lines = await content.split("\n").filter(line => names.some(name => line.includes(name)))
-    //console.log(lines) 
-    return ["[["+file.name.split(".")[0]+"]]", lines] 
-}) 
+    const content = await app.vault.cachedRead(file);
+    // 确保文件内容包含特定标签
+    if (content.includes(specificTag)) {
+        let lines = content.split("\n").filter(line => names.some(name => line.includes(name)));
+        return ["[[" + file.name.split(".")[0] + "]]", lines];
+    }
+    return null; // 如果不包含标签，返回 null
+}); 
 
 Promise.all(arr).then(values => { 
-    const beautify = values.map(value => { 
-        const temp = value[1].map(line => { return line }) //美化要重写
-        return [value[0],temp] 
-    }) 
-    const exists = beautify.filter(value => value[1][0] && value[0] != "[[未命名 10]]") .sort(value => value[0],'desc') 
-    dv.table(["日期", "动态"], exists) 
-})
+    // 过滤掉 null 结果
+    const filteredValues = values.filter(value => value != null);
+
+    const beautify = filteredValues.map(value => { 
+        const temp = value[1].map(line => line); // 美化处理
+        return [value[0], temp]; 
+    });
+
+    const exists = beautify.filter(value => value[1][0] && value[0] != "[[未命名 10]]")
+        .sort((a, b) => a[0].localeCompare(b[0])); // 排序处理修正为 localeCompare
+
+    dv.table(["日期", "动态"], exists);
+});
+
 ```

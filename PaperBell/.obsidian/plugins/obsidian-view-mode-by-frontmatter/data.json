@@ -12,11 +12,27 @@
       "viewMode": "obsidianUIMode: preview"
     },
     {
+      "folder": "Projects",
+      "viewMode": "obsidianUIMode: preview"
+    },
+    {
+      "folder": "Persons/Scholars",
+      "viewMode": "obsidianUIMode: preview"
+    },
+    {
+      "folder": "Places/Institutes",
+      "viewMode": "obsidianUIMode: preview"
+    },
+    {
       "folder": "",
       "viewMode": ""
     }
   ],
   "files": [
+    {
+      "filePattern": "00.*",
+      "viewMode": "obsidianUIMode: preview"
+    },
     {
       "filePattern": "",
       "viewMode": ""

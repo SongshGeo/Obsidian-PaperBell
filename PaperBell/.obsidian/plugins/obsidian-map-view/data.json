@@ -81,7 +81,7 @@
     }
   ],
   "mapControls": {
-    "filtersDisplayed": true,
+    "filtersDisplayed": false,
     "viewDisplayed": false,
     "presetsDisplayed": false
   },
@@ -95,6 +95,7 @@
       "preset": true
     }
   ],
+  "frontMatterKey": "location",
   "chosenMapMode": "auto",
   "saveHistory": true,
   "letZoomBeyondMax": false,

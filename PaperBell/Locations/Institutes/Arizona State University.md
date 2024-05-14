@@ -1,7 +1,7 @@
 ---
 name: Arizona State University
 abbr: ASU
-alias:
+aliases:
 - 亚利桑那州立大学
 website: https://www.asu.edu/
 location: [33.4213174, -111.93315932269833]

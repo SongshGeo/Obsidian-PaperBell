@@ -9,7 +9,7 @@
   "template": {
     "folder": "40 - Obsidian/模板",
     "templates": {
-      "filename": "<%= it.citekey ?? it.DOI ?? it.title ?? it.key %>.md"
+      "filename": "<%= it.title ?? it.citekey ?? it.DOI ?? it.key %>.md"
     }
   },
   "updateAnnotBlock": false,

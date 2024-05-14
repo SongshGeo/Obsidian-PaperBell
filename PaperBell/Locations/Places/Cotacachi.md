@@ -3,7 +3,7 @@ location: [0.3005297707253397, -78.26421272091355]
 name: Cotacachi
 banner: "40 - Obsidian/附件/banners/global-tracking-banner.jpg"
 banner_icon: 🌍
-alias: 
+aliases: 
 - 科塔卡奇
 tags:
 - city
@@ -18,7 +18,7 @@ tags:
 
 let folderChoicePath = "00 - 每日日记/DailyNote"
 const files = app.vault.getMarkdownFiles().filter(file => file.path.includes(folderChoicePath))
-let names = dv.current().alias ? dv.current().alias : [];
+let names = dv.current().aliases ? dv.current().aliases : [];
 names.push(dv.current().name)
 
 let arr = files.map(async(file) => { 

@@ -1,5 +1,5 @@
 ---
-alias:
+aliases:
 - Pablo
 gender: 男
 birthday:
@@ -43,7 +43,7 @@ following_date: 2023-09-07
 - 
 ## 相关论文
 ```dataviewjs
-let names = dv.current().alias ? dv.current().alias : [];
+let names = dv.current().aliases ? dv.current().aliases : [];
 names.push(dv.current().name)
 
 // 参考 https://forum.obsidian.md/t/for-loops-and-dataviewjs/46284
@@ -62,7 +62,7 @@ dv.pages(`#paper`)
 
 let folderChoicePath = "00 - 每日日记/DailyNote"
 const files = app.vault.getMarkdownFiles().filter(file => file.path.includes(folderChoicePath))
-let names = dv.current().alias ? dv.current().alias : [];
+let names = dv.current().aliases ? dv.current().aliases : [];
 names.push(dv.current().name)
 
 

@@ -14,7 +14,7 @@ app_version: 1.16.0
 ### 📄 PaperBell/Persons/Scholars/宋爽.md
 ```markdown
 1      ---
-2      alias:
+2      aliases:
 3      - Shuang Song
 4      gender: 男
 5      birthday:
@@ -56,7 +56,7 @@ app_version: 1.16.0
 ### 📄 PaperBell/Persons/Scholars/宋爽.md
 ```markdown
 48     ```dataviewjs
-49     let names = dv.current().alias ? dv.current().alias : [];
+49     let names = dv.current().aliases ? dv.current().aliases : [];
 50     names.push(dv.current().name)
 51     
 52     // 参考 https://forum.obsidian.md/t/for-loops-and-dataviewjs/46284
@@ -92,7 +92,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod nulla.
 65     
 66     let folderChoicePath = "00 - 每日日记/DailyNote"
 67     const files = app.vault.getMarkdownFiles().filter(file => file.path.includes(folderChoicePath))
-68     let names = dv.current().alias ? dv.current().alias : [];
+68     let names = dv.current().aliases ? dv.current().aliases : [];
 69     names.push(dv.current().name)
 70     
 71     

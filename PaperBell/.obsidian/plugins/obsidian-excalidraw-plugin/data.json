@@ -6,6 +6,7 @@
   "templateFilePath": "Excalidraw/Template.excalidraw",
   "scriptFolderPath": "Excalidraw/Scripts",
   "compress": false,
+  "decompressForMDView": true,
   "autosave": true,
   "autosaveInterval": 15000,
   "autosaveIntervalDesktop": 15000,
@@ -85,7 +86,7 @@
   "library2": {
     "type": "excalidrawlib",
     "version": 2,
-    "source": "https://github.com/zsviczian/obsidian-excalidraw-plugin/releases/tag/1.9.19",
+    "source": "https://github.com/zsviczian/obsidian-excalidraw-plugin/releases/tag/2.1.7",
     "libraryItems": []
   },
   "imageElementNotice": true,
@@ -97,7 +98,7 @@
   "mdCSS": "",
   "scriptEngineSettings": {},
   "defaultTrayMode": true,
-  "previousRelease": "2.1.7",
+  "previousRelease": "2.1.8",
   "showReleaseNotes": true,
   "showNewVersionNotification": true,
   "latexBoilerplate": "\\color{blue}",
@@ -740,5 +741,6 @@
   "areaZoomLimit": 1,
   "longPressDesktop": 500,
   "longPressMobile": 500,
+  "isDebugMode": false,
   "mathjaxSourceURL": "https://cdn.jsdelivr.net/npm/mathjax@3.2.1/es5/tex-svg.js"
 }

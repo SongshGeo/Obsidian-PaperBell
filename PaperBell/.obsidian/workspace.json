@@ -4,11 +4,32 @@
     "type": "split",
     "children": [
       {
-        "id": "5f03452e98bf1d0a",
+        "id": "f1682179569dddb6",
         "type": "tabs",
         "children": [
           {
-            "id": "6bfed2bb764704b3",
+            "id": "4746299fda043eba",
+            "type": "leaf",
+            "state": {
+              "type": "thino_view",
+              "state": {}
+            }
+          },
+          {
+            "id": "05e1b70d96284b43",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Outputs/设计理念.md",
+                "mode": "source",
+                "backlinks": false,
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "791027ddb9549e38",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -19,8 +40,48 @@
                 "source": false
               }
             }
+          },
+          {
+            "id": "ee7cb530d29f0a6b",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Outputs/使用PaperBell整理输出笔记.md",
+                "mode": "source",
+                "backlinks": false,
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "9a989c39e59003db",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Outputs/关于科研生活的探讨.md",
+                "mode": "source",
+                "backlinks": false,
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "92bc4d02cb1ea732",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Outputs/是否适用于你.md",
+                "mode": "source",
+                "backlinks": false,
+                "source": false
+              }
+            }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -32,7 +93,7 @@
       {
         "id": "404b714244a12346",
         "type": "tabs",
-        "dimension": 62.83422459893048,
+        "dimension": 46.06635071090047,
         "children": [
           {
             "id": "7408259d9b92b5f4",
@@ -50,7 +111,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": ".some(",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -62,9 +123,80 @@
         ]
       },
       {
+        "id": "e0bef1adf8747f55",
+        "type": "tabs",
+        "dimension": 28.436018957345972,
+        "children": [
+          {
+            "id": "9581d79f5c13f03c",
+            "type": "leaf",
+            "state": {
+              "type": "map",
+              "state": {
+                "name": "Default",
+                "mapZoom": 1,
+                "mapCenter": {
+                  "lat": 52.482780222078226,
+                  "lng": 171.5625
+                },
+                "query": "",
+                "chosenMapSource": 0,
+                "showLinks": false,
+                "linkColor": "red",
+                "queryError": false
+              }
+            }
+          },
+          {
+            "id": "6942a36c08c85196",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {}
+            }
+          },
+          {
+            "id": "dec0d591e8a157e6",
+            "type": "leaf",
+            "state": {
+              "type": "localgraph",
+              "state": {
+                "file": "README.md",
+                "options": {
+                  "collapse-filter": true,
+                  "search": "",
+                  "localJumps": 1,
+                  "localBacklinks": true,
+                  "localForelinks": true,
+                  "localInterlinks": false,
+                  "showTags": false,
+                  "showAttachments": false,
+                  "hideUnresolved": false,
+                  "collapse-color-groups": true,
+                  "colorGroups": [],
+                  "collapse-display": true,
+                  "showArrow": false,
+                  "textFadeMultiplier": 0,
+                  "nodeSizeMultiplier": 1,
+                  "lineSizeMultiplier": 1,
+                  "collapse-forces": true,
+                  "centerStrength": 0.518713248970312,
+                  "repelStrength": 10,
+                  "linkStrength": 1,
+                  "linkDistance": 250,
+                  "scale": 0.7132754626224419,
+                  "close": true
+                }
+              }
+            }
+          }
+        ],
+        "currentTab": 2
+      },
+      {
         "id": "98f0d4a0722ccaa3",
         "type": "tabs",
-        "dimension": 37.165775401069524,
+        "dimension": 25.49763033175355,
         "children": [
           {
             "id": "a2ea7e19451c5b4f",
@@ -94,16 +226,17 @@
                 "file": "40 - Obsidian/主页/00. 导航.md",
                 "mode": "preview",
                 "backlinks": false,
-                "source": true
+                "source": false
               },
               "pinned": true
             }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "horizontal",
-    "width": 200.5
+    "width": 335.5
   },
   "right": {
     "id": "61191f8ea8fb7606",
@@ -112,7 +245,7 @@
       {
         "id": "4294f9e389e0008a",
         "type": "tabs",
-        "dimension": 36.87089715536105,
+        "dimension": 35.260663507109,
         "children": [
           {
             "id": "6ad73b7dcf2a71b6",
@@ -138,6 +271,14 @@
               "type": "calendar",
               "state": {}
             }
+          },
+          {
+            "id": "6783ab816b124685",
+            "type": "leaf",
+            "state": {
+              "type": "ReferenceListView",
+              "state": {}
+            }
           }
         ],
         "currentTab": 1
@@ -145,78 +286,94 @@
       {
         "id": "4fce416981e6cec9",
         "type": "tabs",
-        "dimension": 63.12910284463894,
+        "dimension": 64.739336492891,
         "children": [
           {
-            "id": "4354bd31fa04df0e",
+            "id": "3191225bb556d597",
             "type": "leaf",
             "state": {
-              "type": "empty",
+              "type": "tasks_timeline_view",
               "state": {}
+            }
+          },
+          {
+            "id": "9b3beec9f05a0e5b",
+            "type": "leaf",
+            "state": {
+              "type": "zotero-annotation-view",
+              "state": {
+                "file": "README.md",
+                "itemId": -1,
+                "attachmentId": -1,
+                "follow": "zt-reader"
+              }
             }
           }
         ]
       }
     ],
     "direction": "horizontal",
-    "width": 302.5
+    "width": 302.5,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
+      "obsidian-projects:Open projects": false,
+      "obsidian-excalidraw-plugin:新建绘图文件": false,
+      "soundscapes:Soundscapes: My Music": false,
+      "obsidian-memos:Thino": false,
       "switcher:打开快速切换": false,
       "graph:查看关系图谱": false,
       "canvas:新建白板": false,
       "command-palette:打开命令面板": false,
       "markdown-importer:打开 Markdown 格式转换器": false,
       "workspaces:管理工作区布局": false,
-      "periodic-notes:Open today": false,
-      "templater-obsidian:Templater": false,
-      "obsidian-projects:Open projects": false,
-      "obsidian-excalidraw-plugin:新建绘图文件": false,
-      "soundscapes:Soundscapes: My Music": false,
       "obsidian-map-view:Open map view": false,
+      "periodic-notes:Open today": false,
       "homepage:Open homepage": false,
-      "obsidian-memos:Thino": false
+      "templater-obsidian:Templater": false
     }
   },
-  "active": "6bfed2bb764704b3",
+  "active": "791027ddb9549e38",
   "lastOpenFiles": [
-    "完善路线.md",
+    "Outputs/使用PaperBell阅读与整理资料.md",
     "README.md",
-    "Persons/Scholars/Marco A. Janssen.md",
-    "Persons/Scholars/宋爽.md",
-    "Locations/Institutes/北京师范大学.md",
-    "Locations/Institutes/Arizona State University.md",
-    "Locations/机构列表.md",
-    "40 - Obsidian/模板/机构模板.md",
-    "40 - Obsidian/模板/季度OKR模板.md",
-    "40 - Obsidian/模板/每周周记模板.md",
-    "40 - Obsidian/模板/每日日记模板.md",
-    "Inputs/Zotero/song2023a.md",
-    "40 - Obsidian/模板/Zotero论文导入模板.md",
-    "40 - Obsidian/侧边栏/收件箱.md",
-    "40 - Obsidian/react组件/music and birthday countdown 1.md",
-    "40 - Obsidian/react组件/00. React使用说明.md",
-    "40 - Obsidian/侧边栏/侧边栏音乐播放器.md",
-    "Cards/概念墙.md",
-    "40 - Obsidian/模板/zt-colored.eta.md",
-    "40 - Obsidian/模板/zt-cite2.eta.md",
-    "40 - Obsidian/模板/zt-cite.eta.md",
-    "40 - Obsidian/模板/zt-annot.eta.md",
-    "40 - Obsidian/模板/zt-annots.eta.md",
-    "40 - Obsidian/模板/zt-field.eta.md",
-    "40 - Obsidian/模板/zt-note.eta.md",
-    "Cards/Concepts/Social ecological system.md",
-    "40 - Obsidian/附件/1ED114F3-09B9-4A83-B2ED-E921F0F47344_1_105_c.jpeg",
-    "40 - Obsidian/img/文献阅读笔记.png",
-    "40 - Obsidian/img/主页追踪进度.png",
-    "40 - Obsidian/img/个人履历.png",
-    "40 - Obsidian/img/阅读论文标注方法.png",
-    "40 - Obsidian/img/追踪项目进度和动态.png",
-    "40 - Obsidian/img/学者关联相关论文.png",
+    "Outputs/设计理念.md",
+    "Outputs/使用PaperBell整理输出笔记.md",
+    "Outputs/使用PaperBell进行日常记录.md",
+    "40 - Obsidian/模板/输出笔记模板.md",
+    "Outputs/关于科研生活的探讨.md",
+    "Outputs/是否适用于你.md",
+    "40 - Obsidian/img/数据方法.png",
+    "40 - Obsidian/img/结果.jpg",
+    "40 - Obsidian/img/方法.jpg",
     "40 - Obsidian/img/概念墙.png",
-    "40 - Obsidian/img/写作与参考.png",
-    "40 - Obsidian/img/概念关联论文与想法.png",
+    "40 - Obsidian/img/引言.jpg",
+    "40 - Obsidian/img/阅读论文标注方法.png",
+    "40 - Obsidian/img/paperbell.png",
+    "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md",
+    "40 - Obsidian/img/追踪项目进度和动态.png",
+    "40 - Obsidian/img/主页追踪进度.png",
+    "40 - Obsidian/img/整理追踪的学者.png",
+    "Persons/Scholars/宋爽.md",
+    "Persons/00. 学者列表.md",
+    "Cards/Concepts/Social ecological system.md",
+    "Inputs/Zotero/Decoupling of SDGs followed by re-coupling as sustainable development progresses.md",
+    "Persons/Scholars/Pablo A. Astudillo-Estévez.md",
+    "Locations/00. 机构列表.md",
+    "Cards/00. 概念墙.md",
+    "40 - Obsidian/主页/00. 主页.md",
+    "Persons/Scholars/武旭同.md",
+    "00 - 每日日记/DailyNote/2024年05月14日.md",
+    "Projects/PaperBell.md",
+    "Outputs/使用PaperBell管理项目.md",
+    "Cards/Concepts/agent-based model.md",
+    "未命名.md",
+    "使用PaperBell整理输出笔记.md",
+    "40 - Obsidian/主页/00. 导航.md",
+    "Projects/新项目.md",
+    "Projects/测试",
+    "Projects/PaperBell",
     "40 - Obsidian/img",
     "Outputs/01 - Introduction",
     "Cards/Methods",
@@ -224,8 +381,6 @@
     "40 - Obsidian/脚本/QuickAdd/bookfromdouban.js",
     "40 - Obsidian/脚本/moviefromdouban.js",
     "40 - Obsidian/脚本/bookfromdouban.js",
-    "未命名",
-    "Projects/Supporter",
-    "Projects/SongshGeo"
+    "未命名"
   ]
 }

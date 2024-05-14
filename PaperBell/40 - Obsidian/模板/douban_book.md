@@ -4,6 +4,7 @@ cover: {{VALUE:cover}}
 tags:
 - reading
 - {{VALUE:tag}}
+- project/index
 douban_url: {{VALUE:douban_url}}
 author: {{VALUE:author}}
 isbn: {{VALUE:isbn}}

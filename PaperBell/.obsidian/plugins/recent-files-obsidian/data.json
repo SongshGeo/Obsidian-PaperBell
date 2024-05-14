@@ -5,76 +5,116 @@
       "path": "README.md"
     },
     {
-      "basename": "Marco A. Janssen",
-      "path": "Persons/Scholars/Marco A. Janssen.md"
+      "basename": "设计理念",
+      "path": "Outputs/设计理念.md"
+    },
+    {
+      "basename": "使用PaperBell整理输出笔记",
+      "path": "Outputs/使用PaperBell整理输出笔记.md"
+    },
+    {
+      "basename": "输出笔记模板",
+      "path": "40 - Obsidian/模板/输出笔记模板.md"
+    },
+    {
+      "basename": "关于科研生活的探讨",
+      "path": "Outputs/关于科研生活的探讨.md"
+    },
+    {
+      "basename": "是否适用于你",
+      "path": "Outputs/是否适用于你.md"
+    },
+    {
+      "basename": "数据方法",
+      "path": "40 - Obsidian/img/数据方法.png"
+    },
+    {
+      "basename": "结果",
+      "path": "40 - Obsidian/img/结果.jpg"
+    },
+    {
+      "basename": "方法",
+      "path": "40 - Obsidian/img/方法.jpg"
+    },
+    {
+      "basename": "引言",
+      "path": "40 - Obsidian/img/引言.jpg"
+    },
+    {
+      "basename": "阅读论文标注方法",
+      "path": "40 - Obsidian/img/阅读论文标注方法.png"
+    },
+    {
+      "basename": "paperbell",
+      "path": "40 - Obsidian/img/paperbell.png"
+    },
+    {
+      "basename": "社会—生态系统适应性治理研究进展与展望",
+      "path": "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md"
+    },
+    {
+      "basename": "追踪项目",
+      "path": "40 - Obsidian/附件/追踪项目.gif"
     },
     {
       "basename": "宋爽",
       "path": "Persons/Scholars/宋爽.md"
     },
     {
-      "basename": "北京师范大学",
-      "path": "Locations/Institutes/北京师范大学.md"
+      "basename": "00. 学者列表",
+      "path": "Persons/00. 学者列表.md"
     },
     {
-      "basename": "Arizona State University",
-      "path": "Locations/Institutes/Arizona State University.md"
+      "basename": "使用PaperBell进行日常记录",
+      "path": "Outputs/使用PaperBell进行日常记录.md"
     },
     {
-      "basename": "机构列表",
-      "path": "Locations/机构列表.md"
+      "basename": "Social ecological system",
+      "path": "Cards/Concepts/Social ecological system.md"
     },
     {
-      "basename": "机构模板",
-      "path": "40 - Obsidian/模板/机构模板.md"
+      "basename": "00. 机构列表",
+      "path": "Locations/00. 机构列表.md"
     },
     {
-      "basename": "季度OKR模板",
-      "path": "40 - Obsidian/模板/季度OKR模板.md"
+      "basename": "00. 概念墙",
+      "path": "Cards/00. 概念墙.md"
     },
     {
-      "basename": "每周周记模板",
-      "path": "40 - Obsidian/模板/每周周记模板.md"
+      "basename": "00. 主页",
+      "path": "40 - Obsidian/主页/00. 主页.md"
     },
     {
-      "basename": "每日日记模板",
-      "path": "40 - Obsidian/模板/每日日记模板.md"
+      "basename": "使用PaperBell管理项目",
+      "path": "Outputs/使用PaperBell管理项目.md"
     },
     {
-      "basename": "song2023a",
-      "path": "Inputs/Zotero/song2023a.md"
+      "basename": "agent-based model",
+      "path": "Cards/Concepts/agent-based model.md"
     },
     {
-      "basename": "music and birthday countdown 1",
-      "path": "40 - Obsidian/react组件/music and birthday countdown 1.md"
+      "basename": "使用PaperBell阅读与整理资料",
+      "path": "Outputs/使用PaperBell阅读与整理资料.md"
     },
     {
-      "basename": "00. React使用说明",
-      "path": "40 - Obsidian/react组件/00. React使用说明.md"
+      "basename": "00. 导航",
+      "path": "40 - Obsidian/主页/00. 导航.md"
     },
     {
-      "basename": "概念墙",
-      "path": "Cards/概念墙.md"
+      "basename": "PaperBell",
+      "path": "Projects/PaperBell.md"
     },
     {
-      "basename": "zt-colored.eta",
-      "path": "40 - Obsidian/模板/zt-colored.eta.md"
+      "basename": "武旭同",
+      "path": "Persons/Scholars/武旭同.md"
     },
     {
-      "basename": "zt-cite2.eta",
-      "path": "40 - Obsidian/模板/zt-cite2.eta.md"
+      "basename": "Decoupling of SDGs followed by re-coupling as sustainable development progresses",
+      "path": "Inputs/Zotero/Decoupling of SDGs followed by re-coupling as sustainable development progresses.md"
     },
     {
-      "basename": "zt-cite.eta",
-      "path": "40 - Obsidian/模板/zt-cite.eta.md"
-    },
-    {
-      "basename": "zt-annot.eta",
-      "path": "40 - Obsidian/模板/zt-annot.eta.md"
-    },
-    {
-      "basename": "zt-annots.eta",
-      "path": "40 - Obsidian/模板/zt-annots.eta.md"
+      "basename": "学者模板",
+      "path": "40 - Obsidian/模板/学者模板.md"
     },
     {
       "basename": "zt-field.eta",
@@ -85,120 +125,80 @@
       "path": "40 - Obsidian/模板/zt-note.eta.md"
     },
     {
-      "basename": "Sediment transport under increasing anthropogenic stress - Regime shifts within the Yellow River, China",
-      "path": "Inputs/Zotero/Sediment transport under increasing anthropogenic stress - Regime shifts within the Yellow River, China.md"
-    },
-    {
-      "basename": "快速开始",
-      "path": "快速开始.md"
-    },
-    {
-      "basename": "00. 主页",
-      "path": "40 - Obsidian/主页/00. 主页.md"
-    },
-    {
-      "basename": "00. 导航",
-      "path": "40 - Obsidian/主页/00. 导航.md"
-    },
-    {
-      "basename": "完善路线",
-      "path": "完善路线.md"
-    },
-    {
-      "basename": "00. 图书馆",
-      "path": "Inputs/00. 图书馆.md"
-    },
-    {
-      "basename": "从福岛核废水排放危机，看公众科学的困境",
-      "path": "Inputs/Cubox/从福岛核废水排放危机，看公众科学的困境.md"
-    },
-    {
-      "basename": "设计理念",
-      "path": "设计理念.md"
-    },
-    {
-      "basename": "是否适用于你",
-      "path": "是否适用于你.md"
-    },
-    {
-      "basename": "Social ecological system",
-      "path": "Cards/Concepts/Social ecological system.md"
-    },
-    {
-      "basename": "多主体建模的ODD框架",
-      "path": "Outputs/02 - Methods/多主体建模的ODD框架.md"
+      "basename": "术语模板",
+      "path": "40 - Obsidian/模板/术语模板.md"
     },
     {
       "basename": "多主体建模的包",
-      "path": "Outputs/02 - Methods/多主体建模的包.md"
+      "path": "Outputs/多主体建模的包.md"
     },
     {
-      "basename": "当今民工",
-      "path": "Outputs/03 - Results/当今民工.md"
+      "basename": "ABSESpy",
+      "path": "Projects/ABSESpy.md"
     },
     {
-      "basename": "社会—生态系统适应性治理研究进展与展望",
-      "path": "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md"
+      "basename": "2024年05月14日",
+      "path": "00 - 每日日记/DailyNote/2024年05月14日.md"
     },
     {
-      "basename": "博士后",
-      "path": "Projects/Scholar/博士后.md"
+      "basename": "项目模板",
+      "path": "40 - Obsidian/模板/项目模板.md"
     },
     {
-      "basename": "博士生",
-      "path": "Projects/Scholar/博士生.md"
+      "basename": "zt-annot.eta",
+      "path": "40 - Obsidian/模板/zt-annot.eta.md"
     },
     {
-      "basename": "本科生",
-      "path": "Projects/Scholar/本科生.md"
+      "basename": "每日日记模板",
+      "path": "40 - Obsidian/模板/每日日记模板.md"
     },
     {
-      "basename": "social ecological system",
-      "path": "Cards/Concepts/social ecological system.md"
+      "basename": "2024年05月13日",
+      "path": "00 - 每日日记/DailyNote/2024年05月13日.md"
     },
     {
-      "basename": "参与的项目",
-      "path": "Projects/Scholar/参与的项目.md"
+      "basename": "学术哲学的邀请—在学术中，何必恐惧飞翔！ 精选",
+      "path": "Inputs/Cubox/学术哲学的邀请—在学术中，何必恐惧飞翔！ 精选.md"
     },
     {
-      "basename": "我的第一个项目",
-      "path": "Projects/Scholar/我的第一个项目.md"
+      "basename": "PaperBell仓库使用的插件及其作用一览",
+      "path": "Outputs/PaperBell仓库使用的插件及其作用一览.md"
     },
     {
-      "basename": "A framework for mapping and comparing behavioural theories in models of social-ecological systems",
-      "path": "Inputs/Zotero/A framework for mapping and comparing behavioural theories in models of social-ecological systems.md"
+      "basename": "科学革命的结构",
+      "path": "40 - Obsidian/附件/科学革命的结构.jpg"
     },
     {
-      "basename": "agent-based model",
-      "path": "Cards/Methods/agent-based model.md"
+      "basename": "Cotacachi",
+      "path": "Locations/Places/Cotacachi.md"
+    },
+    {
+      "basename": "douban_book",
+      "path": "40 - Obsidian/模板/douban_book.md"
     },
     {
       "basename": "00. 文件管理",
       "path": "40 - Obsidian/主页/00. 文件管理.md"
     },
     {
-      "basename": "数据方法",
-      "path": "Outputs/数据方法.md"
+      "basename": "从福岛核废水排放危机，看公众科学的困境",
+      "path": "Inputs/Cubox/从福岛核废水排放危机，看公众科学的困境.md"
     },
     {
-      "basename": "关于科研生活的探讨",
-      "path": "Outputs/04 - Discussion/关于科研生活的探讨.md"
+      "basename": "逃避主义",
+      "path": "Inputs/Books/逃避主义.md"
     },
     {
-      "basename": "引言讨论",
-      "path": "Outputs/引言讨论.md"
+      "basename": "00. 图书馆",
+      "path": "Inputs/00. 图书馆.md"
     },
     {
-      "basename": "学者列表",
-      "path": "Persons/学者列表.md"
+      "basename": "科学革命的结构",
+      "path": "Inputs/Books/科学革命的结构.md"
     },
     {
-      "basename": "Pablo A. Astudillo-Estévez",
-      "path": "Persons/Scholars/Pablo A. Astudillo-Estévez.md"
-    },
-    {
-      "basename": "2023年09月07日",
-      "path": "00 - 每日日记/DailyNote/2023年09月07日.md"
+      "basename": "meme",
+      "path": "40 - Obsidian/附件/meme.jpeg"
     }
   ],
   "omittedPaths": [],
