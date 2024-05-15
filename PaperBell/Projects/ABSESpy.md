@@ -5,10 +5,10 @@ tags:
 target: tasks
 status: 已完成
 start: 2024-05-13
-end:
+end: 
 workload: 5
-duty: "负责人"
-url: "[🔗链接](obsidian://advanced-uri?vault=PaperBell&commandid=obsidian-projects)"
+duty: 负责人
+url: "[🔗链接](obsidian://advanced-uri?vault=PaperBell&commandid=obsidian-projects%253Ashow%253A268552b6-58ed-4e55-922a-024f6e13b57c)"
 ---
 
 ## 👋 README

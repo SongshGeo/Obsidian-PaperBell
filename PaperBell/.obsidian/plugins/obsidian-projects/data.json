@@ -329,7 +329,21 @@
             "checkField": "important",
             "includeFields": [
               "journal"
-            ]
+            ],
+            "columns": {
+              "未设置状态": {
+                "weight": 0
+              },
+              "👀浏览": {
+                "weight": 1
+              },
+              "✅初读": {
+                "weight": 2
+              },
+              "🤔精读": {
+                "weight": 3
+              }
+            }
           },
           "filter": {
             "conjunction": "and",
@@ -665,9 +679,6 @@
       },
       {
         "project": "268552b6-58ed-4e55-922a-024f6e13b57c"
-      },
-      {
-        "project": "b7ac7263-c0fe-4e6a-b053-c5419329ef02"
       }
     ],
     "linkBehavior": "open-editor"

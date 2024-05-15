@@ -1,6 +1,50 @@
 {
   "recentFiles": [
     {
+      "basename": "00. 主页",
+      "path": "40 - Obsidian/主页/00. 主页.md"
+    },
+    {
+      "basename": "ABSESpy",
+      "path": "Projects/ABSESpy.md"
+    },
+    {
+      "basename": "00. 导航",
+      "path": "40 - Obsidian/主页/00. 导航.md"
+    },
+    {
+      "basename": "Decreased virtual water outflows from the Yellow River basin are increasingly critical to China",
+      "path": "Inputs/Zotero/Decreased virtual water outflows from the Yellow River basin are increasingly critical to China.md"
+    },
+    {
+      "basename": "Quantifying the effects of institutional shifts on water governance in the Yellow River Basin_ A ",
+      "path": "Inputs/Zotero/Quantifying the effects of institutional shifts on water governance in the Yellow River Basin_ A .md"
+    },
+    {
+      "basename": "Identifying Regime Transitions for Water Governance in the Yellow River Basin, China",
+      "path": "Inputs/Zotero/Identifying Regime Transitions for Water Governance in the Yellow River Basin, China.md"
+    },
+    {
+      "basename": "Improving representation of collective memory in socio‐hydrological models and new insights into ",
+      "path": "Inputs/Zotero/Improving representation of collective memory in socio‐hydrological models and new insights into .md"
+    },
+    {
+      "basename": "关于科研生活的探讨",
+      "path": "Outputs/关于科研生活的探讨.md"
+    },
+    {
+      "basename": "zt-field.eta",
+      "path": "40 - Obsidian/模板/zt-field.eta.md"
+    },
+    {
+      "basename": "zt-note.eta",
+      "path": "40 - Obsidian/模板/zt-note.eta.md"
+    },
+    {
+      "basename": "每周周记模板",
+      "path": "40 - Obsidian/模板/每周周记模板.md"
+    },
+    {
       "basename": "README",
       "path": "README.md"
     },
@@ -15,10 +59,6 @@
     {
       "basename": "输出笔记模板",
       "path": "40 - Obsidian/模板/输出笔记模板.md"
-    },
-    {
-      "basename": "关于科研生活的探讨",
-      "path": "Outputs/关于科研生活的探讨.md"
     },
     {
       "basename": "是否适用于你",
@@ -81,10 +121,6 @@
       "path": "Cards/00. 概念墙.md"
     },
     {
-      "basename": "00. 主页",
-      "path": "40 - Obsidian/主页/00. 主页.md"
-    },
-    {
       "basename": "使用PaperBell管理项目",
       "path": "Outputs/使用PaperBell管理项目.md"
     },
@@ -95,10 +131,6 @@
     {
       "basename": "使用PaperBell阅读与整理资料",
       "path": "Outputs/使用PaperBell阅读与整理资料.md"
-    },
-    {
-      "basename": "00. 导航",
-      "path": "40 - Obsidian/主页/00. 导航.md"
     },
     {
       "basename": "PaperBell",
@@ -117,24 +149,12 @@
       "path": "40 - Obsidian/模板/学者模板.md"
     },
     {
-      "basename": "zt-field.eta",
-      "path": "40 - Obsidian/模板/zt-field.eta.md"
-    },
-    {
-      "basename": "zt-note.eta",
-      "path": "40 - Obsidian/模板/zt-note.eta.md"
-    },
-    {
       "basename": "术语模板",
       "path": "40 - Obsidian/模板/术语模板.md"
     },
     {
       "basename": "多主体建模的包",
       "path": "Outputs/多主体建模的包.md"
-    },
-    {
-      "basename": "ABSESpy",
-      "path": "Projects/ABSESpy.md"
     },
     {
       "basename": "2024年05月14日",
@@ -179,26 +199,6 @@
     {
       "basename": "00. 文件管理",
       "path": "40 - Obsidian/主页/00. 文件管理.md"
-    },
-    {
-      "basename": "从福岛核废水排放危机，看公众科学的困境",
-      "path": "Inputs/Cubox/从福岛核废水排放危机，看公众科学的困境.md"
-    },
-    {
-      "basename": "逃避主义",
-      "path": "Inputs/Books/逃避主义.md"
-    },
-    {
-      "basename": "00. 图书馆",
-      "path": "Inputs/00. 图书馆.md"
-    },
-    {
-      "basename": "科学革命的结构",
-      "path": "Inputs/Books/科学革命的结构.md"
-    },
-    {
-      "basename": "meme",
-      "path": "40 - Obsidian/附件/meme.jpeg"
     }
   ],
   "omittedPaths": [],
