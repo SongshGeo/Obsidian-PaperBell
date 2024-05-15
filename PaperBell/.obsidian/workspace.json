@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "1f91696d3c900ee1",
+        "id": "5aea8beed70f7160",
         "type": "tabs",
         "children": [
           {
-            "id": "4efc635fb223fe7a",
+            "id": "2b43a5edaffea5f4",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -228,15 +228,23 @@
         "dimension": 64.739336492891,
         "children": [
           {
+            "id": "3191225bb556d597",
+            "type": "leaf",
+            "state": {
+              "type": "tasks_timeline_view",
+              "state": {}
+            }
+          },
+          {
             "id": "9b3beec9f05a0e5b",
             "type": "leaf",
             "state": {
               "type": "zotero-annotation-view",
               "state": {
                 "file": "40 - Obsidian/主页/00. 主页.md",
-                "itemId": 293,
-                "attachmentId": 2939,
-                "follow": null
+                "itemId": -1,
+                "attachmentId": -1,
+                "follow": "zt-reader"
               }
             }
           }
@@ -263,17 +271,17 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "4efc635fb223fe7a",
+  "active": "2b43a5edaffea5f4",
   "lastOpenFiles": [
+    "40 - Obsidian/主页/00. 导航.md",
+    "Outputs/关于科研生活的探讨.md",
+    "Inputs/Zotero/Identifying Regime Transitions for Water Governance in the Yellow River Basin, China.md",
+    "Inputs/Zotero/Quantifying the effects of institutional shifts on water governance in the Yellow River Basin.md",
     "40 - Obsidian/主页/00. 主页.md",
     "Projects/ABSESpy.md",
-    "40 - Obsidian/主页/00. 导航.md",
     "Inputs/Zotero/Decreased virtual water outflows from the Yellow River basin are increasingly critical to China.md",
-    "Inputs/Zotero/Quantifying the effects of institutional shifts on water governance in the Yellow River Basin_ A .md",
     "Inputs/Zotero/Decoupling of SDGs followed by re-coupling as sustainable development progresses.md",
     "Inputs/Zotero/Improving representation of collective memory in socio‐hydrological models and new insights into .md",
-    "Inputs/Zotero/Identifying Regime Transitions for Water Governance in the Yellow River Basin, China.md",
-    "Outputs/关于科研生活的探讨.md",
     "40 - Obsidian/模板/zt-field.eta.md",
     "40 - Obsidian/模板/zt-note.eta.md",
     "40 - Obsidian/模板/每周周记模板.md",

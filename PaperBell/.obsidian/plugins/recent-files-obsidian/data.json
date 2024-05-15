@@ -5,20 +5,24 @@
       "path": "40 - Obsidian/主页/00. 主页.md"
     },
     {
-      "basename": "ABSESpy",
-      "path": "Projects/ABSESpy.md"
-    },
-    {
       "basename": "00. 导航",
       "path": "40 - Obsidian/主页/00. 导航.md"
     },
     {
-      "basename": "Decreased virtual water outflows from the Yellow River basin are increasingly critical to China",
-      "path": "Inputs/Zotero/Decreased virtual water outflows from the Yellow River basin are increasingly critical to China.md"
+      "basename": "关于科研生活的探讨",
+      "path": "Outputs/关于科研生活的探讨.md"
     },
     {
-      "basename": "Quantifying the effects of institutional shifts on water governance in the Yellow River Basin_ A ",
-      "path": "Inputs/Zotero/Quantifying the effects of institutional shifts on water governance in the Yellow River Basin_ A .md"
+      "basename": "Quantifying the effects of institutional shifts on water governance in the Yellow River Basin",
+      "path": "Inputs/Zotero/Quantifying the effects of institutional shifts on water governance in the Yellow River Basin.md"
+    },
+    {
+      "basename": "ABSESpy",
+      "path": "Projects/ABSESpy.md"
+    },
+    {
+      "basename": "Decreased virtual water outflows from the Yellow River basin are increasingly critical to China",
+      "path": "Inputs/Zotero/Decreased virtual water outflows from the Yellow River basin are increasingly critical to China.md"
     },
     {
       "basename": "Identifying Regime Transitions for Water Governance in the Yellow River Basin, China",
@@ -27,10 +31,6 @@
     {
       "basename": "Improving representation of collective memory in socio‐hydrological models and new insights into ",
       "path": "Inputs/Zotero/Improving representation of collective memory in socio‐hydrological models and new insights into .md"
-    },
-    {
-      "basename": "关于科研生活的探讨",
-      "path": "Outputs/关于科研生活的探讨.md"
     },
     {
       "basename": "zt-field.eta",
