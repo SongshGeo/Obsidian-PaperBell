@@ -5,20 +5,84 @@
       "path": "README.md"
     },
     {
-      "basename": "使用PaperBell进行日常记录",
-      "path": "Outputs/使用PaperBell进行日常记录.md"
+      "basename": "00. 图书馆",
+      "path": "Inputs/00. 图书馆.md"
     },
     {
-      "basename": "2024年06月02日",
-      "path": "00 - 每日日记/DailyNote/2024年06月02日.md"
+      "basename": "参考文献列表",
+      "path": "Outputs/参考文献列表.png"
+    },
+    {
+      "basename": "追踪项目",
+      "path": "Outputs/追踪项目.gif"
+    },
+    {
+      "basename": "使用PaperBell管理项目",
+      "path": "Outputs/使用方法/使用PaperBell管理项目.md"
+    },
+    {
+      "basename": "使用PaperBell阅读与整理资料",
+      "path": "Outputs/使用方法/使用PaperBell阅读与整理资料.md"
+    },
+    {
+      "basename": "设计理念",
+      "path": "Outputs/项目说明/设计理念.md"
+    },
+    {
+      "basename": "使用PaperBell整理输出笔记",
+      "path": "Outputs/使用方法/使用PaperBell整理输出笔记.md"
+    },
+    {
+      "basename": "使用PaperBell进行日常记录",
+      "path": "Outputs/使用方法/使用PaperBell进行日常记录.md"
+    },
+    {
+      "basename": "社会—生态系统适应性治理研究进展与展望",
+      "path": "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md"
+    },
+    {
+      "basename": "关于自动关联和统计的代码",
+      "path": "Outputs/用户答疑/关于自动关联和统计的代码.md"
+    },
+    {
+      "basename": "关于如何使用示例仓库的问题",
+      "path": "Outputs/用户答疑/关于如何使用示例仓库的问题.md"
+    },
+    {
+      "basename": "关于和Zotero的联动问题",
+      "path": "Outputs/用户答疑/关于和Zotero的联动问题.md"
     },
     {
       "basename": "00. 主页",
       "path": "40 - Obsidian/主页/00. 主页.md"
     },
     {
-      "basename": "使用PaperBell管理项目",
-      "path": "Outputs/使用PaperBell管理项目.md"
+      "basename": "PaperBell",
+      "path": "Projects/PaperBell.md"
+    },
+    {
+      "basename": "index",
+      "path": "Outputs/index.md"
+    },
+    {
+      "basename": "关于科研生活的探讨",
+      "path": "Outputs/项目说明/关于科研生活的探讨.md"
+    },
+    {
+      "basename": "是否适用于你",
+      "path": "Outputs/项目说明/是否适用于你.md"
+    },
+    {
+      "basename": "PaperBell仓库使用的插件及其作用一览",
+      "path": "Outputs/项目说明/PaperBell仓库使用的插件及其作用一览.md"
+    },
+    {
+      "basename": "2024年05月14日",
+      "path": "00 - 每日日记/DailyNote/2024年05月14日.md"
+    },
+    {
+      "basename": "2024年06月02日",
+      "path": "00 - 每日日记/DailyNote/2024年06月02日.md"
     },
     {
       "basename": "Identifying Regime Transitions for Water Governance in the Yellow River Basin, China",
@@ -35,10 +99,6 @@
     {
       "basename": "武旭同",
       "path": "Persons/Scholars/武旭同.md"
-    },
-    {
-      "basename": "设计理念",
-      "path": "Outputs/设计理念.md"
     },
     {
       "basename": "00. 学者列表",
@@ -65,20 +125,8 @@
       "path": "40 - Obsidian/主页/00. 导航.md"
     },
     {
-      "basename": "社会—生态系统适应性治理研究进展与展望",
-      "path": "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md"
-    },
-    {
       "basename": "2024年05月13日",
       "path": "00 - 每日日记/DailyNote/2024年05月13日.md"
-    },
-    {
-      "basename": "PaperBell",
-      "path": "Projects/PaperBell.md"
-    },
-    {
-      "basename": "关于科研生活的探讨",
-      "path": "Outputs/关于科研生活的探讨.md"
     },
     {
       "basename": "ABSESpy",
@@ -105,16 +153,8 @@
       "path": "40 - Obsidian/模板/每周周记模板.md"
     },
     {
-      "basename": "使用PaperBell整理输出笔记",
-      "path": "Outputs/使用PaperBell整理输出笔记.md"
-    },
-    {
       "basename": "输出笔记模板",
       "path": "40 - Obsidian/模板/输出笔记模板.md"
-    },
-    {
-      "basename": "是否适用于你",
-      "path": "Outputs/是否适用于你.md"
     },
     {
       "basename": "数据方法",
@@ -141,10 +181,6 @@
       "path": "40 - Obsidian/img/paperbell.png"
     },
     {
-      "basename": "追踪项目",
-      "path": "40 - Obsidian/附件/追踪项目.gif"
-    },
-    {
       "basename": "宋爽",
       "path": "Persons/Scholars/宋爽.md"
     },
@@ -161,40 +197,8 @@
       "path": "Cards/Concepts/agent-based model.md"
     },
     {
-      "basename": "使用PaperBell阅读与整理资料",
-      "path": "Outputs/使用PaperBell阅读与整理资料.md"
-    },
-    {
       "basename": "术语模板",
       "path": "40 - Obsidian/模板/术语模板.md"
-    },
-    {
-      "basename": "多主体建模的包",
-      "path": "Outputs/多主体建模的包.md"
-    },
-    {
-      "basename": "2024年05月14日",
-      "path": "00 - 每日日记/DailyNote/2024年05月14日.md"
-    },
-    {
-      "basename": "项目模板",
-      "path": "40 - Obsidian/模板/项目模板.md"
-    },
-    {
-      "basename": "zt-annot.eta",
-      "path": "40 - Obsidian/模板/zt-annot.eta.md"
-    },
-    {
-      "basename": "每日日记模板",
-      "path": "40 - Obsidian/模板/每日日记模板.md"
-    },
-    {
-      "basename": "学术哲学的邀请—在学术中，何必恐惧飞翔！ 精选",
-      "path": "Inputs/Cubox/学术哲学的邀请—在学术中，何必恐惧飞翔！ 精选.md"
-    },
-    {
-      "basename": "PaperBell仓库使用的插件及其作用一览",
-      "path": "Outputs/PaperBell仓库使用的插件及其作用一览.md"
     }
   ],
   "omittedPaths": [],

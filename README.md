@@ -6,13 +6,12 @@
 
 1. 🤔️ 这个仓库是根据自己的需求建立的，请先判断`PaperBell`[是否适用于你](PaperBell/Outputs/是否适用于你.md)
 2. 🙋 如果你确定这个仓库适用于你，先欢迎来熟悉下本仓库的[设计理念](PaperBell/Outputs/设计理念.md)
-3. ✍️ 我们提倡将笔记分为[输入资料](PaperBell/Outputs/设计理念.md#输入资料)、[日常记录](PaperBell/Outputs/设计理念.md#日常记录)、和[输出笔记](PaperBell/Outputs/设计理念.md#输出笔记)三大类，你可以阅读以下利用 `PaperBell` 做笔记的方法：
-	- 输入资料：[使用PaperBell阅读与整理资料](PaperBell/Outputs/使用PaperBell阅读与整理资料.md)
-	- 日常记录：[使用PaperBell进行日常记录](PaperBell/Outputs/使用PaperBell进行日常记录.md)
-	- 输出笔记：[使用PaperBell整理输出笔记](PaperBell/Outputs/使用PaperBell整理输出笔记.md)
-4. 🗺️ 最后，如果你喜欢`PaperBell`，欢迎听听我[关于科研生活的探讨](PaperBell/Outputs/关于科研生活的探讨.md)
+3. ✍️ 如果你认同我的理念，欢迎在[文档]里阅读在 `PaperBell` 框架下利用 `Obsidian` [做笔记的方法]，或听听我[关于科研生活的探讨]。
+4. 对于第一次接触`Obsidian`的新人，我建议先看看[关于如何使用示例仓库的问题](https://paperbell.songshgeo.com/)这篇文档。
 
 ## 核心特性
+
+不想看动图的，这里有[我录制的一个介绍视频](https://www.bilibili.com/video/BV15J4m1N7X8/?share_source=copy_web&vd_source=5402be8f77e5ca4d4b74ed198fbdad57)。
 
 `PaperBell` 将自动关联与项目有关的所有笔记。
 
@@ -30,21 +29,16 @@
 
 1. 本库基于我个人研究经验的总结，不一定适用于所有学科，更不一定适用于所有人。
 2. 我不指望从开源分享中获取经济利益，希望**任何人不要包装这个库去赚钱**，你们忍心利用信息差从本就贫穷的中国研究生手里赚💰吗？
-3. `PaperBell`专注于让 Obsidian 服务于学术研究的需要。由于技术和时间有限，**本示例库不会花很多时间在外观上**。如有兴趣折腾仓库的外观，可以参考 [Rainbell129 的 RainBell 示例仓库](https://github.com/Rainbell129/Obsidian-Homepage) 和 [Cuman的Blue Topaz example vault](https://github.com/cumany/Blue-topaz-examples)  这两个仓库已经丰富的文档，本仓库完全在两者的基础上二度开发。
-4. 最后奉上一个我自己做的 meme。学术做得好不好，并不取决于“器”，而是“道”。不过嘛，道可道非常道，切莫本末倒置就好。
+3. `PaperBell`专注于让 Obsidian 服务于学术研究的需要。由于技术和时间有限，**本示例库不会花很多时间在外观上**。如有兴趣折腾仓库的外观，可以参考 [Rainbell129 的 RainBell 示例仓库](https://github.com/Rainbell129/Obsidian-Homepage) 和 [Cuman的Blue Topaz example vault](https://github.com/cumany/Blue-topaz-examples) 这两个仓库已经丰富的文档，本仓库完全在两者的基础上二度开发。
 
 ## 关于作者
 
-开源项目的维护需要动力，离不开各位用户的支持。
+各位用户的支持是我维护开源项目的动力。
 
-按照开源社区的江湖规矩，相对直接的经济支持当然是 “Buy me a coffee”：
-<a href="https://www.buymeacoffee.com/USgxYspYW4" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
-但对还没有工作收入的学生党，我强烈反对在这种地方花钱。你完全可以[写一封邮件](mailto:songshgeo@gmail.com)告诉我，我的开源项目对你有帮助，这对我来说就是极大的鼓励了。包括`PaperBell`，我还维护一个名为 [ABSESpy](https://github.com/ABSESpy/ABSESpy) 的专业开源软件项目，给我一个免费的 star 也是很感激的🥹。
+如果你希望更了解一点我或我的其它项目，欢迎：
 
-或者，我每月都会更新一篇旅行随笔，也许你想为我的文章贡献一两个阅读量，可以关注我的[博客](https://www.songshgeo.com/)或[公众号](https://mp.weixin.qq.com/s/PYvT6zpf9WYnunlXN2x4YA)。或者也许更让我开心的是，告诉我你愿意在某天我经过你的家乡时，为我当半天导游？Then, let's keep in touch...
+- 访问我的[个人博客网站](https://www.songshgeo.com/)或访问我的公众号【隅地】阅读我写的随笔文章。
+- 最后，我为`PaperBell`项目创建了一个微信交流社群，欢迎交流任何关于学术生活的感想。由于二维码定期失效，用户可关注我的公众号【隅地】发送关键字“Obsidian”或“PaperBell”获取最新群聊二维码。
+- 任何开源项目相关问题欢迎邮件联系我 songshgeo[at]gmail[dot]com
 
 ![个人banner2](https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/%E4%B8%AA%E4%BA%BAbanner2.png)
-
-最后，我为`PaperBell`项目创建了一个微信交流社群，欢迎交流任何关于学术生活的感想，可关注我的公众号【隅地】发送关键字“Obsidian”或“PaperBell”获取最新群聊二维码。
-
-任何开源项目相关问题欢迎邮件联系我 songshgeo[at]gmail[dot]com

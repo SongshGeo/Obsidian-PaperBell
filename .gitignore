@@ -11,3 +11,5 @@ tsconfig.tsbuildinfo
 private/
 .replit
 replit.nix
+
+PaperBell/.obsidian/workspace*.json
