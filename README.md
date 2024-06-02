@@ -4,10 +4,10 @@
 
 👋 大家好，欢迎下载和使用 `PaperBell` 示例仓库。制作这个仓库的初衷，是将自己过去两年间使用 Obsidian 管理学术生活的思考整理分享给大家。
 
-1. 🤔️ 这个仓库是根据自己的需求建立的，请先判断`PaperBell`[是否适用于你](PaperBell/Outputs/是否适用于你.md)
-2. 🙋 如果你确定这个仓库适用于你，先欢迎来熟悉下本仓库的[设计理念](PaperBell/Outputs/设计理念.md)
-3. ✍️ 如果你认同我的理念，欢迎在[文档]里阅读在 `PaperBell` 框架下利用 `Obsidian` [做笔记的方法]，或听听我[关于科研生活的探讨]。
-4. 对于第一次接触`Obsidian`的新人，我建议先看看[关于如何使用示例仓库的问题](https://paperbell.songshgeo.com/)这篇文档。
+1. 🤔️ 这个仓库是根据自己的需求建立的，请先判断`PaperBell`[是否适用于你](https://paperbell.songshgeo.com/%E9%A1%B9%E7%9B%AE%E8%AF%B4%E6%98%8E/%E6%98%AF%E5%90%A6%E9%80%82%E7%94%A8%E4%BA%8E%E4%BD%A0)
+2. 🙋 如果你确定这个仓库适用于你，先欢迎来熟悉下本仓库的[设计理念]([PaperBell/Outputs/设计理念.md](https://paperbell.songshgeo.com/%E9%A1%B9%E7%9B%AE%E8%AF%B4%E6%98%8E/%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5))
+3. ✍️ 如果你认同我的理念，欢迎在[文档](https://paperbell.songshgeo.com/)里阅读用 `PaperBell` 框架[做笔记的方法](https://paperbell.songshgeo.com/%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/%E4%BD%BF%E7%94%A8PaperBell%E6%95%B4%E7%90%86%E8%BE%93%E5%87%BA%E7%AC%94%E8%AE%B0)，或听听我[关于科研生活的探讨](https://paperbell.songshgeo.com/%E9%A1%B9%E7%9B%AE%E8%AF%B4%E6%98%8E/%E5%85%B3%E4%BA%8E%E7%A7%91%E7%A0%94%E7%94%9F%E6%B4%BB%E7%9A%84%E6%8E%A2%E8%AE%A8)。
+4. 🐣 对于第一次接触`Obsidian`的新人，我建议先看看[关于如何使用示例仓库的问题](https://paperbell.songshgeo.com/%E7%94%A8%E6%88%B7%E7%AD%94%E7%96%91/%E5%85%B3%E4%BA%8E%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B%E4%BB%93%E5%BA%93%E7%9A%84%E9%97%AE%E9%A2%98)。
 
 ## 核心特性
 
@@ -33,9 +33,7 @@
 
 ## 关于作者
 
-各位用户的支持是我维护开源项目的动力。
-
-如果你希望更了解一点我或我的其它项目，欢迎：
+各位用户的支持是我维护开源项目的动力。如果你希望更了解一点我或我的其它项目，欢迎：
 
 - 访问我的[个人博客网站](https://www.songshgeo.com/)或访问我的公众号【隅地】阅读我写的随笔文章。
 - 最后，我为`PaperBell`项目创建了一个微信交流社群，欢迎交流任何关于学术生活的感想。由于二维码定期失效，用户可关注我的公众号【隅地】发送关键字“Obsidian”或“PaperBell”获取最新群聊二维码。

@@ -1,8 +1,28 @@
 {
   "recentFiles": [
     {
-      "basename": "README",
-      "path": "README.md"
+      "basename": "使用PaperBell阅读与整理资料",
+      "path": "Outputs/使用方法/使用PaperBell阅读与整理资料.md"
+    },
+    {
+      "basename": "关于科研生活的探讨",
+      "path": "Outputs/项目说明/关于科研生活的探讨.md"
+    },
+    {
+      "basename": "index",
+      "path": "index.md"
+    },
+    {
+      "basename": "关于和Zotero的联动问题",
+      "path": "Outputs/用户答疑/关于和Zotero的联动问题.md"
+    },
+    {
+      "basename": "00. 图书馆",
+      "path": "Inputs/00. 图书馆.md"
+    },
+    {
+      "basename": "结果",
+      "path": "40 - Obsidian/img/结果.jpg"
     },
     {
       "basename": "学者模板",
@@ -11,10 +31,6 @@
     {
       "basename": "机构模板",
       "path": "40 - Obsidian/模板/机构模板.md"
-    },
-    {
-      "basename": "00. 图书馆",
-      "path": "Inputs/00. 图书馆.md"
     },
     {
       "basename": "参考文献列表",
@@ -27,10 +43,6 @@
     {
       "basename": "使用PaperBell管理项目",
       "path": "Outputs/使用方法/使用PaperBell管理项目.md"
-    },
-    {
-      "basename": "使用PaperBell阅读与整理资料",
-      "path": "Outputs/使用方法/使用PaperBell阅读与整理资料.md"
     },
     {
       "basename": "设计理念",
@@ -57,24 +69,12 @@
       "path": "Outputs/用户答疑/关于如何使用示例仓库的问题.md"
     },
     {
-      "basename": "关于和Zotero的联动问题",
-      "path": "Outputs/用户答疑/关于和Zotero的联动问题.md"
-    },
-    {
       "basename": "00. 主页",
       "path": "40 - Obsidian/主页/00. 主页.md"
     },
     {
       "basename": "PaperBell",
       "path": "Projects/PaperBell.md"
-    },
-    {
-      "basename": "index",
-      "path": "Outputs/index.md"
-    },
-    {
-      "basename": "关于科研生活的探讨",
-      "path": "Outputs/项目说明/关于科研生活的探讨.md"
     },
     {
       "basename": "是否适用于你",
@@ -163,10 +163,6 @@
     {
       "basename": "数据方法",
       "path": "40 - Obsidian/img/数据方法.png"
-    },
-    {
-      "basename": "结果",
-      "path": "40 - Obsidian/img/结果.jpg"
     },
     {
       "basename": "方法",
