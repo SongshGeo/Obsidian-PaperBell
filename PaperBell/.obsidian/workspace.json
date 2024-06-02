@@ -95,6 +95,7 @@
             "state": {
               "type": "localgraph",
               "state": {
+                "file": "README.md",
                 "options": {
                   "collapse-filter": true,
                   "search": "",
@@ -144,7 +145,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "README.md"
+              }
             }
           },
           {
@@ -183,6 +186,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -223,6 +227,7 @@
             "state": {
               "type": "zotero-annotation-view",
               "state": {
+                "file": "README.md",
                 "itemId": -1,
                 "attachmentId": -1,
                 "follow": "zt-reader"
@@ -254,6 +259,7 @@
   },
   "active": "187032f2c5d5346d",
   "lastOpenFiles": [
+    "Outputs/使用PaperBell进行日常记录.md",
     "index.md",
     "00 - 每日日记/DailyNote/2024年06月02日.md",
     "40 - Obsidian/主页/00. 主页.md",
@@ -279,7 +285,6 @@
     "40 - Obsidian/模板/学者模板.md",
     "40 - Obsidian/主页/00. 导航.md",
     "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md",
-    "00 - 每日日记/DailyNote/2024年05月13日.md",
     "40 - Obsidian/img/数据方法.png",
     "40 - Obsidian/img/结果.jpg",
     "40 - Obsidian/img/方法.jpg",
