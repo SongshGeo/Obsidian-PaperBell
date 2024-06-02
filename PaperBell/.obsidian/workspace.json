@@ -4,20 +4,15 @@
     "type": "split",
     "children": [
       {
-        "id": "5aea8beed70f7160",
+        "id": "52ec0ec20d29dc34",
         "type": "tabs",
         "children": [
           {
-            "id": "2b43a5edaffea5f4",
+            "id": "187032f2c5d5346d",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "40 - Obsidian/主页/00. 主页.md",
-                "mode": "preview",
-                "backlinks": false,
-                "source": false
-              }
+              "type": "thino_view",
+              "state": {}
             }
           }
         ]
@@ -100,7 +95,6 @@
             "state": {
               "type": "localgraph",
               "state": {
-                "file": "40 - Obsidian/主页/00. 主页.md",
                 "options": {
                   "collapse-filter": true,
                   "search": "",
@@ -150,9 +144,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "40 - Obsidian/主页/00. 主页.md"
-              }
+              "state": {}
             }
           },
           {
@@ -170,8 +162,7 @@
               "pinned": true
             }
           }
-        ],
-        "currentTab": 2
+        ]
       }
     ],
     "direction": "horizontal",
@@ -192,7 +183,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "40 - Obsidian/主页/00. 主页.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -228,20 +218,11 @@
         "dimension": 64.739336492891,
         "children": [
           {
-            "id": "3191225bb556d597",
-            "type": "leaf",
-            "state": {
-              "type": "tasks_timeline_view",
-              "state": {}
-            }
-          },
-          {
             "id": "9b3beec9f05a0e5b",
             "type": "leaf",
             "state": {
               "type": "zotero-annotation-view",
               "state": {
-                "file": "40 - Obsidian/主页/00. 主页.md",
                 "itemId": -1,
                 "attachmentId": -1,
                 "follow": "zt-reader"
@@ -258,7 +239,6 @@
     "hiddenItems": {
       "obsidian-projects:Open projects": false,
       "soundscapes:Soundscapes: My Music": false,
-      "obsidian-memos:Thino": false,
       "switcher:打开快速切换": false,
       "graph:查看关系图谱": false,
       "canvas:新建白板": false,
@@ -268,32 +248,38 @@
       "obsidian-map-view:Open map view": false,
       "periodic-notes:Open today": false,
       "homepage:Open homepage": false,
-      "templater-obsidian:Templater": false
+      "templater-obsidian:Templater": false,
+      "obsidian-memos:Thino": false
     }
   },
-  "active": "2b43a5edaffea5f4",
+  "active": "187032f2c5d5346d",
   "lastOpenFiles": [
-    "40 - Obsidian/主页/00. 导航.md",
-    "Outputs/关于科研生活的探讨.md",
-    "Inputs/Zotero/Identifying Regime Transitions for Water Governance in the Yellow River Basin, China.md",
-    "Inputs/Zotero/Quantifying the effects of institutional shifts on water governance in the Yellow River Basin.md",
+    "00 - 每日日记/DailyNote/2024年06月02日.md",
     "40 - Obsidian/主页/00. 主页.md",
-    "Projects/ABSESpy.md",
-    "Inputs/Zotero/Decreased virtual water outflows from the Yellow River basin are increasingly critical to China.md",
-    "Inputs/Zotero/Decoupling of SDGs followed by re-coupling as sustainable development progresses.md",
-    "Inputs/Zotero/Improving representation of collective memory in socio‐hydrological models and new insights into .md",
-    "40 - Obsidian/模板/zt-field.eta.md",
-    "40 - Obsidian/模板/zt-note.eta.md",
-    "40 - Obsidian/模板/每周周记模板.md",
-    "00 - 每日日记/WeeklyNote/2023年34周记录.md",
-    "00 - 每日日记/WeeklyNote/2023年35周记录.md",
-    "Outputs/使用PaperBell阅读与整理资料.md",
-    "README.md",
+    "Outputs/使用PaperBell管理项目.md",
     "Outputs/设计理念.md",
-    "Outputs/使用PaperBell整理输出笔记.md",
-    "Outputs/使用PaperBell进行日常记录.md",
-    "40 - Obsidian/模板/输出笔记模板.md",
-    "Outputs/是否适用于你.md",
+    "Inputs/Zotero/Identifying Regime Transitions for Water Governance in the Yellow River Basin, China.md",
+    "Improving representation of collective memory in socio‐hydrological models and new insights into.md",
+    "Projects/PaperBell.md",
+    "Cards/00. 概念墙.md",
+    "00 - 每日日记/DailyNote/2024年05月14日.md",
+    "00 - 每日日记/DailyNote/2023年08月27日.md",
+    "Cards/Concepts/Social ecological system.md",
+    "Inputs/Zotero/Decoupling of SDGs followed by re-coupling as sustainable development progresses.md",
+    "README.md",
+    "00 - 每日日记/DailyNote/2024年05月15日.md",
+    "Persons/Scholars/武旭同.md",
+    "Inputs/Zotero/Quantifying the effects of institutional shifts on water governance in the Yellow River Basin.md",
+    "Persons/00. 学者列表.md",
+    "Locations/Institutes/北京师范大学.md",
+    "2024-05-15.md",
+    "Persons/Scholars/宋爽.md",
+    "Locations/00. 机构列表.md",
+    "40 - Obsidian/模板/学者模板.md",
+    "40 - Obsidian/主页/00. 导航.md",
+    "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md",
+    "00 - 每日日记/DailyNote/2024年05月13日.md",
+    "40 - Obsidian/主页/00. 文件管理.md",
     "40 - Obsidian/img/数据方法.png",
     "40 - Obsidian/img/结果.jpg",
     "40 - Obsidian/img/方法.jpg",
@@ -301,14 +287,9 @@
     "40 - Obsidian/img/引言.jpg",
     "40 - Obsidian/img/阅读论文标注方法.png",
     "40 - Obsidian/img/paperbell.png",
-    "Inputs/Zotero/社会—生态系统适应性治理研究进展与展望.md",
     "40 - Obsidian/img/追踪项目进度和动态.png",
     "40 - Obsidian/img/主页追踪进度.png",
     "40 - Obsidian/img/整理追踪的学者.png",
-    "Persons/Scholars/宋爽.md",
-    "Persons/00. 学者列表.md",
-    "Cards/Concepts/Social ecological system.md",
-    "Persons/Scholars/Pablo A. Astudillo-Estévez.md",
     "Projects/测试",
     "Projects/PaperBell",
     "40 - Obsidian/img",

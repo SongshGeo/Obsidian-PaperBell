@@ -150,11 +150,11 @@
             },
             "format": {
               "enabled": true,
-              "format": "---\naliases:\ngender: {{VALUE:性别}}\nbirthday:\nemail: \n- {{VALUE:邮箱}}\ntitle:\n- {{VALUE:称谓}}\nwebsite: {{VALUE:主页链接}}\nphoto: \"{{VALUE:照片链接}}\"\ntags: scholar\ninstitute:\n- {{VALUE:所在机构}}\n"
+              "format": "aliases:\ngender: {{VALUE:性别}}\nbirthday:\nemail: \n- {{VALUE:邮箱}}\ntitle:\n- {{VALUE:称谓}}\nwebsite: {{VALUE:主页链接}}\nphoto: \"{{VALUE:照片链接}}\"\ntags: scholar\ninstitute:\n- {{VALUE:所在机构}}\n"
             },
             "insertAfter": {
-              "enabled": false,
-              "after": "",
+              "enabled": true,
+              "after": "---",
               "insertAtEnd": false,
               "considerSubsections": false,
               "createIfNotFound": false,

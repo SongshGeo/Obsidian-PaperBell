@@ -6,11 +6,12 @@ title: Decoupling of SDGs followed by re-coupling as sustainable development pro
 citekey: wu2022b
 tags:
   - paper
-  - M
+  - project/PaperBell
 cate: 论文
-concepts: []
+concepts:
+  - social-ecological system
 read: 🤔精读
-source: 错误：没有找到符合条件的标签。
+source: 📚推荐
 authors:
   - Xutong Wu
   - Bojie Fu
@@ -39,4 +40,22 @@ important: true
 ## Annotations
 
 
+
+### Conclusion
+
+> [!Conclusion] Page 1
+> 
+> The identification of a process of decoupling followed by re-coupling along the SDG Index strengthens our understanding of sustainable development and may help to suggest action priorities to achieve as many SDGs as possible by 2030.
+> 
+> ---
+> #SC/想法  这个事情和社会-生态系统有关啊
+> 🔤确定可持续发展目标指数的脱钩和再耦合过程，加强了我们对可持续发展的理解，并有助于提出行动重点，以在2030年之前实现尽可能多的可持续发展目标。🔤
+> ^YL6RZKYWaN92WR4ZHp1
+
+### Highlight
+
+> [!Highlight] Page 1
+> 
+> Understanding the complex interactions among the Sustainable Development Goals (SDGs) is key to achieving all of the SDGs and ‘leaving no one behind’.
+> ^NNYV3RJHaN92WR4ZHp1
 
