@@ -250,7 +250,7 @@
             },
             "format": {
               "enabled": true,
-              "format": "---\nabbr: {{VALUE:缩写}}\nalias:\n- {{VALUE:别名}}\nwebsite: {{VALUE:主页}}\nlocation: [{{VALUE:经纬度}}]\nlogo: \"{{VALUE:LOGO}}\"\n"
+              "format": "abbr: {{VALUE:缩写}}\nalias:\n- {{VALUE:别名}}\nwebsite: {{VALUE:主页}}\nlocation: [{{VALUE:经纬度}}]\nlogo: \"{{VALUE:LOGO}}\"\n"
             },
             "insertAfter": {
               "enabled": true,

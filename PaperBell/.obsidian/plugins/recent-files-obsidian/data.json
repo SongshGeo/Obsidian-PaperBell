@@ -5,6 +5,14 @@
       "path": "README.md"
     },
     {
+      "basename": "学者模板",
+      "path": "40 - Obsidian/模板/学者模板.md"
+    },
+    {
+      "basename": "机构模板",
+      "path": "40 - Obsidian/模板/机构模板.md"
+    },
+    {
       "basename": "00. 图书馆",
       "path": "Inputs/00. 图书馆.md"
     },
@@ -117,10 +125,6 @@
       "path": "Inputs/Zotero/Quantifying the effects of institutional shifts on water governance in the Yellow River Basin.md"
     },
     {
-      "basename": "学者模板",
-      "path": "40 - Obsidian/模板/学者模板.md"
-    },
-    {
       "basename": "00. 导航",
       "path": "40 - Obsidian/主页/00. 导航.md"
     },
@@ -191,14 +195,6 @@
     {
       "basename": "00. 概念墙",
       "path": "Cards/00. 概念墙.md"
-    },
-    {
-      "basename": "agent-based model",
-      "path": "Cards/Concepts/agent-based model.md"
-    },
-    {
-      "basename": "术语模板",
-      "path": "40 - Obsidian/模板/术语模板.md"
     }
   ],
   "omittedPaths": [],
