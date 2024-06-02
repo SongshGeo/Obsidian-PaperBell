@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "paperbell"
-version = "0.2.0"
+version = "0.2.1"
 description = "An obsidian template vault for tracking your academic life."
 authors = ["SongshGeo <songshgeo@gmail.com>"]
 license = "MIT"

@@ -13,6 +13,8 @@ title: "PaperBell使用手册"
 3. ✍️ 如果你认同我的理念，欢迎在[文档](https://paperbell.songshgeo.com/)里阅读用 `PaperBell` 框架[[使用PaperBell整理输出笔记|做笔记的方法]]，或听听我[[关于科研生活的探讨]]。
 4. 对于第一次接触`Obsidian`的新人，我建议先看看[[关于如何使用示例仓库的问题]]。
 
+关于核心特性，这里有[我录制的一个介绍视频](https://www.bilibili.com/video/BV15J4m1N7X8/?share_source=copy_web&vd_source=5402be8f77e5ca4d4b74ed198fbdad57)。
+
 ## 使用方法
 
 - [[使用PaperBell管理项目]]
