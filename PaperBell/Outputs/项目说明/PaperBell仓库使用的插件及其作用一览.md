@@ -35,6 +35,5 @@ banner: "40 - Obsidian/img/方法.jpg"
 | **obsidian-tasks-plugin**             | 强大的任务管理工具，支持任务创建、跟踪和提醒。              |
 | **obsidian-tracker**                  | 跟踪笔记中的各种数据，可用于习惯追踪、个人健康数据记录等。        |
 | **obsidian-view-mode-by-frontmatter** | 根据笔记的前置元数据自动切换视图模式，如阅读模式或编辑模式。       |
-| **periodic-notes**                    | 用于创建和管理周期性笔记，如日记、周记或月记。              |
 | **quickadd**                          | 提供快速添加笔记、任务或其他元素到 Obsidian 的功能。      |
 | **recent-files-obsidian**             | 管理最近打开的文件                            |

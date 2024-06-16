@@ -1,4 +1,19 @@
 
+<a id='changelog-0.2.2'></a>
+# 0.2.2 — 2024-06-16
+
+## Added
+
+- 置顶了特性相关的 quick add 操作
+
+## Deprecated
+
+- 不再使用 periodic note 插件，改用核心日记插件
+
+## Fixed
+
+- 修复了 thino 和 periodic note 插件不兼容的问题
+
 <a id='changelog-0.2.1'></a>
 # 0.2.1 — 2024-06-02
 
