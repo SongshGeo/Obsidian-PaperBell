@@ -3,14 +3,12 @@
   "obsidian-admonition",
   "obsidian-advanced-uri",
   "obsidian-banners",
-  "calendar",
   "dataview",
   "homepage",
   "obsidian-memos",
   "obsidian-tasks-plugin",
   "templater-obsidian",
   "obsidian-react-components",
-  "periodic-notes",
   "obsidian-tracker",
   "customizable-page-header-buttons",
   "obsidian-hover-editor",
@@ -28,5 +26,6 @@
   "zotlit",
   "soundscapes",
   "obsidian-view-mode-by-frontmatter",
-  "cm-chs-patch"
+  "cm-chs-patch",
+  "calendar"
 ]

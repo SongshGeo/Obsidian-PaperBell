@@ -1,6 +1,34 @@
 {
   "recentFiles": [
     {
+      "basename": "index",
+      "path": "index.md"
+    },
+    {
+      "basename": "2024年06月02日",
+      "path": "00 - 每日日记/DailyNote/2024年06月02日.md"
+    },
+    {
+      "basename": "00. 主页",
+      "path": "40 - Obsidian/主页/00. 主页.md"
+    },
+    {
+      "basename": "00. 机构列表",
+      "path": "Locations/00. 机构列表.md"
+    },
+    {
+      "basename": "宋爽",
+      "path": "Persons/Scholars/宋爽.md"
+    },
+    {
+      "basename": "00. 导航",
+      "path": "40 - Obsidian/主页/00. 导航.md"
+    },
+    {
+      "basename": "PaperBell",
+      "path": "Projects/PaperBell.md"
+    },
+    {
       "basename": "关于如何使用示例仓库的问题",
       "path": "Outputs/用户答疑/关于如何使用示例仓库的问题.md"
     },
@@ -11,10 +39,6 @@
     {
       "basename": "关于科研生活的探讨",
       "path": "Outputs/项目说明/关于科研生活的探讨.md"
-    },
-    {
-      "basename": "index",
-      "path": "index.md"
     },
     {
       "basename": "关于和Zotero的联动问题",
@@ -69,14 +93,6 @@
       "path": "Outputs/用户答疑/关于自动关联和统计的代码.md"
     },
     {
-      "basename": "00. 主页",
-      "path": "40 - Obsidian/主页/00. 主页.md"
-    },
-    {
-      "basename": "PaperBell",
-      "path": "Projects/PaperBell.md"
-    },
-    {
       "basename": "是否适用于你",
       "path": "Outputs/项目说明/是否适用于你.md"
     },
@@ -87,10 +103,6 @@
     {
       "basename": "2024年05月14日",
       "path": "00 - 每日日记/DailyNote/2024年05月14日.md"
-    },
-    {
-      "basename": "2024年06月02日",
-      "path": "00 - 每日日记/DailyNote/2024年06月02日.md"
     },
     {
       "basename": "Identifying Regime Transitions for Water Governance in the Yellow River Basin, China",
@@ -123,10 +135,6 @@
     {
       "basename": "Quantifying the effects of institutional shifts on water governance in the Yellow River Basin",
       "path": "Inputs/Zotero/Quantifying the effects of institutional shifts on water governance in the Yellow River Basin.md"
-    },
-    {
-      "basename": "00. 导航",
-      "path": "40 - Obsidian/主页/00. 导航.md"
     },
     {
       "basename": "2024年05月13日",
@@ -179,14 +187,6 @@
     {
       "basename": "paperbell",
       "path": "40 - Obsidian/img/paperbell.png"
-    },
-    {
-      "basename": "宋爽",
-      "path": "Persons/Scholars/宋爽.md"
-    },
-    {
-      "basename": "00. 机构列表",
-      "path": "Locations/00. 机构列表.md"
     },
     {
       "basename": "00. 概念墙",
