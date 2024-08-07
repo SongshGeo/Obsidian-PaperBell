@@ -3,7 +3,6 @@
   "obsidian-admonition",
   "obsidian-advanced-uri",
   "obsidian-banners",
-  "dataview",
   "homepage",
   "obsidian-memos",
   "obsidian-tasks-plugin",
@@ -27,5 +26,7 @@
   "soundscapes",
   "obsidian-view-mode-by-frontmatter",
   "cm-chs-patch",
-  "calendar"
+  "calendar",
+  "obsidian42-brat",
+  "dataview"
 ]
