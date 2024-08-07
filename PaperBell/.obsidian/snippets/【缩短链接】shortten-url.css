@@ -1,0 +1,77 @@
+/* Moy Link Optimize.css */
+
+/* 点击链接的时候不跳转 */
+/* Style Settings 开关 */
+/* @settings
+
+name: Moy Link Mods
+id: moy-link-mods
+settings:
+    - 
+        id: link-editing-mode
+        title: Link Editing Mode
+        title.zh: 链接编辑模式
+        description: Cancel the link left mouse button click event
+        description.zh: 是否取消链接的左键点击功能
+        type: class-toggle
+        default: true
+        addCommand: true
+    - 
+        id: link-shorten
+        title: Link Shorten
+        title.zh: 缩短链接
+        description: Shorten the link, unless mouse hover
+        description.zh: 将链接缩短为 emoji，鼠标经过才完整显示
+        type: class-toggle
+        default: true
+        addCommand: true
+
+*/
+
+
+.link-editing-mode .cm-link .cm-underline,
+.link-editing-mode .cm-hmd-internal-link .cm-underline {
+  pointer-events: none;
+}
+
+
+/* 隐藏过长的链接网址部分 */
+/* Src: https://forum.obsidian.md/t/how-to-hide-url-link-in-edit-mode-until-hovered-on/82827 */
+/* Hide the URL text and show the symbol */
+.link-shorten div.cm-line .cm-string.cm-url:not(.cm-formatting) {
+    font-size: 0;
+}
+
+/* Display a symbol after the URL */
+.link-shorten div.cm-line .cm-string.cm-url:not(.cm-formatting)::after {
+    content: '🔗'; /* Replace with your desired symbol */
+    font-size: 1rem; /* Adjust font size as needed */
+    color: inherit; /* Inherit color from the parent element */
+}
+
+/* Ensure the URL text is visible when the cursor is over it */
+.link-shorten div.cm-line .cm-string.cm-url:not(.cm-formatting):hover {
+    font-size: inherit;
+}
+
+/* Hide the symbol when the cursor is over the URL */
+.link-shorten div.cm-line .cm-string.cm-url:not(.cm-formatting):hover::after {
+    content: '';
+}
+
+
+/* 修改 wikilink 格式的 */
+/* Modified by Moy */
+.link-shorten .cm-hmd-internal-link.cm-link-has-alias {
+    font-size: 0;
+}
+
+.link-shorten .cm-hmd-internal-link.cm-link-has-alias:hover {
+    font-size: inherit;
+}
+
+.link-shorten .cm-hmd-internal-link.cm-link-has-alias:not(.cm-formatting)::after {
+    content: '📜'; /* Replace with your desired symbol 📄 */
+    font-size: 1rem; /* Adjust font size as needed */
+    color: inherit; /* Inherit color from the parent element */
+}

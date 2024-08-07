@@ -22,6 +22,7 @@
   "AppendDateWhenTaskDone": false,
   "MobileAndDesktop": "All",
   "OpenMemosAutomatically": false,
+  "ShowScrollbar": false,
   "ShowTime": true,
   "ShowDate": true,
   "AddBlankLineWhenDate": false,
@@ -85,7 +86,7 @@
   "MomentsIcon": "40 - Obsidian/img/paperbell.png",
   "MomentsQuote": "独立之精神，自由之思想",
   "DefaultThemeForThino": "classic",
-  "LastUpdatedVersion": "2.4.47",
+  "LastUpdatedVersion": "2.4.51",
   "ShareToThinoWithText": false,
   "ShareToThinoWithTextAppend": "",
   "ShareToThinoWithTextPrepend": "",
@@ -114,5 +115,6 @@
   "AlwaysShowStatusText": false,
   "FilterByMetadata": false,
   "ShowSourcePath": false,
-  "ShowUpdateMessage": true
+  "ShowUpdateMessage": true,
+  "SyncManually": false
 }

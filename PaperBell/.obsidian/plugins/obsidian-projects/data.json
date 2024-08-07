@@ -670,6 +670,9 @@
     "frontmatter": {
       "quoteStrings": "PLAIN"
     },
+    "locale": {
+      "firstDayOfWeek": "default"
+    },
     "commands": [
       {
         "project": "4244e4c7-fbb9-4ca5-a794-1a557a1ad506"

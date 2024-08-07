@@ -6,10 +6,9 @@ node_modules
 public
 prof
 tsconfig.tsbuildinfo
-.obsidian
 .quartz-cache
 private/
 .replit
 replit.nix
 
-PaperBell/.obsidian/workspace*.json
+PaperBell/.obsidian/workspace.json

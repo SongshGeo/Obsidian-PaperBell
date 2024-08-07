@@ -19,7 +19,8 @@
     "【收件箱图标】收件箱icon",
     "【进度颜色】colourful progress bar",
     "【音乐播放器】Music Player",
-    "【主页设置】homepage setting"
+    "【主页设置】homepage setting",
+    "【缩短链接】shortten-url"
   ],
   "cssTheme": "Blue Topaz",
   "theme": "moonstone",

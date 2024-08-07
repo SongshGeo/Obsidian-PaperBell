@@ -1,12 +1,36 @@
 {
   "recentFiles": [
     {
+      "basename": "关于科研生活的探讨",
+      "path": "Outputs/项目说明/关于科研生活的探讨.md"
+    },
+    {
+      "basename": "学术哲学的邀请—在学术中，何必恐惧飞翔！ 精选",
+      "path": "Inputs/Cubox/学术哲学的邀请—在学术中，何必恐惧飞翔！ 精选.md"
+    },
+    {
       "basename": "00. 主页",
       "path": "40 - Obsidian/主页/00. 主页.md"
     },
     {
+      "basename": "如何使用控制台查看错误",
+      "path": "Outputs/用户答疑/如何使用控制台查看错误.md"
+    },
+    {
       "basename": "index",
       "path": "index.md"
+    },
+    {
+      "basename": "关于和Zotero的联动问题",
+      "path": "Outputs/用户答疑/关于和Zotero的联动问题.md"
+    },
+    {
+      "basename": "关于如何使用示例仓库的问题",
+      "path": "Outputs/用户答疑/关于如何使用示例仓库的问题.md"
+    },
+    {
+      "basename": "ABSESpy",
+      "path": "Projects/ABSESpy.md"
     },
     {
       "basename": "00. 文件管理",
@@ -37,20 +61,8 @@
       "path": "Projects/PaperBell.md"
     },
     {
-      "basename": "关于如何使用示例仓库的问题",
-      "path": "Outputs/用户答疑/关于如何使用示例仓库的问题.md"
-    },
-    {
       "basename": "使用PaperBell阅读与整理资料",
       "path": "Outputs/使用方法/使用PaperBell阅读与整理资料.md"
-    },
-    {
-      "basename": "关于科研生活的探讨",
-      "path": "Outputs/项目说明/关于科研生活的探讨.md"
-    },
-    {
-      "basename": "关于和Zotero的联动问题",
-      "path": "Outputs/用户答疑/关于和Zotero的联动问题.md"
     },
     {
       "basename": "00. 图书馆",
@@ -149,10 +161,6 @@
       "path": "00 - 每日日记/DailyNote/2024年05月13日.md"
     },
     {
-      "basename": "ABSESpy",
-      "path": "Projects/ABSESpy.md"
-    },
-    {
       "basename": "Decreased virtual water outflows from the Yellow River basin are increasingly critical to China",
       "path": "Inputs/Zotero/Decreased virtual water outflows from the Yellow River basin are increasingly critical to China.md"
     },
@@ -191,14 +199,6 @@
     {
       "basename": "阅读论文标注方法",
       "path": "40 - Obsidian/img/阅读论文标注方法.png"
-    },
-    {
-      "basename": "paperbell",
-      "path": "40 - Obsidian/img/paperbell.png"
-    },
-    {
-      "basename": "00. 概念墙",
-      "path": "Cards/00. 概念墙.md"
     }
   ],
   "omittedPaths": [],
