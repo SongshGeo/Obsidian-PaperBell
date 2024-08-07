@@ -40,3 +40,9 @@ banner: "40 - Obsidian/img/方法.jpg"
 确实有这个bug，因此仅在视频和示例库里，为了演示好看我示例库里用标题，我个人的库会使用 `citekey` 作为笔记标题，而不是文献标题，这样更稳定：
 
 ![Bq7ka3](https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/Bq7ka3.png)
+
+## 笔记注释没有从文献中自动导出的问题
+
+打开[[如何使用控制台查看错误|Obsidian的控制台]]，如果查看到是类似下图所示的错误（包含`plugin:obsidian-react-compoenent`字样），说明是 Component React 插件不兼容导致的问题，关闭该插件应该就解决了。
+
+![w16ovt](https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/w16ovt.png)
