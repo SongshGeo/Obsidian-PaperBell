@@ -1,0 +1,27 @@
+{
+  "linkerActivated": true,
+  "matchOnlyWholeWords": false,
+  "suppressSuffixForSubWords": false,
+  "includeAllFiles": true,
+  "linkerDirectories": [
+    "Glossary"
+  ],
+  "excludedDirectories": [
+    "00 - 每日日记",
+    "40 - Obsidian"
+  ],
+  "glossarySuffix": "🔗",
+  "applyDefaultLinkStyling": true,
+  "includeHeaders": true,
+  "matchCaseSensitive": false,
+  "tagToIgnoreCase": "linker-ignore-case",
+  "tagToMatchCase": "linker-match-case",
+  "tagToExcludeFile": "linker-exclude",
+  "tagToIncludeFile": "linker-include",
+  "excludeLinksToOwnNote": true,
+  "fixIMEProblem": false,
+  "excludeLinksInCurrentLine": false,
+  "onlyLinkOnce": true,
+  "excludeLinksToRealLinkedFiles": true,
+  "includeAliases": true
+}

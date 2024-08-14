@@ -7,7 +7,6 @@
   "obsidian-memos",
   "obsidian-tasks-plugin",
   "templater-obsidian",
-  "obsidian-react-components",
   "obsidian-tracker",
   "customizable-page-header-buttons",
   "obsidian-hover-editor",
@@ -29,5 +28,6 @@
   "calendar",
   "obsidian42-brat",
   "dataview",
-  "virtual-linker"
+  "virtual-linker",
+  "longform"
 ]
