@@ -20,7 +20,9 @@
     "【进度颜色】colourful progress bar",
     "【音乐播放器】Music Player",
     "【主页设置】homepage setting",
-    "【缩短链接】shortten-url"
+    "【缩短链接】shortten-url",
+    "【卡片框】callout",
+    "【卡片表】card-list"
   ],
   "cssTheme": "Blue Topaz",
   "theme": "moonstone",
