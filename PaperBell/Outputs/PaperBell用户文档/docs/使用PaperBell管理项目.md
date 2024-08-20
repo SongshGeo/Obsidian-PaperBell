@@ -5,6 +5,7 @@ tags:
   - output
   - project/PaperBell
 banner: "40 - Obsidian/img/方法.jpg"
+longform: true
 ---
 
 `PaperBell` 2.0 版本开始，能够借助 `Projects` 插件追踪和管理项目。

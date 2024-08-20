@@ -5,6 +5,7 @@ tags:
   - output
   - project/PaperBell
 banner: "40 - Obsidian/img/方法.jpg"
+longform: true
 ---
 
 聚沙成塔，`PaperBell`感谢这些出色的开源插件，让本仓库的工作流得以丝滑实现。
