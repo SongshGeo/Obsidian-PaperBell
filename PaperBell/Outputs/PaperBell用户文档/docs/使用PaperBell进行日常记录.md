@@ -6,6 +6,7 @@ tags:
   - project/PaperBell
 banner: "40 - Obsidian/img/方法.jpg"
 ---
+
 根据 `PaperBell` 的[[设计理念]]，我们提倡将笔记分为[[设计理念#输入资料|输入资料]]、[[设计理念#日常记录|日常记录]]、和[[设计理念#输出笔记|输出笔记]]三大类，本文主要讨论如何利用 `PaperBell` 更好地进行**日常记录**。
 
 ```ad-seealso
