@@ -180,7 +180,7 @@
           "hierarchy": false
         }
       },
-      "newNotesFolder": "Outputs/",
+      "newNotesFolder": "Drafts",
       "views": [
         {
           "config": {
@@ -253,6 +253,11 @@
                 "operator": "not-contains",
                 "enabled": true,
                 "value": "日记"
+              },
+              {
+                "field": "longform",
+                "operator": "is-checked",
+                "enabled": false
               }
             ]
           },
@@ -405,6 +410,11 @@
                 "operator": "contains",
                 "enabled": true,
                 "value": "Outputs"
+              },
+              {
+                "field": "longform",
+                "operator": "is-checked",
+                "enabled": true
               }
             ]
           },
@@ -452,7 +462,7 @@
           "hierarchy": false
         }
       },
-      "newNotesFolder": "Outputs/",
+      "newNotesFolder": "Drafts/",
       "views": [
         {
           "config": {
