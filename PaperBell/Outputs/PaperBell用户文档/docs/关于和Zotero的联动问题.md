@@ -5,6 +5,7 @@ tags:
   - output
   - project/PaperBell
 banner: "40 - Obsidian/img/方法.jpg"
+longform: true
 ---
 
 ## 如何配置和Zotero的联动？
