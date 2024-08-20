@@ -1,0 +1,72 @@
+{
+  "items": [
+    {
+      "name": "Markdown"
+    },
+    {
+      "name": "Markdown (Hugo)"
+    },
+    {
+      "name": "Html"
+    },
+    {
+      "name": "TextBundle"
+    },
+    {
+      "name": "Typst"
+    },
+    {
+      "name": "PDF"
+    },
+    {
+      "name": "Word (.docx)"
+    },
+    {
+      "name": "OpenOffice"
+    },
+    {
+      "name": "RTF"
+    },
+    {
+      "name": "Epub"
+    },
+    {
+      "name": "Latex"
+    },
+    {
+      "name": "Media Wiki"
+    },
+    {
+      "name": "reStructuredText"
+    },
+    {
+      "name": "Textile"
+    },
+    {
+      "name": "OPML"
+    },
+    {
+      "name": "Bibliography"
+    },
+    {
+      "name": "eisvogel",
+      "type": "pandoc",
+      "arguments": "-f ${fromFormat} --data-dir=\"${vaultDir}/40 - Obsidian/脚本/pandoc\"  --resource-path=\"${currentDir}\" --resource-path=\"${attachmentFolderPath}\" --lua-filter=\"${luaDir}/pdf.lua\" ${ options.textemplate ? `--resource-path=\"${pluginDir}/textemplate\" --template=\"${options.textemplate}\"` : ` ` } -o \"${outputPath}\" -t pdf",
+      "customArguments": "--bibliography=\"${vaultDir}/40 - Obsidian/mybib.bib\"  --pdf-engine=xelatex --filter pandoc-crossref --number-sections --citeproc -M reference-section-title=References --template=eisvogel --listings",
+      "optionsMeta": {
+        "textemplate": "preset:textemplate"
+      },
+      "extension": ".pdf"
+    }
+  ],
+  "defaultExportDirectoryMode": "Same",
+  "openExportedFile": false,
+  "env": {},
+  "showExportProgressBar": true,
+  "openExportedFileLocation": true,
+  "lastEditName": "eisvogel",
+  "lastExportDirectory": {
+    "darwin": "/Users/songshgeo/Documents/VSCode/PaperBell/PaperBell//"
+  },
+  "lastExportType": "eisvogel"
+}
