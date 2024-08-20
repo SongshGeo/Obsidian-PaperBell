@@ -13,7 +13,9 @@ banner: "40 - Obsidian/img/方法.jpg"
 > - 日常记录：[[使用PaperBell进行日常记录]]
 > - 输出笔记：[[使用PaperBell整理输出笔记]]
 
-## 论文阅[](使用PaperBell整理输出笔记.md)按照这样的格式进行高亮批注，`PaperBell`将自动整理它们：
+## 论文阅读笔记
+
+在 Zotero 中阅读论文，并按照这样的格式进行高亮批注，`PaperBell`将自动整理它们：
 
 ![[阅读论文标注方法.png]]
 
