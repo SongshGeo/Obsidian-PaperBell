@@ -59,14 +59,9 @@
       "extension": ".pdf"
     }
   ],
-  "defaultExportDirectoryMode": "Same",
-  "openExportedFile": false,
+  "defaultExportDirectoryMode": "Auto",
+  "openExportedFile": true,
   "env": {},
   "showExportProgressBar": true,
-  "openExportedFileLocation": true,
-  "lastEditName": "eisvogel",
-  "lastExportDirectory": {
-    "darwin": "/Users/songshgeo/Downloads/testing"
-  },
-  "lastExportType": "eisvogel-latex"
+  "lastEditName": "eisvogel"
 }
