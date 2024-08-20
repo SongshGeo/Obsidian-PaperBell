@@ -14,3 +14,4 @@ replit.nix
 PaperBell/.obsidian/workspace.json
 PaperBell/.obsidian/plugins/recent-files-obsidian/data.json
 PaperBell/Outputs/**/*.pdf
+PaperBell/Outputs/**/*.log

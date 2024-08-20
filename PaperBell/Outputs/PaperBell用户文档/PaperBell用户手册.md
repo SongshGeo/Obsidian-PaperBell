@@ -4,7 +4,7 @@ date: "2024-08-20"
 author: "Shuang Song"
 ---
 
-# `PaperBell`是否适用于你？
+# PaperBell是否适用于你?
 
 ## 🧑‍🎓 我...
 - [ ] 希望成为以学术为志业的人，愿意长期积累学术成果
