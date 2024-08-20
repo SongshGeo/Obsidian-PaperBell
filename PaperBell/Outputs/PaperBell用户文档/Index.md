@@ -12,6 +12,8 @@ longform:
       - 使用PaperBell阅读与整理资料
       - 使用PaperBell管理项目
       - 使用PaperBell整理输出笔记
+      - 使用PaperBell撰写长文本
+      - 使用PaperBell导出漂亮的学术文档
     - 用户答疑
     - - 关于和Zotero的联动问题
       - 关于如何使用示例仓库的问题
