@@ -217,6 +217,14 @@
                   "type": "tasks_timeline_view",
                   "state": {}
                 }
+              },
+              {
+                "id": "87e3f56e33a53aee",
+                "type": "leaf",
+                "state": {
+                  "type": "VIEW_TYPE_LONGFORM_EXPLORER",
+                  "state": {}
+                }
               }
             ]
           }
@@ -226,12 +234,13 @@
       },
       "left-ribbon": {
         "hiddenItems": {
+          "obsidian-projects:打开项目": false,
+          "obsidian42-brat:BRAT": false,
           "daily-notes:打开/创建今天的日记": false,
           "homepage:Open homepage": false,
           "obsidian-memos:Thino": false,
           "templater-obsidian:Templater": false,
           "obsidian-map-view:Open map view": false,
-          "obsidian-projects:Open projects": false,
           "soundscapes:Soundscapes: My Music": false,
           "switcher:打开快速切换": false,
           "graph:查看关系图谱": false,
@@ -242,7 +251,7 @@
         }
       },
       "active": "09485baf3a99e2db",
-      "mtime": "2024-06-16T11:23:45+08:00"
+      "mtime": "2024-08-20T09:33:11+08:00"
     }
   },
   "active": "主工作区"

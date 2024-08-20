@@ -1,10 +1,35 @@
 {
   "version": 3,
   "projects": {},
-  "selectedDraftVaultPath": null,
-  "userScriptFolder": null,
+  "selectedDraftVaultPath": "Outputs/PaperBell用户文档/Index.md",
+  "userScriptFolder": "40 - Obsidian/脚本/longform",
   "sessionStorage": "data",
   "sessions": [
+    {
+      "start": "2024-08-20T01:21:19.495Z",
+      "total": 7393,
+      "drafts": {
+        "Outputs/PaperBell用户文档/Index.md": {
+          "total": 7393,
+          "scenes": {
+            "设计理念": 1177,
+            "是否适用于你": 448,
+            "使用说明": 0,
+            "使用PaperBell阅读与整理资料": 918,
+            "使用PaperBell进行日常记录": 692,
+            "使用PaperBell整理输出笔记": 517,
+            "使用PaperBell管理项目": 699,
+            "用户答疑": 0,
+            "关于和Zotero的联动问题": 573,
+            "关于如何使用示例仓库的问题": 265,
+            "关于自动关联和统计的代码": 309,
+            "如何使用控制台查看错误": 126,
+            "PaperBell仓库使用的插件及其作用一览": 583,
+            "关于科研生活的探讨": 1086
+          }
+        }
+      }
+    },
     {
       "start": "2024-08-14T01:11:34.364Z",
       "total": 0,
@@ -31,15 +56,15 @@
     }
   ],
   "showWordCountInStatusBar": true,
-  "startNewSessionEachDay": true,
+  "startNewSessionEachDay": false,
   "sessionGoal": 500,
   "applyGoalTo": "all",
-  "notifyOnGoal": true,
+  "notifyOnGoal": false,
   "countDeletionsForGoal": false,
   "keepSessionCount": 30,
   "sessionFile": "longform-sessions.json",
-  "numberScenes": false,
-  "sceneTemplate": null,
+  "numberScenes": true,
+  "sceneTemplate": "40 - Obsidian/模板/学术长文本模板 Longform academic template.md",
   "workflows": {
     "Default Workflow": {
       "name": "Default Workflow",
@@ -72,7 +97,7 @@
         {
           "id": "write-to-note",
           "optionValues": {
-            "target": "manuscript.md",
+            "target": "PaperBell用户手册",
             "open-after": true
           }
         }
