@@ -1,6 +1,6 @@
 ---
 cate: 方法
-date: 2024-05-13
+date: 2024-08-21
 tags:
   - output
   - project/PaperBell
@@ -9,6 +9,7 @@ longform: true
 ---
 
 聚沙成塔，`PaperBell`感谢这些出色的开源插件，让本仓库的工作流得以丝滑实现。
+
 
 | 插件名                                   | 简单介绍                                 |
 | ------------------------------------- | ------------------------------------ |
@@ -21,12 +22,10 @@ longform: true
 | **obsidian-admonition**               | 允许在笔记中创建带样式的警告框、提示框等内容块。             |
 | **obsidian-advanced-uri**             | 提供高级 URI 功能，支持更复杂的链接和交互操作。           |
 | **obsidian-banners**                  | 在笔记顶部添加自定义横幅图片，美化和个性化笔记视觉效果。         |
-| **obsidian-charts**                   | 在笔记中创建和显示各种图表，支持数据可视化。               |
 | **obsidian-dynamic-toc**              | 自动生成和更新笔记中的动态目录（TOC），方便文档导航。         |
-| **obsidian-excalidraw-plugin**        | 集成 Excalidraw，提供手绘图形和图表的功能。          |
 | **obsidian-hover-editor**             | 允许在悬停时编辑链接预览，提高编辑效率。                 |
 | **obsidian-map-view**                 | 提供地图视图，将笔记中的地理信息可视化。                 |
-| **obsidian-thino**                    | 快速创建和管理备忘录或短笔记。                      |
+| **obsidian-memos**                    | 快速创建和管理备忘录或短笔记，适合轻量级记录。              |
 | **obsidian-minimal-settings**         | 提供额外的设置选项以支持 Minimal 主题的高级配置。        |
 | **obsidian-pandoc-reference-list**    | 集成 Pandoc，管理和格式化文献引用列表。              |
 | **obsidian-projects**                 | 项目管理插件，帮助组织和跟踪项目进度。                  |
@@ -37,4 +36,11 @@ longform: true
 | **obsidian-tracker**                  | 跟踪笔记中的各种数据，可用于习惯追踪、个人健康数据记录等。        |
 | **obsidian-view-mode-by-frontmatter** | 根据笔记的前置元数据自动切换视图模式，如阅读模式或编辑模式。       |
 | **quickadd**                          | 提供快速添加笔记、任务或其他元素到 Obsidian 的功能。      |
-| **recent-files-obsidian**             | 管理最近打开的文件                            |
+| **recent-files-obsidian**             | 管理最近打开的文件，方便快速访问。                      |
+| **obsidian-enhancing-export**         | 增强 Obsidian 导出功能，支持多种文件格式和自定义导出选项。  |
+| **obsidian-tracker**                  | 跟踪和可视化笔记中记录的数据，用于进度、健康、习惯等的监控。       |
+| **soundscapes**                       | 在 Obsidian 中创建和管理声音背景，用于提高工作专注力。         |
+| **tasks-calendar-wrapper**            | 将任务与日历结合，提供任务管理与日历视图的集成。              |
+| **tag-wrangler**                      | 管理和组织标签，提升 Obsidian 中标签的使用效率。           |
+| **virtual-linker**                    | 用于在笔记间创建虚拟链接，帮助管理和构建笔记之间的关系。          |
+| **zotlit**                            | 集成 Zotero，帮助管理和引用文献。                      |
