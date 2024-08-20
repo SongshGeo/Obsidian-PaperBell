@@ -2,11 +2,11 @@
 longform:
   format: scenes
   title: PaperBell用户文档
-  workflow: Default Workflow
+  workflow: CompileWithTitledFormatters
   sceneFolder: docs
   scenes:
-    - 设计理念
     - 是否适用于你
+    - 设计理念
     - 使用说明
     - - 使用PaperBell进行日常记录
       - 使用PaperBell阅读与整理资料

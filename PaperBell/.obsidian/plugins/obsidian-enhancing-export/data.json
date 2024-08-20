@@ -51,7 +51,7 @@
     {
       "name": "eisvogel",
       "type": "pandoc",
-      "arguments": "-f ${fromFormat} --data-dir=\"${vaultDir}/40 - Obsidian/脚本/pandoc\"  --resource-path=\"${currentDir}\" --resource-path=\"${attachmentFolderPath}\" --lua-filter=\"${luaDir}/pdf.lua\" ${ options.textemplate ? `--resource-path=\"${pluginDir}/textemplate\" --template=\"${options.textemplate}\"` : ` ` } -o \"${outputPath}\" -t pdf",
+      "arguments": "-f ${fromFormat} --data-dir=\"${vaultDir}/40 - Obsidian/脚本/pandoc\"  --resource-path=\"${currentDir}\" --resource-path=\"${currentDir}/imgs\" --resource-path=\"${currentDir}/img\" --resource-path=\"${attachmentFolderPath}\" --lua-filter=\"${luaDir}/pdf.lua\" ${ options.textemplate ? `--resource-path=\"${pluginDir}/textemplate\" --template=\"${options.textemplate}\"` : ` ` } -o \"${outputPath}\" -t pdf",
       "customArguments": "--bibliography=\"${vaultDir}/40 - Obsidian/mybib.bib\"  --pdf-engine=xelatex --filter pandoc-crossref --number-sections --citeproc -M reference-section-title=References --template=eisvogel --listings",
       "optionsMeta": {
         "textemplate": "preset:textemplate"
@@ -66,7 +66,7 @@
   "openExportedFileLocation": true,
   "lastEditName": "eisvogel",
   "lastExportDirectory": {
-    "darwin": "/Users/songshgeo/Documents/VSCode/PaperBell/PaperBell//"
+    "darwin": "/Users/songshgeo/Downloads/testing"
   },
-  "lastExportType": "eisvogel"
+  "lastExportType": "eisvogel-latex"
 }
