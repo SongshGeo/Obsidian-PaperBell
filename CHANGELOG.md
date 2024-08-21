@@ -1,4 +1,38 @@
 
+<a id='changelog-0.3.0'></a>
+# 0.3.0 — 2024-08-21
+
+## Added
+
+- 使用Virtual Linker插件进行潜在链接
+- 模板中增加longform: true/false的YAML属性选项
+- 使用Drafts文件夹存储临时的项目笔记文件
+- 增加 LongForm Step: 项目编译添加头文件
+- 增加强化导出功能以及eisvogel模板
+
+## Deprecated
+
+- 导出时过滤掉字符串不存在的警告（缺失emoji字体）
+- 优化一些插件的配置
+
+## Fixed
+
+- 更新所有插件
+
+## Docs
+
+- 增加文档介绍新的长文本和导出功能
+- 更新README，发布3.0介绍视频
+- 增加输出笔记使用说明
+- 更新插件列表
+- 导出PDF版本用户手册
+
+## Appearance
+
+- 图谱展示附件
+- 增加卡片和无序列表callout视图
+- virtual linker 插件展示潜在链接
+
 <a id='changelog-0.2.2'></a>
 # 0.2.2 — 2024-06-16
 
