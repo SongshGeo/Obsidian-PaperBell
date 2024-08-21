@@ -1,10 +1,10 @@
 ---
-title: "PaperBell用户手册PDF导出"
-date: "2024-08-20"
+title: "这是PaperBell用户文档的导出示例"
+date: "2024-08-21"
 author: "Shuang Song"
 ---
 
-# PaperBell是否适用于你?
+# PaperBell是否适用于你？
 
 ## 🧑‍🎓 我...
 - [ ] 希望成为以学术为志业的人，愿意长期积累学术成果
@@ -162,6 +162,8 @@ author: "Shuang Song"
 
 # 使用说明
 
+你可以使用PaperBell阅读与整理资料、使用PaperBell进行日常记录，在得到足够的积累后，你可能会 使用PaperBell整理输出笔记，获得更为成熟的笔记。这些笔记会为你的项目服务，所以你可能还需要使用PaperBell管理项目。项目的输出可能是论文或者报告，你同样希望在 Obsidian 这个最棒的笔记软件中进行，所以你还可以 使用PaperBell撰写长文本，并将你的长文本使用PaperBell导出漂亮的学术文档。
+
 
 -----
 
@@ -317,7 +319,7 @@ Cubox 是一个高亮阅读器，提供剪藏网页、高亮、批注等功能�
 > - 输入资料：使用PaperBell阅读与整理资料
 > - 日常记录：使用PaperBell进行日常记录
 
-## 创建笔记
+## 创建笔记草稿
 
 `PaperBell` 鼓励用户**以项目为导向**进行输出，在某个特定项目的项目主页里点击 “新建笔记”，就会弹出提示框，引导用户在以下四类中选择一个开始写输出笔记：
 
@@ -326,9 +328,9 @@ Cubox 是一个高亮阅读器，提供剪藏网页、高亮、批注等功能�
 - **结果**：介绍你得到的研究结果或总结的初步结论。
 - **讨论**：将你的结果和前人研究进行对比和深入探讨。
 
-> [!todo] 
+> [!warning] 注意
 > 
-> 目前上述四种分类仅仅是配图不同，以便用户区分。但未来的 `PaperBell` 版本中，可能会引入一些帮助笔记撰写的功能更新。
+> 目前上述四种分类仅仅是配图不同，以便用户区分。为了未经思考地避免创建过多笔记，输出的笔记仅存放在 `Drafts` 文件夹内，你不需要太强迫自己立即完成它。在未来，你需要使用PaperBell撰写长文本时，你可以再导入这些草稿。
 
 ## 参考文献
 
@@ -342,6 +344,98 @@ Cubox 是一个高亮阅读器，提供剪藏网页、高亮、批注等功能�
 在完成上述配置后，写笔记时使用 `[@]` 便可自动触发一个参考文献列表，根据你要参考的文献选择，就会自动插入一个 `[@citekey]` 格式的条目，如 [@song2019]，它会被自动渲染成可读的参考文献格式，并在右上角形成参考文献列表。
 
 ![[参考文献列表.png]]
+
+
+-----
+
+## 使用PaperBell撰写长文本
+
+## 组织长文本项目
+
+> 写作在于把网状的思维变成线性的输出。
+
+长文本功能主要使用LongForm插件实现。它允许你从一个大纲开始，将输出笔记积累成一篇长文本——这可能是一篇学术论文或者一份项目报告。
+
+>[!note]
+> 本手册无法穷极所有功能，具体的插件细节请参考原插件的相关文档。
+
+你可以在仓库内任意文件夹下右键使用 `Create Longform Project` 按钮创建一个长文本项目。输入一个项目名字，（如这里的示例是 "**PaperBell用户文档**"）。这之后会自动创建一个新的文件夹，文件夹为项目名，内部有一个 `index.md` 文档。
+
+>[!tip]
+> 文件夹的名字和 `index.md` 的名字都是可以更改的，`index.md` 的头文件中“longform”字段才是LongForm 插件识别项目的关键，小心更改。
+
+你的项目可以有很多的 `Scenes`，你可以认为每个 `Scene` 就是一小节，或者说你长文本中的最小写作单元。而在 Obsidian 中，每个 Scene 对应着一个 `.md` 文件。你可以从其它地方（如导入使用PaperBell整理输出笔记#创建笔记草稿）的笔记，也可以直接通过 LongForm 新建 Scene 来增加笔记。最后，再任意拖动的顺序来排列它们，这个顺序就会是未来整个项目的笔记编译和输出顺序，如：
+
+![[新建长文本笔记.png]]
+
+>[!tip] 建议
+>
+> 由于稍后我们要编译 LongForm 项目，我们尽量所有 `Scene` 的笔记创建到子文件夹内，再配置 LongForm Project 里的 "Scene Folder" 去找这些笔记。这样你的项目文件夹会干净很多。本地的配图也建议放在另一个子文件夹 "imgs" 中（而不是 Obsidian 的默认附件文件夹）。这样你可以用挪动整个项目文件夹的方式迁移/同步你的项目。
+
+> [!note]
+> 
+> 你可以从 `学术长文本模板 Longform academic template` 中修改创建 scene 的模板。它和输出笔记草稿最关键的区别是 `longform: true`，这标识着该笔记已经归属于某个长文本项目。
+
+## 编译项目
+
+当准备好项目输出时，可以在 `Compile` 一栏编译项目的输出手稿。`Longform` 插件使用 "WorkFlow" 的概念来完成这一编译过程。这意味着，你的编译会包含一些步骤，他们将依次处理你的各章节，并整合成一篇完整的手稿。默认的步骤通常为：
+
+1. 去除各章节的YAML属性 (Strip Frontmatter)
+2. 移除文件的外部链接 (Remove Links)
+3. 添加章节标题 (Prepend Title)
+4. 聚合文本 (Concatenate Text)
+5. 保存手稿 (Save as Note)
+
+在 `PaperBell` 中，我们提供了另两个脚本： 
+
+- 将各章节YAML中变量`scene_alias`作为章节题目 (Rename scenes to aliases)
+- 在最后输出的手稿中增加YAML头文件 (Add YAML Metadata)
+
+>[!warning] 注意
+>各个步骤的顺序很重要，如 Add YAML Metadata 一定要在 Save as Note 之前，Rename scenes to aliases 一定要在 Prepend Title 之前。
+
+这些步骤如果成功处理，通常你会打开一个编译后的手稿，你接下来可以使用PaperBell导出漂亮的学术文档，直接完成由`.md`笔记到学术报告的华丽蜕变。
+
+
+-----
+
+## 使用PaperBell导出漂亮的学术文档
+
+## 理论基础
+
+当你需要将 `MarkDown` 笔记转化为其它格式时，首先要明白有哪些通常的做法^[感谢Obsidian for Science交流群群友皮皮的推荐]：
+
+![MarkDown文档的导出方式类型](https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/e4MVc4.png)
+
+其中，我尝试使用过 `Pandoc`, `obsidian-pandoc-filters` 两种方案：
+
+- ”吹爆“的 `obsidian-pandoc-filters` 其实也是基于 “先转 `LaTeX`，再输出 `PDF`” 的核心思路。只是它用了最先进的 `LuaLaTeX`，结合漂亮的模板，的确在输出 `PDF` 的美观程度上无人能及。
+- Pandoc: 文档转化的瑞士军刀，可以说是最流行的文档转化方案。不仅可以转化 `.pdf`，还可以处理很多其它格式，如 `.docx`。而它在转化为 `PDF` 的时候核心也是用了 `LaTeX` 做中转，所以爱折腾的话也能弄出漂亮格式。而且你可以自由选择编译模板、编译方式等等，所以 `PaperBell` 这里使用 `Pandoc` 作为输出工具。
+
+## Enhancing Export
+
+`Enhancing Export` 是一个让用户更加灵活使用 Pandoc 的 Obsidian 插件。你可以在其中预定义许多命令，并存为模板，在导出时直接调用。举例来说，示例项目中的本笔记就可以轻松被导出成PDF，如以下效果：
+
+这里介绍一下相关参数，以便用户做定制：
+
+
+| 参数                      | 默认值                                   | 参数含义                                                                                                                         |
+| ----------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| --data-dir              | "${vaultDir}/40 - Obsidian/脚本/pandoc" | 从哪里读取Pandoc的数据文件（如模板），PaperBell提供了一个文件夹供参考，你也可以使用你自己的文件夹路径，或删掉该参数，以使用默认值。                                                    |
+| --resource-path         | "${currentDir}"                       | 资源路径，可以设置多个。${currentDir} 指的是当前文件夹，PaperBell 默认从以下位置找你的附件：(1) 当前文件夹 (2) Obsidian Vault 的附件文件夹 (3) 当前文件夹下的 "img" 或 "imgs" 文件夹 |
+| --bibliography          | "${vaultDir}/40 - Obsidian/mybib.bib" | 从哪里读参考文献列表（`.bib`文件），`PaperBell`这里使用和 Pandoc Reference List 插件相同的存放路径。                                                       |
+| --pdf-engine            | xelatex                               | 可选：xelatex, pdflatex, lualatex。建议 xelatex 对中文支持最友好。                                                                          |
+| --template              | eisvogel                              | 使用的 #LaTeX 模板，板名称一定要在 --data-dir 参数路径下的 templates 文件夹中以 `.latex` 的后缀名存在。`eisvogel` 是 `PaperBell` 提供的模板。                  |
+| reference-section-title | References                            | 参考文献小节的标题                                                                                                                    |
+| --listings              |                                       | 允许处理代码块格式                                                                                                                    |
+| --number-sections       |                                       | 小节标题带序号                                                                                                                      |
+
+>[!note]
+> 本手册无法穷极所有功能，具体的细节请参考 Pandoc 的相关文档。
+
+## LaTeX 模板
+
+`PaperBell` 提供了一个导出模板 “eisvogel”，这是基于一个流行的 pandoc-to-latex 模板 改编的中文适配版。你也可以参考这里定制你自己的模板，存放在 `40 - Obsidian/脚本/pandoc/templates` 文件夹中，然后使用 `--template=<模板名>` 命令来调用。
 
 
 -----
@@ -391,6 +485,7 @@ Cubox 是一个高亮阅读器，提供剪藏网页、高亮、批注等功能�
 -----
 
 ## 关于如何使用示例仓库的问题
+
 ## 什么是示例仓库？
 
 1. 示例仓库 **不是插件，不是插件，不是插件**。
@@ -433,6 +528,7 @@ Cubox 是一个高亮阅读器，提供剪藏网页、高亮、批注等功能�
 
 聚沙成塔，`PaperBell`感谢这些出色的开源插件，让本仓库的工作流得以丝滑实现。
 
+
 | 插件名                                   | 简单介绍                                 |
 | ------------------------------------- | ------------------------------------ |
 | **calendar**                          | 添加日历视图，方便查看和管理时间线。                   |
@@ -444,12 +540,10 @@ Cubox 是一个高亮阅读器，提供剪藏网页、高亮、批注等功能�
 | **obsidian-admonition**               | 允许在笔记中创建带样式的警告框、提示框等内容块。             |
 | **obsidian-advanced-uri**             | 提供高级 URI 功能，支持更复杂的链接和交互操作。           |
 | **obsidian-banners**                  | 在笔记顶部添加自定义横幅图片，美化和个性化笔记视觉效果。         |
-| **obsidian-charts**                   | 在笔记中创建和显示各种图表，支持数据可视化。               |
 | **obsidian-dynamic-toc**              | 自动生成和更新笔记中的动态目录（TOC），方便文档导航。         |
-| **obsidian-excalidraw-plugin**        | 集成 Excalidraw，提供手绘图形和图表的功能。          |
 | **obsidian-hover-editor**             | 允许在悬停时编辑链接预览，提高编辑效率。                 |
 | **obsidian-map-view**                 | 提供地图视图，将笔记中的地理信息可视化。                 |
-| **obsidian-thino**                    | 快速创建和管理备忘录或短笔记。                      |
+| **obsidian-memos**                    | 快速创建和管理备忘录或短笔记，适合轻量级记录。              |
 | **obsidian-minimal-settings**         | 提供额外的设置选项以支持 Minimal 主题的高级配置。        |
 | **obsidian-pandoc-reference-list**    | 集成 Pandoc，管理和格式化文献引用列表。              |
 | **obsidian-projects**                 | 项目管理插件，帮助组织和跟踪项目进度。                  |
@@ -460,7 +554,14 @@ Cubox 是一个高亮阅读器，提供剪藏网页、高亮、批注等功能�
 | **obsidian-tracker**                  | 跟踪笔记中的各种数据，可用于习惯追踪、个人健康数据记录等。        |
 | **obsidian-view-mode-by-frontmatter** | 根据笔记的前置元数据自动切换视图模式，如阅读模式或编辑模式。       |
 | **quickadd**                          | 提供快速添加笔记、任务或其他元素到 Obsidian 的功能。      |
-| **recent-files-obsidian**             | 管理最近打开的文件                            |
+| **recent-files-obsidian**             | 管理最近打开的文件，方便快速访问。                      |
+| **obsidian-enhancing-export**         | 增强 Obsidian 导出功能，支持多种文件格式和自定义导出选项。  |
+| **obsidian-tracker**                  | 跟踪和可视化笔记中记录的数据，用于进度、健康、习惯等的监控。       |
+| **soundscapes**                       | 在 Obsidian 中创建和管理声音背景，用于提高工作专注力。         |
+| **tasks-calendar-wrapper**            | 将任务与日历结合，提供任务管理与日历视图的集成。              |
+| **tag-wrangler**                      | 管理和组织标签，提升 Obsidian 中标签的使用效率。           |
+| **virtual-linker**                    | 用于在笔记间创建虚拟链接，帮助管理和构建笔记之间的关系。          |
+| **zotlit**                            | 集成 Zotero，帮助管理和引用文献。                      |
 
 
 -----

@@ -11,13 +11,20 @@
 
 ## 核心特性
 
-不想看动图的，这里有[我录制的一个介绍视频](https://www.bilibili.com/video/BV15J4m1N7X8/?share_source=copy_web&vd_source=5402be8f77e5ca4d4b74ed198fbdad57)。
+不想看动图的，这里有我录制的介绍视频:
 
-`PaperBell` 将自动关联与项目有关的所有笔记。
+- [PaperBell 2.0: 增加项目管理功能](https://www.bilibili.com/video/BV15J4m1N7X8/?share_source=copy_web&vd_source=5402be8f77e5ca4d4b74ed198fbdad57)。
+- [PaperBell 3.0: 增加长文撰写与导出](https://www.bilibili.com/video/BV126WheJEDm/?share_source=copy_web&vd_source=5402be8f77e5ca4d4b74ed198fbdad57)
+
+`PaperBell` 将 `.md` 笔记转化为漂亮的学术文档（3.0以上版本）。
+
+![PDF导出功能](https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/CleanShot%202024-08-21%20at%2012.18.44@2x.png)
+
+`PaperBell` 将自动关联与项目有关的所有笔记（2.0以上版本）。
 
 ![追踪项目](https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/%E8%BF%BD%E8%B8%AA%E9%A1%B9%E7%9B%AE.gif)
 
-`PaperBell` 帮你关联所有一闪而过的念头与相关科学概念。
+`PaperBell` 帮你关联所有一闪而过的念头与相关科学概念（2.0以上版本）。
 
 ![概念-想法的链接](https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/%E6%A6%82%E5%BF%B5-%E6%83%B3%E6%B3%95%E7%9A%84%E9%93%BE%E6%8E%A5.gif)
 
