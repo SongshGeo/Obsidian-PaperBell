@@ -59,7 +59,7 @@
       "extension": ".pdf"
     }
   ],
-  "defaultExportDirectoryMode": "Auto",
+  "defaultExportDirectoryMode": "Same",
   "openExportedFile": true,
   "env": {},
   "showExportProgressBar": true,

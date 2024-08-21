@@ -29,6 +29,8 @@ const config: QuartzConfig = {
       "Inputs/0*.md",
       "Inputs/Books",
       "Inputs/Cubox",
+      "Outputs/**/Index.md",
+      "Outputs/**/index.md",
   ],
     defaultDateType: "created",
     theme: {
