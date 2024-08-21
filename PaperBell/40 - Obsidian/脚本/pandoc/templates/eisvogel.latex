@@ -76,6 +76,7 @@ $if(background-image)$
 \usebackgroundtemplate{%
   \includegraphics[width=\paperwidth]{$background-image$}%
 }
+
 % In beamer background-image does not work well when other images are used, so this is the workaround
 \pgfdeclareimage[width=\paperwidth,height=\paperheight]{background}{$background-image$}
 \usebackgroundtemplate{\pgfuseimage{background}}
@@ -226,6 +227,13 @@ $if(luatexjapresetoptions)$
     \usepackage[$for(luatexjapresetoptions)$$luatexjapresetoptions$$sep$,$endfor$]{luatexja-preset}
   \fi
 $endif$
+
+% 关闭缺失字体的警告
+\AtBeginDocument{
+  \tracinglostchars=0 % 关闭缺失字符的警告
+  \tracingonline=0    % 禁止在线报告字体问题
+}
+
 $if(CJKmainfont)$
   \ifLuaTeX
     \usepackage[$for(luatexjafontspecoptions)$$luatexjafontspecoptions$$sep$,$endfor$]{luatexja-fontspec}
