@@ -46,4 +46,4 @@
 - 最后，我为`PaperBell`项目创建了一个微信交流社群，欢迎交流任何关于学术生活的感想。由于二维码定期失效，用户可关注我的公众号【隅地】发送关键字“Obsidian”或“PaperBell”获取最新群聊二维码。
 - 任何开源项目相关问题欢迎邮件联系我 songshgeo[at]gmail[dot]com
 
-![个人banner2](https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/%E4%B8%AA%E4%BA%BAbanner2.png)
+![个人banner2](https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/myprofile.png)
