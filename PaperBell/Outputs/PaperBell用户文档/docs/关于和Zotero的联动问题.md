@@ -17,6 +17,33 @@ longform: true
 
 我个人认为后者更强大（要不然咱从 1.0 更新到 2.0 换工具了呢），也是咱们 `PKMer` 国内大佬 [AidenLx](https://github.com/aidenlx) 开发的，也有很好的中文教程，照着配置就好！
 
+## Zotlit 无法导入文献时排除错误
+
+首先排查模板问题，打开 `ZotLit` 插件的设置，上方的 `Template` 标签页，检查 `Ejectable` 栏目下的文档是否能正常打开（路径没问题）。
+
+![lvPLDZ](https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/lvPLDZ.png)
+
+> [!tip]
+> 
+> 通常来说无法导入文献都是由于转换成 `Markdown` 时的 YAML 属性出错，建议先检查 Note properties 这个模板。
+
+如果能够正常找到模板，在 Obsidian 命令板里找到 "**ZotLit: Open Zotero annotation view in side panel**" 并运行，你会在打开的侧边栏中找到如下图所示的图标。
+
+![SLVQ8b](https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/SLVQ8b.png)
+
+选择一篇你要测试的文献进行绑定，再点击左边第一个小图标 “Show details”，以该文献为例，查看根据模板导入 Obsidian 后的笔记示例。
+
+![1zAUIC](https://songshgeo-picgo-1302043007.cos.ap-beijing.myqcloud.com/uPic/1zAUIC.png)
+
+在三栏中，最左侧为模板，最右侧为 Zotero 的文献元数据，中间则为导入后的示例笔记。当最右侧数据出现时，通常说明 Zotero 到 Obsidian 的链接没有问题。但当中间一栏没有出现预期的笔记时，通常先换一篇文献看看是不是之前选定文献存在必要属性缺失的情况。如果换了几篇文献都问题，可以在最左侧一栏删去模板中的部分属性，排查出问题在哪里。
+
+> [!tip]
+> 检查出问题属性最快速的策略是用“二分法”，先删除一半的模板，看看问题出在上半部分还是下半部分，再对出问题的那部分继续二分 ... ...（小学数学问题，但还是有很多人问咋整 ... ...）
+
+> [!note]
+> 
+> `ZotLit` 使用 [Eta 模板语法](https://www.etajs.cn/docs/intro/template-syntax) 进行配置，对自定义模板感兴趣的可以查看 [ZotLit 的文档](https://zotlit.aidenlx.top/zh-CN/getting-started/basic-usage/template-basics)。本手册不做进一步说明。
+
 ## 如何引用文献？
 
 `PaperBell` 实现在 `Obsidian` 中引用文献的功能依赖于 [obsidian-pandoc-reference-list](https://github.com/mgmeyers/obsidian-pandoc-reference-list)插件，本质上是依赖于 `pandoc` 和 `BibTex` 的。前者是一种格式导入/导出的开源工具，后者是一套广为接受的参考文献引用系统。
