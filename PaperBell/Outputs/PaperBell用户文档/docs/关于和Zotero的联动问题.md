@@ -10,7 +10,7 @@ longform: true
 
 ## 如何配置和Zotero的联动？
 
-`PaperBell` 在1.0版本依赖 `Zotero Integration` 插件，在2.0版本依赖 `Zotlit` 插件。这两个插件都是为了让 Obsidian 和 Zotero 之间的联动更加方便。首先确认你的 `PaperBell` 参考的是哪个版本，然后按照对应插件的官方文档进行配置：
+`PaperBell` 在1.0版本依赖 `Zotero Integration` 插件，在2.0版本依赖 `Zotlit` 插件。这两个插件都是为了让 [[Obsidian]] 和 Zotero 之间的联动更加方便。首先确认你的 `PaperBell` 参考的是哪个版本，然后按照对应插件的官方文档进行配置：
 
 - [Zotero Integration GitHub 地址](https://github.com/mgmeyers/obsidian-zotero-integration)
 - [ZotLit 教程](https://zotlit.aidenlx.top/zh-CN)

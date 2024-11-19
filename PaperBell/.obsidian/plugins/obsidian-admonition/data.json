@@ -55,6 +55,19 @@
       "command": false,
       "injectColor": true,
       "noTitle": true
+    },
+    "bot": {
+      "type": "bot",
+      "color": "181, 69, 69",
+      "icon": {
+        "name": "robot",
+        "type": "font-awesome"
+      },
+      "command": false,
+      "title": "Bot",
+      "injectColor": true,
+      "noTitle": false,
+      "copy": true
     }
   },
   "syntaxHighlight": false,

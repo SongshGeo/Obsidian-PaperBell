@@ -13,5 +13,7 @@
   },
   "attachmentFolderPath": "40 - Obsidian/附件",
   "showInlineTitle": true,
-  "propertiesInDocument": "source"
+  "propertiesInDocument": "source",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "Cards/Concepts"
 }
