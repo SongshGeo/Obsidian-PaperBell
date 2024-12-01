@@ -1,15 +1,15 @@
 {
-  "name": "@jackyzha0/quartz",
-  "description": "🌱 publish your digital garden and notes as a website",
+  "name": "@songshgeo/paperbell",
+  "description": "✍🏻 An obsidian template vault for tracking your academic life.",
   "private": true,
-  "version": "4.2.3",
+  "version": "3.0.3",
   "type": "module",
-  "author": "jackyzha0 <j.zhao2k19@gmail.com>",
+  "author": "songshgeo <songshgeo@gmail.com>",
   "license": "MIT",
-  "homepage": "https://quartz.jzhao.xyz",
+  "homepage": "https://github.com/songshgeo/PaperBell",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jackyzha0/quartz.git"
+    "url": "https://github.com/songshgeo/PaperBell.git"
   },
   "scripts": {
     "quartz": "./quartz/bootstrap-cli.mjs",
