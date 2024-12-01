@@ -1,6 +1,6 @@
 {
   "command_timeout": 5,
-  "templates_folder": "Obsidian/模板",
+  "templates_folder": "40 - Obsidian/模板",
   "templates_pairs": [
     [
       "",
@@ -15,11 +15,19 @@
   "enable_folder_templates": true,
   "folder_templates": [
     {
-      "folder": "",
+      "folder": "Cards",
+      "template": "40 - Obsidian/模板/术语模板.md"
+    }
+  ],
+  "enable_file_templates": false,
+  "file_templates": [
+    {
+      "regex": ".*",
       "template": ""
     }
   ],
   "syntax_highlighting": true,
+  "syntax_highlighting_mobile": false,
   "enabled_templates_hotkeys": [
     ""
   ],
