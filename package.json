@@ -2,7 +2,7 @@
   "name": "@songshgeo/paperbell",
   "description": "✍🏻 An obsidian template vault for tracking your academic life.",
   "private": true,
-  "version": "2.1.0",
+  "version": "3.0.1",
   "type": "module",
   "author": "songshgeo <songshgeo@gmail.com>",
   "license": "MIT",

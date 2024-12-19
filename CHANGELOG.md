@@ -86,6 +86,13 @@
 - 修复了一些已知问题 📅 2024-05-13
 
 <a id='changelog-0.1.0'></a>
+## [3.0.1](https://github.com/SongshGeo/Obsidian-PaperBell/compare/v2.1.0...v3.0.1) (2024-12-19)
+
+
+### Bug Fixes
+
+* **theme:** :art: 修复由于gitignore而PaperBell路径内img没有上传的问题 ([d2a384f](https://github.com/SongshGeo/Obsidian-PaperBell/commit/d2a384fd0b4b4e987bb725587133ecb28f400cfb))
+
 ## [2.1.0](https://github.com/SongshGeo/Obsidian-PaperBell/compare/2.0.0...v2.1.0) (2024-12-01)
 
 
