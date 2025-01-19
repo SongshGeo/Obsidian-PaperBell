@@ -292,7 +292,7 @@
         },
         {
           "config": {
-            "interval": "2weeks",
+            "interval": "month",
             "checkField": "important"
           },
           "filter": {

@@ -19,3 +19,19 @@ If your plugin does not need CSS, delete this file.
     min-width: 200px;
     min-height: 60px;
 }
+
+
+.virtual-link-span:hover .multiple-files-references {
+    display: inline;
+}
+.virtual-link-span:hover .multiple-files-indicator {
+    display: none;
+}
+
+.multiple-files-references {
+    display: none;
+}
+
+.multiple-files-indicator {
+    display: inline;
+}
