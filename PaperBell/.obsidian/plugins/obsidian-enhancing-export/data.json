@@ -51,11 +51,7 @@
     {
       "name": "eisvogel",
       "type": "pandoc",
-      "arguments": "-f ${fromFormat} --data-dir=\"${vaultDir}/40 - Obsidian/脚本/pandoc\"  --resource-path=\"${currentDir}\" --resource-path=\"${currentDir}/imgs\" --resource-path=\"${currentDir}/img\" --resource-path=\"${attachmentFolderPath}\" --lua-filter=\"${luaDir}/pdf.lua\" ${ options.textemplate ? `--resource-path=\"${pluginDir}/textemplate\" --template=\"${options.textemplate}\"` : ` ` } -o \"${outputPath}\" -t pdf",
-      "customArguments": "--bibliography=\"${vaultDir}/40 - Obsidian/mybib.bib\"  --pdf-engine=xelatex --filter pandoc-crossref --number-sections --citeproc -M reference-section-title=References --template=eisvogel --listings",
-      "optionsMeta": {
-        "textemplate": "preset:textemplate"
-      },
+      "arguments": "--defaults=\"${vaultDir}/40 - Obsidian/脚本/pandoc/defaults/pdf.yaml\" --resource-path=\"${currentDir}\" --resource-path=\"${currentDir}/imgs\" --resource-path=\"${attachmentFolderPath}\" -o \"${outputPath}\"",
       "extension": ".pdf"
     }
   ],
@@ -63,5 +59,9 @@
   "openExportedFile": true,
   "env": {},
   "showExportProgressBar": true,
-  "lastEditName": "eisvogel"
+  "lastEditName": "eisvogel",
+  "lastExportDirectory": {
+    "darwin": "/Users/songshgeo/Downloads"
+  },
+  "lastExportType": "Markdown"
 }
