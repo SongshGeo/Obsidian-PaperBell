@@ -29,7 +29,6 @@ filters:
   - ${USERDATA}/filters/div.lua
   - ${USERDATA}/filters/preamble.lua
   - ${USERDATA}/filters/highlight.lua
-  - ${USERDATA}/filters/abstract-section.lua
   - pandoc-crossref
   - citeproc
 
