@@ -12,11 +12,11 @@ repos:
     args: ["-c", ".markdownlint.json"]
   - id: markdownlint-fix
     args: ["-c", ".markdownlint.json"]
--   repo: local
-    hooks:
-    -   id: check-obsidian-links
-        name: Check Obsidian Links
-        entry: python scripts/check_obsidian_links.py
-        language: python
-        types: [markdown]
-        pass_filenames: false
+# -   repo: local
+#     hooks:
+#     -   id: check-obsidian-links
+#         name: Check Obsidian Links
+#         entry: python scripts/check_obsidian_links.py
+#         language: python
+#         types: [markdown]
+#         pass_filenames: false

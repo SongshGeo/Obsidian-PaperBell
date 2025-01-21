@@ -1,6 +1,12 @@
 {
   "items": [
     {
+      "name": "PaperBell",
+      "type": "pandoc",
+      "arguments": "--defaults=\"${vaultDir}/40 - Obsidian/脚本/pandoc/defaults/pdf.yaml\" --resource-path=\"${currentDir}\" --resource-path=\"${currentDir}/imgs\" --resource-path=\"${attachmentFolderPath}\" -o \"${outputPath}\"",
+      "extension": ".pdf"
+    },
+    {
       "name": "Markdown"
     },
     {
@@ -47,12 +53,6 @@
     },
     {
       "name": "Bibliography"
-    },
-    {
-      "name": "eisvogel",
-      "type": "pandoc",
-      "arguments": "--defaults=\"${vaultDir}/40 - Obsidian/脚本/pandoc/defaults/pdf.yaml\" --resource-path=\"${currentDir}\" --resource-path=\"${currentDir}/imgs\" --resource-path=\"${attachmentFolderPath}\" -o \"${outputPath}\"",
-      "extension": ".pdf"
     }
   ],
   "defaultExportDirectoryMode": "Same",
@@ -61,7 +61,7 @@
   "showExportProgressBar": true,
   "lastEditName": "eisvogel",
   "lastExportDirectory": {
-    "darwin": "/Users/songshgeo/Downloads"
+    "darwin": "/Users/songshgeo/Documents/VSCode/PaperBell/PaperBell/Outputs/PaperBell用户文档"
   },
-  "lastExportType": "Markdown"
+  "lastExportType": "PaperBell"
 }

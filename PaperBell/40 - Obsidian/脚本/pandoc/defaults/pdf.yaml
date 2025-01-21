@@ -12,7 +12,7 @@ data-dir: ${.}/..                             #! custom data directory, the dire
 
 
 ## Templates
-# template: ${USERDATA}/templates/proposal.latex     #! custom template
+template: ${USERDATA}/templates/eisvogel.latex
 
 ## Biliography
 bibliography: ${USERDATA}/../../mybib.bib     #! custom bib file
@@ -29,16 +29,19 @@ filters:
   - ${USERDATA}/filters/div.lua
   - ${USERDATA}/filters/preamble.lua
   - ${USERDATA}/filters/highlight.lua
-  # - mermaid-filter
+  - ${USERDATA}/filters/abstract-section.lua
   - pandoc-crossref
   - citeproc
 
 metadata:
-  CJKmainfont: SimSong
-  CJKoptions: AutoFakeBold
-  # numbersections: true
+  CJKmainfont: Songti SC
+  CJKsansfont: Heiti SC
+  CJKmonofont: STFangsong
+  mainfont: Times New Roman
+  sansfont: Arial
+  monofont: Courier New
+  numbersections: true
   link-citations: true
-  preamble-file: preamble.sty            #! custom preamble file, relative to the custom data directory
   # For pandoc-crossref
   crossrefYaml: .config/pandoc/defaults/crossref.yaml
   # For citeproc
@@ -50,8 +53,6 @@ variables:
   fonttheme: "professionalfonts"
   theme: "Antibes"
   graphics: true
-  geometry:
-    - margin=1in
   natbiboptions: numbers,square
   biblatexoptions: style=numeric
   biblio-title: References

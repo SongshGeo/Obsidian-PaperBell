@@ -6,76 +6,35 @@
 --]]
 
 function Link(link)
-  local content_type = nil
-  local target_type = nil
-  local link_type = nil
 
+  -- 如果是外部链接（以 http 开头）
+  if link.target:match("^https?://") then
+    return pandoc.RawInline("latex", "\\href{" .. link.target .. "}{" .. pandoc.utils.stringify(link.content) .. "}")
+  end
+
+  -- 如果是 wikilink
   if link.title == "wikilink" then
-    -- Handling content (display)
-    if link.target == pandoc.utils.stringify(link.content) then
-      content_type = "noalias"
-      if link.target:match("^#") then
-        content = nil
-      else
-        if link.target:match("#%^") then
-          content = link.target:gsub('#%^.*', '')
-        else
-          content = link.content[1].text:gsub('#', ' > ')
-        end
-      end
-    else -- use alias
-      content_type = "alias"
-      content = link.content[1].text
-    end
+    local content = pandoc.utils.stringify(link.content)
+    local target = link.target
 
-    -- Handling target
-    if link.target:match("^#") then
-      link_type = "internal"
-      if link.target:match("^#%^") then
-        target_type = "block"
-        target = link.target:gsub('^#%^', '')
+    -- 处理带有 # 的目标（章节引用）
+    if target:match("#") then
+      local base, section = target:match("([^#]*)#(.*)")
+      if base == "" then
+        -- 只有章节引用
+        return pandoc.RawInline("latex", "\\hyperref[" .. section .. "]{" .. section .. "}")
       else
-        target_type = "heading"
+        -- 文件名和章节引用
+        local display_text = base .. " => " .. section
+        return pandoc.RawInline("latex", "\\href{" .. section .. "}{" .. display_text .. "}")
       end
     else
-      link_type = "external"
-      if link.target:match("#") then
-        if link.target:match("#%^") then
-          target_type = "block"
-          target = link.target:gsub('#%^.*', '')
-        else
-          target_type = "heading"
-        end
-      else
-        target_type = "file"
-        target = link.target
-      end
+      -- 普通文件引用
+      return pandoc.RawInline("latex", "\\href{" .. target .. "}{" .. content .. "}")
     end
   end
 
-  -- Heading links
-  if (target_type == "heading") or (link.title ~= "wikilink" and link.target:match("^<?#[^%^]")) then
-    link.target = link.target:lower()
-    link.target = link.target:gsub(' ', '-')
-    link.target = link.target:gsub('%%20', '-')
-    link.target = link.target:gsub('[^a-zA-Z0-9#%-]', '')
-    target = link.target:gsub('^#*', '')
-  end
-
-  -- Compose reference
-  if link.title == "wikilink" then
-    if link_type == "internal" then
-      if content_type == "noalias" then
-        return pandoc.RawInline("latex", "\\ref{" .. target .. "}")
-      elseif content_type == "alias" then
-        return pandoc.RawInline("latex", "\\hyperref[" .. target .. "]{" .. content .. "}")
-      end
-    elseif link_type == "external" then
-      link.content = content
-      link.target = target
-      return link
-    end
-  end
+  -- 其他情况保持原样
   return link
 end
 

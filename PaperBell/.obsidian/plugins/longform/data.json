@@ -18,7 +18,7 @@
   "workflows": {
     "CompileWithTitledFormatters": {
       "name": "CompileWithTitledFormatters",
-      "description": "A starter workflow. Feel free to edit, rename, or delete it and create your own.",
+      "description": "",
       "steps": [
         {
           "id": "strip-frontmatter",
@@ -51,7 +51,7 @@
         {
           "id": "40 - Obsidian/脚本/longform/编译后增加头文件.js",
           "optionValues": {
-            "title": "这是PaperBell用户文档的导出示例",
+            "title": "PaperBell用户文档",
             "author-name": "Shuang Song"
           }
         },
