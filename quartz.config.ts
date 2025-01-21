@@ -15,7 +15,7 @@ const config: QuartzConfig = {
       provider: "plausible",
     },
     locale: "en-US",
-    baseUrl: "https://paperbell.songshgeo.com",
+    baseUrl: "quartz.jzhao.xyz",
     ignorePatterns: [
       "private",
       "templates",
