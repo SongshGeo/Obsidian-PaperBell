@@ -1,7 +1,7 @@
 {
   "version": 3,
   "projects": {},
-  "selectedDraftVaultPath": "Outputs/PaperBell用户文档/Index.md",
+  "selectedDraftVaultPath": "Outputs/PaperBell用户文档/index.md",
   "userScriptFolder": "40 - Obsidian/脚本/longform",
   "sessionStorage": "file",
   "sessions": [],
@@ -51,7 +51,7 @@
         {
           "id": "40 - Obsidian/脚本/longform/编译后增加头文件.js",
           "optionValues": {
-            "title": "PaperBell用户文档",
+            "title": "PaperBell用户手册",
             "author-name": "Shuang Song"
           }
         },
