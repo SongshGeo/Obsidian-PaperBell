@@ -2,7 +2,7 @@
   "name": "@songshgeo/paperbell",
   "description": "✍🏻 Research, to be connected.",
   "private": true,
-  "version": "3.1.0",
+  "version": "3.0.1",
   "type": "module",
   "author": "songshgeo <songshgeo@gmail.com>",
   "license": "MIT",
