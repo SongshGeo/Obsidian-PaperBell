@@ -5,10 +5,17 @@ tags:
   - output
   - project/PaperBell
 banner: "40 - Obsidian/img/方法.jpg"
-longform: true
+author:
+  - Shuang Song
+longform: false
+title: "关于和 Zotero 的联动问题"
+banner_icon: 🧭
 ---
 
 ## ZotLit 无法导入文献时排除错误
+
+> [!question]
+> 为什么我导入文献时，ZotLit 无法导入文献？
 
 首先排查模板问题，打开 `ZotLit` 插件的设置，上方的 `Template` 标签页，检查 `Ejectable` 栏目下的文档是否能正常打开（路径没问题）。
 

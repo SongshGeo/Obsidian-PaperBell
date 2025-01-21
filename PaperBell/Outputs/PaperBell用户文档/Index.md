@@ -5,11 +5,12 @@ longform:
   workflow: CompileWithTitledFormatters
   sceneFolder: 功能介绍
   scenes:
-    - 导出学术文档
-    - 撰写输出笔记
-    - 管理科研项目
     - 日常记录
     - 文献阅读笔记
+    - 管理科研项目
+    - 撰写输出笔记
+    - 撰写长文本
+    - 导出学术文档
   ignoredFiles:
     - PaperBell用户手册
 title: PaperBell
@@ -19,28 +20,25 @@ title: PaperBell
 
 `PaperBell`: Research, to be connected.
 
-👋 `PaperBell` 是使用 `Obsidian` 管理你学术生涯的终极方案。
+👋 `PaperBell` 是使用 `Obsidian` 管理你学术生涯的终极方案。如果你是首次接触 `PaperBell`，请按照以下步骤操作：
 
-1. 🤔️ 这个仓库是根据自己的需求建立的，请先判断`PaperBell`[[是否适用于你]]
-2. 🙋 如果你确定这个仓库适用于你，先欢迎来熟悉下本仓库的[[设计理念]]
-3. ✍️ 如果你认同我的理念，欢迎在[文档](https://paperbell.songshgeo.com/)里阅读用 `PaperBell` 框架[[使用PaperBe[[撰写输出笔记|做笔记的方法]]生活的探讨]]。
-4. 对于第一次接触`Obsidian`的新人，我建议先看看[[关于如何使用示例仓库的问题]]。
+1. 🤔️ 先判断 `PaperBell` [[是否适用于你]]
+2. 🙋 熟悉下本仓库的[[核心设计理念]]，并通过[介绍视频](https://www.bilibili.com/video/BV15J4m1N7X8/?share_source=copy_web&vd_source=5402be8f77e5ca4d4b74ed198fbdad57)了解核心功能。
+3. ✍️ 在[这里](https://github.com/SongshGeo/Obsidian-PaperBell/releases)下载最新版本的示例库。
+4. 对于第一次接触 `Obsidian` 的新人，先看看[Obsidian 的使用方法](https://help.obsidian.md/Home)与[[使用示例仓库]]。
+5. 参照以下核心功能介绍文档，使用 `PaperBell` 管理你的学术生活：
+   - [[管理科研项目]]
+   - [[日常记录]]
+   - [[文献阅读笔记]]
+   - [[撰写输出笔记]]
+   - [[导出学术文档]]
+6. 使用过程中有任何问题，请参考以下用户答疑：
+   - [[使用示例仓库]]
+   - [[和 Zotero 的联动]]
+   - [[关于自动关联和统计的代码]]
 
-关于核心特性，这里有[我录制的一个介绍视频](https://www.bilibili.com/video/BV15J4m1N7X8/?share_source=copy_web&vd_source=5402be8f77e5ca4d4b74ed198fbdad57)。
+## 社区支持
 
-## 使用方法
+我们为`PaperBell`项目创建了一个微信交流社群，欢迎交流任何关于学术生活的感想。用户可关注我的公众号【隅地】发送关键字 `Obsidian` 或 `PaperBell` 获取最新群聊二维码。
 
-- [[使用Paper[[管理科研项目]]perBell[[日常记录]]ell阅读与整理资料]]
-- [[使用PaperBe[[撰写输出笔记]]]
-- [[使用PaperBe[[导[[导出学术文档]][是否适用于你]]
-- [[设计理念]]
-- [[PaperBell仓库使用的插件及其作用一览]]
-- [[关于科研生活的探讨]]
-
-## 用户答疑
-
-- [[关于如何使用示例仓库的问题]]
-- [[关于和Zotero的联动问题]]
-- [[关于自动关联和统计的代码]]
-
-最后，我为`PaperBell`项目创建了一个微信交流社群，欢迎交流任何关于学术生活的感想。由于二维码定期失效，用户可关注我的公众号【隅地】发送关键字“Obsidian”或“PaperBell”获取最新群聊二维码。
+你也可以通过[GitHub issue](https://github.com/SongshGeo/PaperBell/issues)反馈问题，或者[通过邮箱联系我们](mailto:PaperBell@songshgeo.com)。
