@@ -98,9 +98,11 @@ var PrefixNode = class {
   }
 };
 var VisitedPrefixNode = class {
-  constructor(node, caseIsMatched = true) {
+  constructor(node, caseIsMatched = true, startedAtWordBeginning = false) {
+    this.formattingDelta = 0;
     this.node = node;
     this.caseIsMatched = caseIsMatched;
+    this.startedAtWordBeginning = startedAtWordBeginning;
   }
 };
 var MatchNode = class {
@@ -111,6 +113,7 @@ var MatchNode = class {
     this.value = "";
     this.isAlias = false;
     this.caseIsMatched = true;
+    this.startsAtWordBoundary = false;
     this.requiresCaseMatch = false;
   }
   get end() {
@@ -146,14 +149,14 @@ var PrefixTree = class {
         continue;
       }
       const matchNode = new MatchNode();
-      matchNode.length = node.node.value.length;
+      matchNode.length = node.node.value.length + node.formattingDelta;
       matchNode.start = index - matchNode.length;
       matchNode.files = new Set(Array.from(node.node.files).filter((file) => !excludedNote || file.path !== excludedNote.path));
       matchNode.value = node.node.value;
       matchNode.requiresCaseMatch = node.node.requiresCaseMatch;
       const fileNames = Array.from(matchNode.files).map((file) => file.basename);
       const nodeValue = node.node.value;
-      matchNode.isAlias = !fileNames.includes(nodeValue);
+      matchNode.isAlias = !fileNames.map((n) => n.toLowerCase()).includes(nodeValue.toLowerCase());
       let currentNode = node.node;
       while (currentNode) {
         if (!node.caseIsMatched) {
@@ -162,6 +165,7 @@ var PrefixTree = class {
         }
         currentNode = currentNode.parent;
       }
+      matchNode.startsAtWordBoundary = node.startedAtWordBeginning;
       if (matchNode.requiresCaseMatch && !matchNode.caseIsMatched) {
         continue;
       }
@@ -347,23 +351,40 @@ var PrefixTree = class {
     const chars = [char];
     chars.push(char.toLowerCase());
     chars.forEach((c) => {
-      if (!this.settings.matchOnlyWholeWords || PrefixTree.checkWordBoundary(c)) {
-        newNodes.push(new VisitedPrefixNode(this.root));
+      const isBoundary = PrefixTree.checkWordBoundary(c);
+      if (this.settings.matchAnyPartsOfWords || isBoundary || this.settings.matchEndOfWords) {
+        newNodes.push(new VisitedPrefixNode(this.root, true, isBoundary));
       }
       for (const node of this._currentNodes) {
         const child = node.node.children.get(c);
+        const startedAtBoundary = node.startedAtWordBeginning;
         if (child) {
           const newPrefixNodes = newNodes.map((n) => n.node);
           if (!newPrefixNodes.includes(child)) {
-            newNodes.push(new VisitedPrefixNode(child, char == c));
+            const newVisited = new VisitedPrefixNode(child, char == c, startedAtBoundary);
+            newVisited.formattingDelta = node.formattingDelta;
+            newNodes.push(newVisited);
           }
+        }
+      }
+      if (false) {
+        const isFormatting = PrefixTree.isFormattingChar(char);
+        if (isFormatting) {
+          this._currentNodes.forEach((node) => {
+            node.formattingDelta += 1;
+          });
+          newNodes.push(...this._currentNodes);
         }
       }
     });
     this._currentNodes = newNodes;
   }
   static checkWordBoundary(char) {
-    let pattern = /[\t- !-/:-@\[-`{-~\p{Emoji_Presentation}\p{Extended_Pictographic}]/u;
+    let pattern = /[^\p{L}]/u;
+    return pattern.test(char);
+  }
+  static isFormattingChar(char) {
+    const pattern = /[^\p{L}\p{N}]/u;
     return pattern.test(char);
   }
 };
@@ -402,6 +423,157 @@ var LinkerCache = class {
   }
 };
 
+// linker/virtualLinkDom.ts
+var VirtualMatch = class {
+  constructor(id, originText, from, to, files, isAlias, isSubWord, settings) {
+    this.id = id;
+    this.originText = originText;
+    this.from = from;
+    this.to = to;
+    this.files = files;
+    this.isAlias = isAlias;
+    this.isSubWord = isSubWord;
+    this.settings = settings;
+  }
+  getCompleteLinkElement() {
+    const span = this.getLinkRootSpan();
+    const firstPath = this.files.length > 0 ? this.files[0].path : "";
+    span.appendChild(this.getLinkAnchorElement(this.originText, firstPath));
+    if (this.files.length > 1) {
+      if (!this.isSubWord) {
+        span.appendChild(this.getMultipleReferencesIndicatorSpan());
+      }
+      span.appendChild(this.getMultipleReferencesSpan());
+    }
+    if (!this.isSubWord || !this.settings.suppressSuffixForSubWords) {
+      const icon = this.getIconSpan();
+      if (icon)
+        span.appendChild(icon);
+    }
+    return span;
+  }
+  getLinkAnchorElement(linkText, href) {
+    const link = document.createElement("a");
+    link.href = href;
+    link.textContent = linkText;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.setAttribute("from", this.from.toString());
+    link.setAttribute("to", this.to.toString());
+    link.setAttribute("origin-text", this.originText);
+    link.classList.add("internal-link", "virtual-link-a");
+    return link;
+  }
+  getLinkRootSpan() {
+    const span = document.createElement("span");
+    span.classList.add("glossary-entry", "virtual-link", "virtual-link-span");
+    if (this.settings.applyDefaultLinkStyling) {
+      span.classList.add("virtual-link-default");
+    }
+    return span;
+  }
+  getMultipleReferencesSpan(files) {
+    const spanReferences = document.createElement("span");
+    if (!this.settings.alwaysShowMultipleReferences) {
+      spanReferences.classList.add("multiple-files-references");
+    }
+    files = files != null ? files : this.files;
+    files.forEach((file, index) => {
+      if (index === 0) {
+        const bracket = document.createElement("span");
+        bracket.textContent = this.isSubWord ? "[" : " [";
+        spanReferences.appendChild(bracket);
+      }
+      let linkText = ` ${index + 1} `;
+      if (index < files.length - 1) {
+        linkText += "|";
+      }
+      let linkHref = file.path;
+      const link = this.getLinkAnchorElement(linkText, linkHref);
+      spanReferences.appendChild(link);
+      if (index == files.length - 1) {
+        const bracket = document.createElement("span");
+        bracket.textContent = "]";
+        spanReferences.appendChild(bracket);
+      }
+    });
+    return spanReferences;
+  }
+  getMultipleReferencesIndicatorSpan() {
+    const spanIndicator = document.createElement("span");
+    spanIndicator.textContent = " [...]";
+    spanIndicator.classList.add("multiple-files-indicator");
+    return spanIndicator;
+  }
+  getIconSpan() {
+    var _a;
+    const suffix = this.isAlias ? this.settings.virtualLinkAliasSuffix : this.settings.virtualLinkSuffix;
+    if (((_a = suffix == null ? void 0 : suffix.length) != null ? _a : 0) > 0) {
+      let icon = document.createElement("sup");
+      icon.textContent = suffix;
+      icon.classList.add("linker-suffix-icon");
+      return icon;
+    }
+    return null;
+  }
+  static compare(a, b) {
+    if (a.from === b.from) {
+      if (b.to == a.to) {
+        return b.files.length - a.files.length;
+      }
+      return b.to - a.to;
+    }
+    return a.from - b.from;
+  }
+  static sort(matches) {
+    return Array.from(matches).sort(VirtualMatch.compare);
+  }
+  static filterAlreadyLinked(matches, linkedFiles, mode = "every") {
+    return matches.filter((match) => {
+      if (mode === "every") {
+        return !match.files.every((file) => linkedFiles.has(file));
+      } else {
+        return !match.files.some((file) => linkedFiles.has(file));
+      }
+    });
+  }
+  static filterOverlapping(matches, onlyLinkOnce = true, excludedIntervalTree) {
+    const matchesToDelete = /* @__PURE__ */ new Map();
+    for (let i = 0; i < matches.length; i++) {
+      const addition = matches[i];
+      if (matchesToDelete.has(addition.id)) {
+        continue;
+      }
+      if (excludedIntervalTree) {
+        const overlaps = excludedIntervalTree.search([addition.from, addition.to]);
+        if (overlaps.length > 0) {
+          matchesToDelete.set(addition.id, true);
+          continue;
+        }
+      }
+      for (let j = i + 1; j < matches.length; j++) {
+        const otherAddition = matches[j];
+        if (otherAddition.from >= addition.to) {
+          break;
+        }
+        matchesToDelete.set(otherAddition.id, true);
+      }
+      if (onlyLinkOnce) {
+        for (let j = i + 1; j < matches.length; j++) {
+          const otherAddition = matches[j];
+          if (matchesToDelete.has(otherAddition.id)) {
+            continue;
+          }
+          if (otherAddition.files.every((f) => addition.files.contains(f))) {
+            matchesToDelete.set(otherAddition.id, true);
+          }
+        }
+      }
+    }
+    return matches.filter((match) => !matchesToDelete.has(match.id));
+  }
+};
+
 // linker/readModeLinker.ts
 var GlossaryLinker = class extends import_obsidian3.MarkdownRenderChild {
   constructor(app, settings, context, containerEl) {
@@ -430,7 +602,6 @@ var GlossaryLinker = class extends import_obsidian3.MarkdownRenderChild {
     return currentPath;
   }
   onload() {
-    var _a;
     if (!this.settings.linkerActivated) {
       return;
     }
@@ -452,122 +623,50 @@ var GlossaryLinker = class extends import_obsidian3.MarkdownRenderChild {
             if (text.length === 0)
               continue;
             this.linkerCache.reset();
-            const additions = [];
+            let matches = [];
             let id = 0;
             for (let i = 0; i <= text.length; i) {
               const codePoint = text.codePointAt(i);
               const char = i < text.length ? String.fromCodePoint(codePoint) : "\n";
               const isWordBoundary = PrefixTree.checkWordBoundary(char);
-              if (!this.settings.matchOnlyWholeWords || this.settings.matchBeginningOfWords || isWordBoundary) {
+              if (this.settings.matchAnyPartsOfWords || this.settings.matchBeginningOfWords || isWordBoundary) {
                 const currentNodes = this.linkerCache.cache.getCurrentMatchNodes(i);
                 if (currentNodes.length > 0) {
-                  const node = currentNodes[0];
-                  const nFrom = node.start;
-                  const nTo = node.end;
-                  const name = text.slice(nFrom, nTo);
-                  const file = node.files.values().next().value;
-                  additions.push({
-                    id: id++,
-                    from: nFrom,
-                    to: nTo,
-                    text: name,
-                    file,
-                    isSubWord: !isWordBoundary,
-                    isAlias: node.isAlias
+                  currentNodes.forEach((node) => {
+                    if (!this.settings.matchAnyPartsOfWords) {
+                      if (this.settings.matchBeginningOfWords && !node.startsAtWordBoundary && this.settings.matchEndOfWords && !isWordBoundary) {
+                        return;
+                      }
+                    }
+                    const nFrom = node.start;
+                    const nTo = node.end;
+                    const name = text.slice(nFrom, nTo);
+                    matches.push(new VirtualMatch(id++, name, nFrom, nTo, Array.from(node.files), node.isAlias, !isWordBoundary, this.settings));
                   });
                 }
               }
               this.linkerCache.cache.pushChar(char);
               i += char.length;
             }
-            additions.sort((a, b) => {
-              if (a.from === b.from) {
-                return b.to - a.to;
-              }
-              return a.from - b.from;
-            });
-            const filteredAdditions = [];
-            const additionsToDelete = /* @__PURE__ */ new Map();
+            matches = VirtualMatch.sort(matches);
             if (this.settings.excludeLinksToRealLinkedFiles) {
-              for (const addition of additions) {
-                if (explicitlyLinkedFiles.has(addition.file)) {
-                  additionsToDelete.set(addition.id, true);
-                }
-              }
+              matches = VirtualMatch.filterAlreadyLinked(matches, explicitlyLinkedFiles);
             }
             if (this.settings.onlyLinkOnce) {
-              for (const addition of additions) {
-                if (linkedFiles.has(addition.file)) {
-                  additionsToDelete.set(addition.id, true);
-                }
-              }
+              matches = VirtualMatch.filterAlreadyLinked(matches, linkedFiles);
             }
-            for (let i = 0; i < additions.length; i++) {
-              const addition = additions[i];
-              if (additionsToDelete.has(addition.id)) {
-                continue;
-              }
-              for (let j = i + 1; j < additions.length; j++) {
-                const otherAddition = additions[j];
-                if (otherAddition.from >= addition.to) {
-                  break;
-                }
-                additionsToDelete.set(otherAddition.id, true);
-              }
-              if (this.settings.onlyLinkOnce) {
-                for (let j = i + 1; j < additions.length; j++) {
-                  const otherAddition = additions[j];
-                  if (additionsToDelete.has(otherAddition.id)) {
-                    continue;
-                  }
-                  if (otherAddition.file.path === addition.file.path) {
-                    additionsToDelete.set(otherAddition.id, true);
-                  }
-                }
-              }
-            }
-            for (const addition of additions) {
-              if (!additionsToDelete.has(addition.id)) {
-                filteredAdditions.push(addition);
-              }
-            }
+            matches = VirtualMatch.filterOverlapping(matches, this.settings.onlyLinkOnce);
             const parent = childNode.parentElement;
             let lastTo = 0;
-            for (let addition of filteredAdditions) {
-              linkedFiles.add(addition.file);
-              const destName = this.ctx.sourcePath.replace(/(.*).md/, "$1");
-              const linkpath = addition.file.path;
-              const replacementText = addition.text;
-              let span = document.createElement("span");
-              span.classList.add("glossary-entry", "virtual-link");
-              if (this.settings.applyDefaultLinkStyling) {
-                span.classList.add("virtual-link-default");
-              }
-              let link = this.containerEl.createEl("a");
-              link.text = `${replacementText}`;
-              link.href = `${linkpath}`;
-              link.setAttribute("data-href", `${linkpath}`);
-              link.classList.add("internal-link");
-              link.classList.add("virtual-link-a");
-              link.setAttribute("origin-text", this.text);
-              link.target = "_blank";
-              link.rel = "noopener";
-              span.appendChild(link);
-              if (!addition.isSubWord || !this.settings.suppressSuffixForSubWords) {
-                const suffix = addition.isAlias ? this.settings.virtualLinkAliasSuffix : this.settings.virtualLinkSuffix;
-                if (((_a = suffix == null ? void 0 : suffix.length) != null ? _a : 0) > 0) {
-                  let icon = document.createElement("sup");
-                  icon.textContent = suffix;
-                  icon.classList.add("linker-suffix-icon");
-                  span.appendChild(icon);
-                }
-              }
-              if (addition.from > 0) {
-                parent == null ? void 0 : parent.insertBefore(document.createTextNode(text.slice(lastTo, addition.from)), childNode);
+            matches.forEach((match) => {
+              match.files.forEach((f) => linkedFiles.add(f));
+              const span = match.getCompleteLinkElement();
+              if (match.from > 0) {
+                parent == null ? void 0 : parent.insertBefore(document.createTextNode(text.slice(lastTo, match.from)), childNode);
               }
               parent == null ? void 0 : parent.insertBefore(span, childNode);
-              lastTo = addition.to;
-            }
+              lastTo = match.to;
+            });
             const textLength = text.length;
             if (lastTo < textLength) {
               parent == null ? void 0 : parent.insertBefore(document.createTextNode(text.slice(lastTo)), childNode);
@@ -1138,57 +1237,13 @@ function isDescendant(parent, child, maxDepth = 10) {
   }
   return false;
 }
-var LiveLinkWidget = class extends import_view.WidgetType {
-  constructor(text, linkFile, from, to, isSubWord, isAlias, app, settings) {
+var VirtualLinkWidget = class extends import_view.WidgetType {
+  constructor(match) {
     super();
-    this.text = text;
-    this.linkFile = linkFile;
-    this.from = from;
-    this.to = to;
-    this.isSubWord = isSubWord;
-    this.isAlias = isAlias;
-    this.app = app;
-    this.settings = settings;
-  }
-  createInternalLinkSpan() {
-    var _a;
-    const note = this.linkFile;
-    const linkText = this.text;
-    let linkHref = "";
-    try {
-      linkHref = note.path;
-    } catch (e) {
-      console.error(e);
-    }
-    const span = document.createElement("span");
-    const link = document.createElement("a");
-    link.href = linkHref;
-    link.textContent = linkText;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.setAttribute("from", this.from.toString());
-    link.setAttribute("to", this.to.toString());
-    link.setAttribute("origin-text", this.text);
-    link.classList.add("internal-link", "virtual-link-a");
-    span.classList.add("glossary-entry", "virtual-link");
-    if (this.settings.applyDefaultLinkStyling) {
-      span.classList.add("virtual-link-default");
-    }
-    span.appendChild(link);
-    if (!this.isSubWord || !this.settings.suppressSuffixForSubWords) {
-      const suffix = this.isAlias ? this.settings.virtualLinkAliasSuffix : this.settings.virtualLinkSuffix;
-      if (((_a = suffix == null ? void 0 : suffix.length) != null ? _a : 0) > 0) {
-        let icon = document.createElement("sup");
-        icon.textContent = suffix;
-        icon.classList.add("linker-suffix-icon");
-        span.appendChild(icon);
-      }
-    }
-    return span;
+    this.match = match;
   }
   toDOM(view) {
-    const div = this.createInternalLinkSpan();
-    return div;
+    return this.match.getCompleteLinkElement();
   }
 };
 var AutoLinkerPlugin = class {
@@ -1253,43 +1308,35 @@ var AutoLinkerPlugin = class {
     for (let { from, to } of view.visibleRanges) {
       this.linkerCache.reset();
       const text = view.state.doc.sliceString(from, to);
-      const additions = [];
+      let matches = [];
       let id = 0;
       for (let i = 0; i <= text.length; i) {
         const codePoint = text.codePointAt(i);
         const char = i < text.length ? String.fromCodePoint(codePoint) : "\n";
         const isWordBoundary = PrefixTree.checkWordBoundary(char);
-        if (!this.settings.matchOnlyWholeWords || this.settings.matchBeginningOfWords || isWordBoundary) {
+        if (this.settings.matchAnyPartsOfWords || this.settings.matchBeginningOfWords || isWordBoundary) {
           const currentNodes = this.linkerCache.cache.getCurrentMatchNodes(i, this.settings.excludeLinksToOwnNote ? mappedFile : null);
           if (currentNodes.length > 0) {
             for (const node of currentNodes) {
+              if (!this.settings.matchAnyPartsOfWords) {
+                if (this.settings.matchBeginningOfWords && !node.startsAtWordBoundary && (this.settings.matchEndOfWords && !isWordBoundary)) {
+                  continue;
+                }
+              }
               const nFrom = node.start;
               const nTo = node.end;
               const name = text.slice(nFrom, nTo);
               const isAlias = node.isAlias;
               const aFrom = from + nFrom;
               const aTo = from + nTo;
-              node.files.forEach((file) => {
-                additions.push({
-                  id: id++,
-                  from: aFrom,
-                  to: aTo,
-                  file,
-                  widget: new LiveLinkWidget(name, file, aFrom, aTo, !isWordBoundary, isAlias, this.app, this.settings)
-                });
-              });
+              matches.push(new VirtualMatch(id++, name, aFrom, aTo, Array.from(node.files), isAlias, !isWordBoundary, this.settings));
             }
           }
         }
         this.linkerCache.cache.pushChar(char);
         i += char.length;
       }
-      additions.sort((a, b) => {
-        if (a.from === b.from) {
-          return b.to - a.to;
-        }
-        return a.from - b.from;
-      });
+      matches = VirtualMatch.sort(matches);
       const excludedIntervalTree = new IntervalTree();
       const excludedTypes = ["codeblock", "code-block", "inline-code", "internal-link", "link", "url", "hashtag"];
       if (!this.settings.includeHeaders) {
@@ -1321,64 +1368,21 @@ var AutoLinkerPlugin = class {
           }
         }
       });
-      const filteredAdditions = [];
-      const additionsToDelete = /* @__PURE__ */ new Map();
       if (this.settings.excludeLinksToRealLinkedFiles) {
-        for (const addition of additions) {
-          if (explicitlyLinkedFiles.has(addition.file)) {
-            additionsToDelete.set(addition.id, true);
-          }
-        }
+        matches = VirtualMatch.filterAlreadyLinked(matches, explicitlyLinkedFiles);
       }
       if (this.settings.onlyLinkOnce) {
-        for (const addition of additions) {
-          if (alreadyLinkedFiles.has(addition.file)) {
-            additionsToDelete.set(addition.id, true);
-          }
-        }
+        matches = VirtualMatch.filterAlreadyLinked(matches, alreadyLinkedFiles);
       }
-      for (let i = 0; i < additions.length; i++) {
-        const addition = additions[i];
-        if (additionsToDelete.has(addition.id)) {
-          continue;
-        }
-        const overlaps = excludedIntervalTree.search([addition.from, addition.to]);
-        if (overlaps.length > 0) {
-          additionsToDelete.set(addition.id, true);
-          continue;
-        }
-        for (let j = i + 1; j < additions.length; j++) {
-          const otherAddition = additions[j];
-          if (otherAddition.from >= addition.to) {
-            break;
-          }
-          additionsToDelete.set(otherAddition.id, true);
-        }
-        if (this.settings.onlyLinkOnce) {
-          for (let j = i + 1; j < additions.length; j++) {
-            const otherAddition = additions[j];
-            if (additionsToDelete.has(otherAddition.id)) {
-              continue;
-            }
-            if (otherAddition.file === addition.file) {
-              additionsToDelete.set(otherAddition.id, true);
-            }
-          }
-        }
-      }
-      for (const addition of additions) {
-        if (!additionsToDelete.has(addition.id)) {
-          filteredAdditions.push(addition);
-          alreadyLinkedFiles.add(addition.file);
-        }
-      }
+      matches = VirtualMatch.filterOverlapping(matches, this.settings.onlyLinkOnce, excludedIntervalTree);
+      matches.forEach((addition) => addition.files.forEach((f) => alreadyLinkedFiles.add(f)));
       const cursorPos = view.state.selection.main.from;
       const excludeLine = viewIsActive && this.settings.excludeLinksInCurrentLine;
       const fixIMEProblem = viewIsActive && this.settings.fixIMEProblem;
       let needImeFix = false;
       const lineStart = view.state.doc.lineAt(cursorPos).from;
       const lineEnd = view.state.doc.lineAt(cursorPos).to;
-      filteredAdditions.forEach((addition) => {
+      matches.forEach((addition) => {
         const [from2, to2] = [addition.from, addition.to];
         const cursorNearby = cursorPos >= from2 - 0 && cursorPos <= to2 + 0;
         const additionIsInCurrentLine = from2 >= lineStart && to2 <= lineEnd;
@@ -1402,7 +1406,7 @@ var AutoLinkerPlugin = class {
         }
         if (!cursorNearby && !needImeFix && !(excludeLine && additionIsInCurrentLine)) {
           builder.add(from2, to2, import_view.Decoration.replace({
-            widget: addition.widget
+            widget: new VirtualLinkWidget(addition)
           }));
         }
       });
@@ -1424,7 +1428,8 @@ var path = __toESM(require("path"));
 var DEFAULT_SETTINGS = {
   advancedSettings: false,
   linkerActivated: true,
-  matchOnlyWholeWords: true,
+  matchAnyPartsOfWords: false,
+  matchEndOfWords: true,
   matchBeginningOfWords: true,
   suppressSuffixForSubWords: false,
   includeAllFiles: true,
@@ -1453,7 +1458,8 @@ var DEFAULT_SETTINGS = {
   excludeLinksInCurrentLine: false,
   onlyLinkOnce: true,
   excludeLinksToRealLinkedFiles: true,
-  includeAliases: true
+  includeAliases: true,
+  alwaysShowMultipleReferences: false
 };
 var LinkerPlugin = class extends import_obsidian5.Plugin {
   constructor() {
@@ -1499,6 +1505,86 @@ var LinkerPlugin = class extends import_obsidian5.Plugin {
         return false;
       }
     });
+    this.addCommand({
+      id: "convert-selected-virtual-links",
+      name: "Convert All Virtual Links in Selection to Real Links",
+      checkCallback: (checking) => {
+        var _a;
+        const view = this.app.workspace.getActiveViewOfType(import_obsidian5.MarkdownView);
+        const editor = view == null ? void 0 : view.editor;
+        if (!editor || !editor.somethingSelected()) {
+          return false;
+        }
+        if (checking)
+          return true;
+        const from = editor.getCursor("from");
+        const to = editor.getCursor("to");
+        const cmEditor = editor.cm;
+        if (!cmEditor)
+          return false;
+        const selectionRange = cmEditor.dom.querySelector(".cm-content");
+        if (!selectionRange)
+          return false;
+        const virtualLinks = Array.from(selectionRange.querySelectorAll(".virtual-link-a")).filter((link) => link instanceof HTMLElement).map((link) => ({
+          element: link,
+          from: parseInt(link.getAttribute("from") || "-1"),
+          to: parseInt(link.getAttribute("to") || "-1"),
+          text: link.getAttribute("origin-text") || "",
+          href: link.getAttribute("href") || ""
+        })).filter((link) => {
+          const linkFrom = editor.offsetToPos(link.from);
+          const linkTo = editor.offsetToPos(link.to);
+          return this.isPosWithinRange(linkFrom, linkTo, from, to);
+        }).sort((a, b) => a.from - b.from);
+        if (virtualLinks.length === 0)
+          return;
+        const replacements = [];
+        for (const link of virtualLinks) {
+          const targetFile = this.app.vault.getAbstractFileByPath(link.href);
+          if (!(targetFile instanceof import_obsidian5.TFile))
+            continue;
+          const activeFile = this.app.workspace.getActiveFile();
+          const activeFilePath = (_a = activeFile == null ? void 0 : activeFile.path) != null ? _a : "";
+          let absolutePath = targetFile.path;
+          let relativePath = path.relative(path.dirname(activeFilePath), path.dirname(absolutePath)) + "/" + path.basename(absolutePath);
+          relativePath = relativePath.replace(/\\/g, "/");
+          const replacementPath = this.app.metadataCache.fileToLinktext(targetFile, activeFilePath);
+          const lastPart = replacementPath.split("/").pop();
+          const shortestFile = this.app.metadataCache.getFirstLinkpathDest(lastPart, "");
+          let shortestPath = (shortestFile == null ? void 0 : shortestFile.path) === targetFile.path ? lastPart : absolutePath;
+          if (!replacementPath.endsWith(".md")) {
+            if (absolutePath.endsWith(".md"))
+              absolutePath = absolutePath.slice(0, -3);
+            if (shortestPath.endsWith(".md"))
+              shortestPath = shortestPath.slice(0, -3);
+            if (relativePath.endsWith(".md"))
+              relativePath = relativePath.slice(0, -3);
+          }
+          const useMarkdownLinks = this.settings.useDefaultLinkStyleForConversion ? this.settings.defaultUseMarkdownLinks : this.settings.useMarkdownLinks;
+          const linkFormat = this.settings.useDefaultLinkStyleForConversion ? this.settings.defaultLinkFormat : this.settings.linkFormat;
+          let replacement = "";
+          if (replacementPath === link.text && linkFormat === "shortest") {
+            replacement = `[[${replacementPath}]]`;
+          } else {
+            const path2 = linkFormat === "shortest" ? shortestPath : linkFormat === "relative" ? relativePath : absolutePath;
+            replacement = useMarkdownLinks ? `[${link.text}](${path2})` : `[[${path2}|${link.text}]]`;
+          }
+          replacements.push({
+            from: link.from,
+            to: link.to,
+            text: replacement
+          });
+        }
+        for (const replacement of replacements.reverse()) {
+          const fromPos = editor.offsetToPos(replacement.from);
+          const toPos = editor.offsetToPos(replacement.to);
+          editor.replaceRange(replacement.text, fromPos, toPos);
+        }
+      }
+    });
+  }
+  isPosWithinRange(linkFrom, linkTo, selectionFrom, selectionTo) {
+    return (linkFrom.line > selectionFrom.line || linkFrom.line === selectionFrom.line && linkFrom.ch >= selectionFrom.ch) && (linkTo.line < selectionTo.line || linkTo.line === selectionTo.line && linkTo.ch <= selectionTo.ch);
   }
   addContextMenuItem(menu, file, source) {
     if (!file) {
@@ -1522,7 +1608,7 @@ var LinkerPlugin = class extends import_obsidian5.Plugin {
         const to = parseInt(targetElement.getAttribute("to") || "-1");
         if (from === -1 || to === -1) {
           menu.addItem((item) => {
-            item.setTitle("[Virtual Linker] Converting to real link is not possible in read mode, switch to edit or source mode to convert.").setIcon("link");
+            item.setTitle("[Virtual Linker] Converting link is not here.").setIcon("link");
           });
         } else if (isVirtualLink) {
           menu.addItem((item) => {
@@ -1750,17 +1836,21 @@ var LinkerSettingTab = class extends import_obsidian5.PluginSettingTab {
     new import_obsidian5.Setting(containerEl).setName("Include headers").setDesc("If activated, headers (so your lines beginning with at least one `#`) are included for virtual links.").addToggle((toggle) => toggle.setValue(this.plugin.settings.includeHeaders).onChange(async (value) => {
       await this.plugin.updateSettings({ includeHeaders: value });
     }));
-    new import_obsidian5.Setting(containerEl).setName("Match only whole words").setDesc("If activated, only whole words are matched. Otherwise, every part of a word is found.").addToggle((toggle) => toggle.setValue(this.plugin.settings.matchOnlyWholeWords).onChange(async (value) => {
-      await this.plugin.updateSettings({ matchOnlyWholeWords: value });
+    new import_obsidian5.Setting(containerEl).setName("Match any part of a word").setDesc("If deactivated, only whole words are matched. Otherwise, every part of a word is found.").addToggle((toggle) => toggle.setValue(this.plugin.settings.matchAnyPartsOfWords).onChange(async (value) => {
+      await this.plugin.updateSettings({ matchAnyPartsOfWords: value });
       this.display();
     }));
-    if (this.plugin.settings.matchOnlyWholeWords) {
-      new import_obsidian5.Setting(containerEl).setName("Match also beginning of words").setDesc("If activated, the beginnings of words are also linked, even if it is not a whole match.").addToggle((toggle) => toggle.setValue(this.plugin.settings.matchBeginningOfWords).onChange(async (value) => {
+    if (!this.plugin.settings.matchAnyPartsOfWords) {
+      new import_obsidian5.Setting(containerEl).setName("Match the beginning of words").setDesc("If activated, the beginnings of words are also linked, even if it is not a whole match.").addToggle((toggle) => toggle.setValue(this.plugin.settings.matchBeginningOfWords).onChange(async (value) => {
         await this.plugin.updateSettings({ matchBeginningOfWords: value });
         this.display();
       }));
+      new import_obsidian5.Setting(containerEl).setName("Match the end of words").setDesc("If activated, the ends of words are also linked, even if it is not a whole match.").addToggle((toggle) => toggle.setValue(this.plugin.settings.matchEndOfWords).onChange(async (value) => {
+        await this.plugin.updateSettings({ matchEndOfWords: value });
+        this.display();
+      }));
     }
-    if (!this.plugin.settings.matchOnlyWholeWords || this.plugin.settings.matchBeginningOfWords) {
+    if (this.plugin.settings.matchAnyPartsOfWords || this.plugin.settings.matchBeginningOfWords) {
       new import_obsidian5.Setting(containerEl).setName("Suppress suffix for sub words").setDesc("If activated, the suffix is not added to links for subwords, but only for complete matches.").addToggle((toggle) => toggle.setValue(this.plugin.settings.suppressSuffixForSubWords).onChange(async (value) => {
         await this.plugin.updateSettings({ suppressSuffixForSubWords: value });
       }));
@@ -1870,6 +1960,9 @@ var LinkerSettingTab = class extends import_obsidian5.PluginSettingTab {
       });
     }
     new import_obsidian5.Setting(containerEl).setName("Link style").setHeading();
+    new import_obsidian5.Setting(containerEl).setName("Always show multiple references").setDesc("If toggled, if there are multiple matching notes, all references are shown behind the match. If not toggled, the references are only shown if hovering over the match.").addToggle((toggle) => toggle.setValue(this.plugin.settings.alwaysShowMultipleReferences).onChange(async (value) => {
+      await this.plugin.updateSettings({ alwaysShowMultipleReferences: value });
+    }));
     new import_obsidian5.Setting(containerEl).setName("Virtual link suffix").setDesc("The suffix to add to auto generated virtual links.").addText((text) => text.setValue(this.plugin.settings.virtualLinkSuffix).onChange(async (value) => {
       await this.plugin.updateSettings({ virtualLinkSuffix: value });
     }));
@@ -1893,3 +1986,5 @@ var LinkerSettingTab = class extends import_obsidian5.PluginSettingTab {
     }
   }
 };
+
+/* nosourcemap */

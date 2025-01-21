@@ -1,14 +1,10 @@
-# <%= it.title %>
-
 | Zotero | File | Journal |
 | ---- | ---- | ---- |
 | [Zotero](<%= it.backlink %>) | <%= it.fileLink %> | [<%= it.publicationTitle %>](<%= it.url%>) |
 
-> [!Abstract]
-> 
-> <%= it.abstractNote %>
+> [!summary]
+> `=(this.abstract)`
 
----
 ## Annotations
 
 <%~ include("annots", it.annotations) %>

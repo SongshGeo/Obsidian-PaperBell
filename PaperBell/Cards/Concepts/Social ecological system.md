@@ -8,6 +8,7 @@ tags:
 - concept
 ---
 ## Description
+
 社会-生态系统是典型的复杂系统 #S
 
 ## 相关论文
@@ -23,17 +24,18 @@ names.push(dv.current().name)
 
 dv.table(["论文","期刊","年份"],
 dv.pages(`#paper`)
-	.where(t => names.some(x => t.concepts.includes(x)))
-	.map(b => [b.file.link, b.journal, b.paper_date])
-	.sort(b => b.paper_date, 'desc')
+ .where(t => names.some(x => t.concepts.includes(x)))
+ .map(b => [b.file.link, b.journal, b.paper_date])
+ .sort(b => b.paper_date, 'desc')
 )
 ```
+
 ## 相关想法
 
 ```dataviewjs
 
 let folderChoicePaths = ["00 - 每日日记/DailyNote", "Inputs", "Outputs", "Projects"];
-const specificTag = "#SC/想法"; // 指定要检查的标签，可以更改
+const specificTag = "#想法"; // 指定要检查的标签，可以更改
 
 const files = app.vault.getMarkdownFiles().filter(file => folderChoicePaths.some(path => file.path.includes(path)) );
 
@@ -41,7 +43,7 @@ let names = dv.current().aliases ? dv.current().aliases : [];
 names.push(dv.current().name);
 names.push(dv.current().ch);
 
-let arr = files.map(async(file) => { 
+let arr = files.map(async(file) => {
     const content = await app.vault.cachedRead(file);
     // 确保文件内容包含特定标签
     if (content.includes(specificTag)) {
@@ -49,15 +51,15 @@ let arr = files.map(async(file) => {
         return ["[[" + file.name.split(".")[0] + "]]", lines];
     }
     return null; // 如果不包含标签，返回 null
-}); 
+});
 
-Promise.all(arr).then(values => { 
+Promise.all(arr).then(values => {
     // 过滤掉 null 结果
     const filteredValues = values.filter(value => value != null);
 
-    const beautify = filteredValues.map(value => { 
+    const beautify = filteredValues.map(value => {
         const temp = value[1].map(line => line); // 美化处理
-        return [value[0], temp]; 
+        return [value[0], temp];
     });
 
     const exists = beautify.filter(value => value[1][0] && value[0] != "[[未命名 10]]")
