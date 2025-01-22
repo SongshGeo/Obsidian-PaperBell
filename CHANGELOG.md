@@ -86,6 +86,13 @@
 - 修复了一些已知问题 📅 2024-05-13
 
 <a id='changelog-0.1.0'></a>
+## [3.1.2](https://github.com/SongshGeo/Obsidian-PaperBell/compare/v3.1.1...v3.1.2) (2025-01-22)
+
+
+### Bug Fixes
+
+* **theme:** :bug: 修复了主页 banner 不显示的问题 ([da24046](https://github.com/SongshGeo/Obsidian-PaperBell/commit/da24046997f9f92796d3c7adf9157585c3f962ff))
+
 ## [3.0.1](https://github.com/SongshGeo/Obsidian-PaperBell/compare/v3.0.1...v3.0.1) (2025-01-21)
 
 
