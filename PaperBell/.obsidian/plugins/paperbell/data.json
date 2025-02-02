@@ -1,0 +1,8 @@
+{
+  "registrationId": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHBpcmVzQXQiOjE3NDA3NTg0MDAwMDAsImV4cCI6MTc0MDc1ODQwMCwiaWF0IjoxNzM3OTY4ODcxfQ.N3IxtSQI3xnE43m92Ho_JUVgJNj5LbRDg3zMExdOaPpJsNB7YREgKWBlVf5xLHSZM4G263MOSooRbq-a4POUW9TBWhafYcPwG0u3LFwNotaxnN623vvUb76_XRc9Tz0_uNnIJ1sZO-5UX0z4HzDtiElQLizNa5wyKgGbkLSbscPHg_hPt4lmZzKP4pXdZMW3BOmizulQ2GVlEWjEjokF2teN6ePjSA21OWu-Xi34SsWxUkIbakwYKNAmlDvd5m-s7Ixsg7QsfMYam4r-mSH6ebBfisxcDuugN3Ot3BKm9XP-NG1CI7W4owdV8fe4lKnwGhMupypEY5qJLCVO9LdnwA",
+  "noteLocation": "Locations/Institutes",
+  "institutionNoteTemplate": "40 - Obsidian/模板/机构模板pro",
+  "autoGenerateInstitutionNotes": true,
+  "openInstitutionAfterCreation": true,
+  "listenToFileCreatedInPath": "Persons/Scholars"
+}

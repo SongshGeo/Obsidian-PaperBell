@@ -7,7 +7,6 @@
   "obsidian-memos",
   "obsidian-tasks-plugin",
   "templater-obsidian",
-  "obsidian-tracker",
   "customizable-page-header-buttons",
   "obsidian-hover-editor",
   "recent-files-obsidian",
@@ -26,8 +25,9 @@
   "cm-chs-patch",
   "calendar",
   "dataview",
-  "virtual-linker",
   "longform",
   "obsidian-enhancing-export",
-  "floating-toc"
+  "floating-toc",
+  "paperbell",
+  "obsidian-tracker"
 ]
