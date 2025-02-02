@@ -4,14 +4,14 @@ let {pages, view, firstDayOfWeek, globalTaskFilter, dailyNoteFolder, dailyNoteFo
 if (!pages && pages!="") { dv.span('> [!ERROR] Missing pages parameter\n> \n> Please set the pages parameter like\n> \n> `pages: ""`'); return false };
 if (!options.includes("style")) { dv.span('> [!ERROR] Missing style parameter\n> \n> Please set a style inside options parameter like\n> \n> `options: "style1"`'); return false };
 if (!view) { dv.span('> [!ERROR] Missing view parameter\n> \n> Please set a default view inside view parameter like\n> \n> `view: "month"`'); return false };
-if (firstDayOfWeek) { 
-	if (firstDayOfWeek.match(/[|\\0123456]/g) == null) { 
+if (firstDayOfWeek) {
+	if (firstDayOfWeek.match(/[|\\0123456]/g) == null) {
 		dv.span('> [!ERROR] Wrong value inside firstDayOfWeek parameter\n> \n> Please choose a number between 0 and 6');
 		return false
 	};
 } else {
-	dv.span('> [!ERROR] Missing firstDayOfWeek parameter\n> \n> Please set the first day of the week inside firstDayOfWeek parameter like\n> \n> `firstDayOfWeek: "1"`'); 
-	return false 
+	dv.span('> [!ERROR] Missing firstDayOfWeek parameter\n> \n> Please set the first day of the week inside firstDayOfWeek parameter like\n> \n> `firstDayOfWeek: "1"`');
+	return false
 };
 if (startPosition) { if (!startPosition.match(/\d{4}\-\d{1,2}/gm)) { dv.span('> [!ERROR] Wrong startPosition format\n> \n> Please set a startPosition with the following format\n> \n> Month: `YYYY-MM` | Week: `YYYY-ww`'); return false }};
 if (dailyNoteFormat) { if (dailyNoteFormat.match(/[|\\YMDWwd.,-: \[\]]/g).length != dailyNoteFormat.length) { dv.span('> [!ERROR] The `dailyNoteFormat` contains invalid characters'); return false }};
@@ -147,26 +147,26 @@ function momentToRegex(momentFormat) {
 	momentFormat = momentFormat.replaceAll("-", "\\-");
 	momentFormat = momentFormat.replaceAll(":", "\\:");
 	momentFormat = momentFormat.replaceAll(" ", "\\s");
-	
+
 	momentFormat = momentFormat.replace("dddd", "\\w{1,}");
 	momentFormat = momentFormat.replace("ddd", "\\w{1,3}");
 	momentFormat = momentFormat.replace("dd", "\\w{2}");
 	momentFormat = momentFormat.replace("d", "\\d{1}");
-	
+
 	momentFormat = momentFormat.replace("YYYY", "\\d{4}");
 	momentFormat = momentFormat.replace("YY", "\\d{2}");
-	
+
 	momentFormat = momentFormat.replace("MMMM", "\\w{1,}");
 	momentFormat = momentFormat.replace("MMM", "\\w{3}");
 	momentFormat = momentFormat.replace("MM", "\\d{2}");
-	
+
 	momentFormat = momentFormat.replace("DDDD", "\\d{3}");
 	momentFormat = momentFormat.replace("DDD", "\\d{1,3}");
 	momentFormat = momentFormat.replace("DD", "\\d{2}");
 	momentFormat = momentFormat.replace("D", "\\d{1,2}");
-	
+
 	momentFormat = momentFormat.replace("ww", "\\d{1,2}");
-	
+
 	regEx = "/^(" + momentFormat + ")$/";
 	console.log(regEx)
 	return regEx;
@@ -189,7 +189,7 @@ function getTasks(date) {
 };
 
 
-  
+
 
 function setTask(obj, cls) {
 	var lighter = 25;
@@ -221,7 +221,7 @@ function setTask(obj, cls) {
 
 function setTaskContentContainer(currentDate) {
 	var cellContent = "";
-	
+
 	function compareFn(a, b) {
 		if (a.priority.toUpperCase() < b.priority.toUpperCase()) {
 			return -1;
@@ -432,7 +432,7 @@ function setStatisticValues(dueCounter, doneCounter, overdueCounter, startCounte
 	var tasksRemaining = taskCounter - doneCounter;
 	var percentage = Math.round(100/(dueCounter+doneCounter+overdueCounter)*doneCounter);
 	percentage = isNaN(percentage) ? 100 : percentage;
-	
+
 	if (dueCounter == 0 && doneCounter == 0) {
 		rootNode.querySelector("button.statistic").innerHTML = calendarHeartIcon;
 	} else if (tasksRemaining > 0) {
@@ -475,10 +475,10 @@ function getMonth(tasks, month) {
 	var scheduledCounter = 0;
 	var recurrenceCounter = 0;
 	var dailyNoteCounter = 0;
-	
+
 	// Move First Week Of Month To Second Week In Month View
 	if (firstDayOfMonth == 0) { firstDayOfMonth = 7};
-	
+
 	// Set Grid Heads
 	var gridHeads = "";
 	for (h=0-firstDayOfMonth+parseInt(firstDayOfWeek);h<7-firstDayOfMonth+parseInt(firstDayOfWeek);h++) {
@@ -490,7 +490,7 @@ function getMonth(tasks, month) {
 			gridHeads += "<div class='gridHead' data-weekday='" + weekDayNr + "'>" + weekDayName + "</div>";
 		};
 	};
-	
+
 	// Set Wrappers
 	var wrappers = "";
 	var starts = 0-firstDayOfMonth+parseInt(firstDayOfWeek);
@@ -513,7 +513,7 @@ function getMonth(tasks, month) {
 
 			// Filter Tasks
 			getTasks(currentDate);
-			
+
 			// Count Events Only From Selected Month
 			if (moment(month).format("MM") == moment(month).add(i, "days").format("MM")) {
 				dueCounter += due.length;
@@ -530,10 +530,10 @@ function getMonth(tasks, month) {
 					overdueCounter = overdue.length;
 				};
 			};
-			
+
 			// Set New Content Container
 			var cellContent = setTaskContentContainer(currentDate);
-		
+
 			// Set Cell Name And Weekday
 			if ( moment(month).add(i, "days").format("D") == 1 ) {
 				var cell = cellTemplate.replace("{{date}}", currentDate).replace("{{cellName}}", longDayName).replace("{{cellContent}}", cellContent).replace("{{weekday}}", weekDay).replace("{{dailyNote}}", dailyNotePath);
@@ -541,7 +541,7 @@ function getMonth(tasks, month) {
 			} else {
 				var cell = cellTemplate.replace("{{date}}", currentDate).replace("{{cellName}}", shortDayName).replace("{{cellContent}}", cellContent).replace("{{weekday}}", weekDay).replace("{{dailyNote}}", dailyNotePath);
 			};
-		
+
 			// Set prevMonth, currentMonth, nextMonth
 			if (i < 0) {
 				cell = cell.replace("{{class}}", "prevMonth");
@@ -579,17 +579,17 @@ function getWeek(tasks, week) {
 	var scheduledCounter = 0;
 	var recurrenceCounter = 0;
 	var dailyNoteCounter = 0;
-	
+
 	for (i=0-currentWeekday+parseInt(firstDayOfWeek);i<7-currentWeekday+parseInt(firstDayOfWeek);i++) {
 		var currentDate = moment(week).add(i, "days").format("YYYY-MM-DD");
 		if (!dailyNoteFolder) {var dailyNotePath = currentDate} else {var dailyNotePath = dailyNoteFolder+"/"+currentDate};
 		var weekDay = moment(week).add(i, "days").format("d");
 		var dayName = moment(currentDate).format("ddd D.");
 		var longDayName = moment(currentDate).format("ddd, D. MMM");
-		
+
 		// Filter Tasks
 		getTasks(currentDate);
-		
+
 		// Count Events From Selected Week
 		dueCounter += due.length;
 		dueCounter += recurrence.length;
@@ -603,10 +603,10 @@ function getWeek(tasks, week) {
 		if (moment().format("YYYY-MM-DD") == moment(week).add(i, "days").format("YYYY-MM-DD")) {
 			overdueCounter = overdue.length;
 		};
-	
+
 		// Set New Content Container
 		var cellContent = setTaskContentContainer(currentDate);
-		
+
 		// Set Cell Name And Weekday
 		var cell = cellTemplate.replace("{{date}}", currentDate).replace("{{cellName}}", longDayName).replace("{{cellContent}}", cellContent).replace("{{weekday}}", weekDay).replace("{{dailyNote}}", dailyNotePath);
 
@@ -616,7 +616,7 @@ function getWeek(tasks, week) {
 		} else {
 			var cell = cellTemplate.replace("{{date}}", currentDate).replace("{{cellName}}", dayName).replace("{{cellContent}}", cellContent).replace("{{weekday}}", weekDay).replace("{{dailyNote}}", dailyNotePath);
 		};
-			
+
 		// Set Today, Before Today, After Today
 		if (currentDate < tToday) {
 			cell = cell.replace("{{class}}", "beforeToday");
@@ -644,7 +644,7 @@ function getList(tasks, month) {
 	var scheduledCounter = 0;
 	var recurrenceCounter = 0;
 	var dailyNoteCounter = 0;
-	
+
 	// Loop Days From Current Month
 	for (i=0;i<moment(month).endOf('month').format("D");i++) {
 		var currentDate = moment(month).startOf('month').add(i, "days").format("YYYY-MM-DD");
@@ -652,7 +652,7 @@ function getList(tasks, month) {
 
 		// Filter Tasks
 		getTasks(currentDate);
-		
+
 		// Count Events
 		dueCounter += due.length;
 		dueCounter += recurrence.length;
@@ -673,7 +673,7 @@ function getList(tasks, month) {
 	rootNode.querySelector("span").appendChild(dv.el("div", listContent, {cls: "list", attr:{"data-month": monthName}}));
 	setStatisticValues(dueCounter, doneCounter, overdueCounter, startCounter, scheduledCounter, recurrenceCounter, dailyNoteCounter);
 	rootNode.setAttribute("view", "list");
-	
+
 	// Scroll To Today If Selected Month Is Current Month
 	if ( moment().format("YYYY-MM") == moment(month).format("YYYY-MM") ) {
 		var listElement = rootNode.querySelector(".list");

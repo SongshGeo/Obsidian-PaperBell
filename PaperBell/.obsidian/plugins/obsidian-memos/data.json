@@ -50,7 +50,7 @@
     "MemoDefaultMultiFilePath": "Thino",
     "MemoDefaultSingleFilePath": "basic.thino.md"
   },
-  "MemoDailyTarget": 5,
+  "MemoDailyTarget": 6,
   "HeatmapColorScheme": "grass",
   "EnabledHttpApi": false,
   "HttpApiIpType": "127.0.0.1",

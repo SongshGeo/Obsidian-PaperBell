@@ -1,3 +1,27 @@
+/* 
+Hide Properties in reading mode by default.
+Add "show_properties" to `css_classes` property to show them.
+============================================================= */
+.workspace-leaf-content[data-mode="preview"]
+.markdown-preview-view
+.metadata-container{
+    display: none;
+}
+
+.workspace-leaf-content[data-mode="preview"]
+.markdown-preview-view.show_properties
+.metadata-container{
+    display: block;
+}
+/* Show "Add property" button in reading mode by default.
+Add "hide_add_property_btn" to `css_classes` property to hide it.
+================================================================= */
+.workspace-leaf-content[data-mode="preview"]
+.markdown-preview-view.hide_add_property_btn
+.metadata-add-button {
+    display: none;
+}
+
 /* 处理 ob1.0 鸟库顶部导航多出来的点 */
 .myhome .list-bullet{
   display: none !important;
@@ -10,14 +34,17 @@
 
 .myhome .obsidian-banner-icon .icon-box img
 {
-content: url("https://api.wolai.com/v1/icon?type=1&locale=en&pro=0&color=grey");
+content: url("https://api.wolai.com/v1/icon?type=1&locale=en&pro=0&color=blue");
 }
 
 /* end */
 
+
+/*去掉导航左侧线条*/
 .markdown-rendered.show-indentation-guide li > ul::before, .markdown-rendered.show-indentation-guide li > ol::before {
   content: unset;
 }
+
 
 
 
@@ -29,7 +56,10 @@ content: url("https://api.wolai.com/v1/icon?type=1&locale=en&pro=0&color=grey");
   margin: -0.6em 0em 0.1em 0.2em;
 }
 
-
+.external-link {
+  text-decoration: none;
+  background-image: none;
+}
 
 progress {
   width: 80px !important;
@@ -43,43 +73,6 @@ progress {
 /* progress::-moz-progress-bar { background: #a77575; }
 progress::-webkit-progress-bar { background: #947d7d; }
 progress::-webkit-progress-value  { background: #947d7d; } */
-
-
-/* minimal 优化 */
-
-.myhome .internal-embed .markdown-embed {
-  border: 0px solid var(--background-modifier-border);
-}
-
-/* react components 设置 */ 
-
-div.musicBirthday{
-  display: flex;
-  }
-
-.myhome .external-link {
-  background-image: none;
-  padding-right: 0;
-
-}
-
-
-/* 不知道设置了啥 */
-
-.myhome .admonition-col2 ul>li:not(.task-list-item){
-  display: inline-table;
-}
-
-.myhome .admonition-col2 ul>li:not(.task-list-item) {
-  flex: 1 1 90%;
-}
-.myhome .admonition-col2 ul > li.task-list-item {
-  flex: 1 1 90%;
-}
-
-.myhome .admonition-flex ul > li.task-list-item {
-  flex: 1 1 99%;
-}
 
 
 /* dataview 设置 */
@@ -96,7 +89,7 @@ button:hover {
 }
 
 button {
-  background-color: #053B50;
+  background-color: #acacac80;
 }
 
 /* dataview 背景设置 */
@@ -222,7 +215,7 @@ a, .markdown-preview-view .internal-link {
   display: flex;
   width: 100%;
   display: block;
-  background-color: #176B87 !important ;
+  background-color: #BBD5E9 !important ;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -301,7 +294,7 @@ a, .markdown-preview-view .internal-link {
 
 
 .myhome ul ul li:nth-child(even) {
-  background-color: #EEEEEE !important;
+  background-color:#F8B494  !important;
 }
 
 .myhome ul>li:hover {
@@ -315,8 +308,8 @@ a, .markdown-preview-view .internal-link {
 }
 
 .theme-dark .myhome ul ul li:hover {
-  border-color: #176B87 !important;
-  border-left: 1px solid #176B87 !important;
+  border-color: #696969e1 !important;
+  border-left: 1px solid #696969e1 !important;
 }
 
 .myhome ul ul li .task-list-item-checkbox {
@@ -488,7 +481,7 @@ a, .markdown-preview-view .internal-link {
   overflow: visible ;
   margin:0;
   break-inside: avoid;
-  column-rule: 1px solid #176B87; 
+  column-rule: 1px solid #d4d2d2; 
 }
 .admonition-col3>.admonition-content-holder>.admonition-content ol {	
   margin-top: -0.25em;
@@ -592,43 +585,6 @@ a, .markdown-preview-view .internal-link {
    
 .admonition-col4-parent .admonition-col4 .admonition > .admonition-title.no-title + .admonition-content-holder {
   margin-top: 0;
-}
-
-/* flex */
-
-/*自适应分栏*/
-.admonition-flex {
-  margin: auto;
- box-shadow:none;
-   
- }
- .admonition-flex >.admonition-content-holder {
-  margin-top:0!important;
-  margin-bottom:0!important;
-}
-.admonition-flex .admonition-content {
- width: 100%;
- margin: 0px;
- display: flex;
- flex-wrap: wrap;
-}
-.admonition-flex .admonition-content div{
- flex: 1;
- margin: 0 0.625rem;
-}
-
-
-/*blank ad框全透明隐藏*/
-.admonition-blank {
-  overflow: visible;
-  background-color: rgba(255, 255, 255, 0)!important;
-  border-left:0px!important;
-  margin: auto;
-  box-shadow:none;
-}
-.admonition-blank .admonition-content {
-  overflow: visible;
-  margin: 0;
 }
 
 /* ============ */

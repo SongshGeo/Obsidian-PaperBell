@@ -4,41 +4,19 @@
   "showTags": true,
   "showAttachments": true,
   "hideUnresolved": true,
-  "showOrphans": false,
-  "collapse-color-groups": false,
-  "colorGroups": [
-    {
-      "query": "path:Outputs  ",
-      "color": {
-        "a": 1,
-        "rgb": 14048348
-      }
-    },
-    {
-      "query": "path:Inputs  ",
-      "color": {
-        "a": 1,
-        "rgb": 6084196
-      }
-    },
-    {
-      "query": "path:Cards  ",
-      "color": {
-        "a": 1,
-        "rgb": 6063574
-      }
-    }
-  ],
-  "collapse-display": true,
-  "showArrow": false,
+  "showOrphans": true,
+  "collapse-color-groups": true,
+  "colorGroups": [],
+  "collapse-display": false,
+  "showArrow": true,
   "textFadeMultiplier": 0,
   "nodeSizeMultiplier": 1,
   "lineSizeMultiplier": 1,
-  "collapse-forces": true,
+  "collapse-forces": false,
   "centerStrength": 0.460615335051546,
   "repelStrength": 10,
   "linkStrength": 1,
   "linkDistance": 250,
-  "scale": 0.18336352646862134,
+  "scale": 0.06833607675397686,
   "close": true
 }

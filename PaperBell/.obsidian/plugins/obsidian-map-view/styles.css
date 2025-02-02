@@ -1,20 +1,3 @@
-.map-view-marker-name {
-    color: var(--text-normal);
-    font-size: var(--font-text-size);
-    font-family: var(--font-text);
-    font-weight: bold;
-    margin: 0 !important;
-    /* Make sure the marker name doesn't cover up the close button */
-    margin-right: 18px !important;
-}
-
-.map-view-marker-sub-name {
-    color: var(--text-normal);
-    font-size: var(--font-text-size);
-    font-family: var(--font-text);
-    margin: 0 !important;
-}
-
 .map-view-main {
     position: relative;
     width: 100%;
@@ -38,7 +21,7 @@
     overflow: auto;
     position: absolute;
     z-index: 2;
-    padding: 8px 25px 5px 12px;
+    padding: 8px 14px 5px 12px;
 }
 
 .graph-control-div {
@@ -72,25 +55,6 @@
 
 a.mv-icon-button.on {
     background-color: var(--background-modifier-border-focus) !important;
-}
-
-.controls-toggle:checked
-    + .lbl-triangle
-    + .lbl-toggle
-    + .graph-control-content {
-    display: block;
-}
-
-.lbl-triangle {
-    display: inline-block;
-    position: relative;
-    top: -1px;
-    transition: 0.25s;
-}
-
-.controls-toggle:checked + .lbl-triangle {
-    transform: rotate(90deg);
-    top: 0px;
 }
 
 .settings-dense-button {
@@ -142,11 +106,6 @@ a.mv-icon-button.on {
     margin: 10px 0 !important;
 }
 
-.graph-control-follow-label {
-    vertical-align: top;
-    padding-left: 5px;
-}
-
 .marker-popup {
     border-radius: 6px;
     color: var(--text-normal);
@@ -170,21 +129,21 @@ a.mv-icon-button.on {
 
 .mv-marker-popup-container {
     max-height: 20em;
+    min-height: 4em;
     width: 30em;
     overflow: hidden;
     /* Initially this isn't displayed */
     display: none;
-    z-index: 2;
+    z-index: 1000;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
 }
 .mv-marker-popup-container .markdown-embed {
     border-left: 0;
-    max-height: 200px;
     overflow-y: auto;
 }
 /* Simple placement mode is used on mobile, where the screen is too small and Popper is unavailable anyway */
 .mv-marker-popup-container.simple-placement {
-    bottom: 32px;
+    bottom: 0px;
     position: absolute;
     width: 100%;
 }
@@ -253,8 +212,12 @@ div.map-view-highlight.marker-cluster {
 }
 
 .mv-emoji-icon {
-    text-shadow: 0 0 1px #fff, -1px -1px 1px #fff, 1px -1px 1px #fff,
-        -1px 1px 1px #fff, 0 0 2px #fff;
+    text-shadow:
+        0 0 1px #fff,
+        -1px -1px 1px #fff,
+        1px -1px 1px #fff,
+        -1px 1px 1px #fff,
+        0 0 2px #fff;
     top: -2px;
     position: relative;
 }
@@ -289,7 +252,9 @@ div.map-view-highlight.marker-cluster {
     height: 200px;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.2s ease-in-out, visibility 0s 0.2s;
+    transition:
+        opacity 0.2s ease-in-out,
+        visibility 0s 0.2s;
     padding: 2px;
 }
 
@@ -321,4 +286,9 @@ div.map-view-highlight.marker-cluster {
 
 .mv-simple-circle-marker .mv-emoji-icon {
     top: 0;
+}
+
+.mv-highlight-offline img.mv-offline {
+    padding: 1px !important;
+    background-color: blue;
 }

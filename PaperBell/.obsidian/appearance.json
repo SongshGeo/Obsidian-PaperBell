@@ -6,7 +6,6 @@
     "【边栏图标】sidepane",
     "【AD优化】admonitions",
     "【进度颜色】多彩进度条",
-    "【便签样式】stickies",
     "【生日倒计时】birthday countdown",
     "【日记时间轴】Time",
     "【情绪记录】AllTracker",
@@ -21,12 +20,16 @@
     "【音乐播放器】Music Player",
     "【主页设置】homepage setting",
     "【卡片框】callout",
-    "【卡片表】card-list"
+    "【卡片表】card-list",
+    "【AnuPpuccin】扩展颜色方案",
+    "【缩短链接】shortten-url",
+    "【字体】stylesheet"
   ],
-  "cssTheme": "Blue Topaz",
+  "cssTheme": "AnuPpuccin",
   "theme": "moonstone",
-  "baseFontSize": 17,
-  "accentColor": "#64ccc5",
+  "baseFontSize": 15,
+  "accentColor": "#66a9f0",
   "showViewHeader": true,
-  "translucency": false
+  "translucency": false,
+  "baseFontSizeAction": true
 }

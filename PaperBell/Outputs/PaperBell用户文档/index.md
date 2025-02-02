@@ -11,6 +11,7 @@ longform:
     - 撰写输出笔记
     - 撰写长文本
     - 导出学术文档
+    - 追踪学者和组织
   ignoredFiles:
     - PaperBell用户手册
 title: PaperBell

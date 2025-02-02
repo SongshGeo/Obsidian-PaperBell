@@ -227,68 +227,10 @@
               "focus": true
             },
             "openFile": true,
-            "openFileInMode": "source",
+            "openFileInMode": "preview",
             "fileExistsMode": "Nothing",
             "setFileExistsBehavior": true
           }
-        },
-        {
-          "name": "Wait",
-          "type": "Wait",
-          "id": "0dbe7715-306b-4542-b9fc-333f4a36bb8a",
-          "time": 100
-        },
-        {
-          "name": "添加元信息",
-          "type": "NestedChoice",
-          "id": "a6c6b993-3217-48da-b575-2540620c9c28",
-          "choice": {
-            "id": "171047af-2421-4c90-bb04-91f67dcc196d",
-            "name": "添加元信息",
-            "type": "Capture",
-            "command": false,
-            "appendLink": false,
-            "captureTo": "",
-            "captureToActiveFile": true,
-            "createFileIfItDoesntExist": {
-              "enabled": false,
-              "createWithTemplate": false,
-              "template": ""
-            },
-            "format": {
-              "enabled": true,
-              "format": "abbr: {{VALUE:缩写}}\nalias:\n- {{VALUE:别名}}\nwebsite: {{VALUE:主页}}\nlocation: [{{VALUE:经纬度}}]\nlogo: \"{{VALUE:LOGO}}\"\n"
-            },
-            "insertAfter": {
-              "enabled": true,
-              "after": "",
-              "insertAtEnd": false,
-              "considerSubsections": false,
-              "createIfNotFound": false,
-              "createIfNotFoundLocation": "top"
-            },
-            "prepend": false,
-            "task": false,
-            "openFileInNewTab": {
-              "enabled": false,
-              "direction": "vertical",
-              "focus": true
-            },
-            "openFile": false,
-            "openFileInMode": "default"
-          }
-        },
-        {
-          "name": "Wait",
-          "type": "Wait",
-          "id": "175e0976-f9df-4faa-a99f-80a2727f828a",
-          "time": 100
-        },
-        {
-          "name": "切换编辑/预览视图",
-          "type": "Obsidian",
-          "id": "a1d2b31e-2010-4f20-a50c-e4c5f2f98217",
-          "commandId": "markdown:toggle-preview"
         }
       ],
       "runOnStartup": false
