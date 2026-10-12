@@ -32,6 +32,7 @@ type: literature-note
 paper_id: paper-cab2bd58a0e53280
 paper_aliases:
   - file:unknown:cimpo一种以输出为导向的学术知识管理方法
+cited_in: []
 ---
 
 ## 摘要

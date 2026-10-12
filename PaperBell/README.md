@@ -93,3 +93,7 @@ git commit -m "Merge template/main, `PaperBell` is up-to-date (version: `git rev
   - `.obsidan/plugins/**/data.json`: 插件的用户配置
   - `.gitignore`: 用户自定义的忽略文件
   - `README.md`: 用户自定义的 README 文件
+- 有些设置**根本不在本仓库里**，合并配置带不过来，只能在每台机器上手动开一次：
+  - Templater 自 `2.24` 起把「新建文件时触发」等开关挪进了 Obsidian 的本地设置，不再写入
+    `data.json`，且默认关闭。它一关，五个文件夹模板（每日日记、概念卡、项目、学者、输出草稿）
+    全都不会渲染，新笔记里会留下 `<% ... %>` 代码。见用户文档《关于如何使用示例仓库的问题》。

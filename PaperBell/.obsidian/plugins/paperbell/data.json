@@ -1,5 +1,4 @@
 {
-  "registrationId": "",
   "llm": {
     "providerId": "openai",
     "api": "openai",
@@ -7,11 +6,6 @@
     "model": "",
     "providers": []
   },
-  "noteLocation": "30 - Metadata/Institutes",
-  "institutionNoteTemplate": "00 - Obsidian/模板/机构模板pro",
-  "autoGenerateInstitutionNotes": true,
-  "openInstitutionAfterCreation": true,
-  "listenToFileCreatedInPath": "30 - Metadata/Scholars",
   "enableUpdater": false,
   "landing": {
     "firstLoad": false,
@@ -93,15 +87,6 @@
     "skillsDirectory": ".claude/skills",
     "builtinSkillStates": {},
     "marketplaceSkills": []
-  },
-  "agentAutoExec": {
-    "enabled": false,
-    "rules": [],
-    "binaryPaths": {},
-    "globalMaxConcurrent": 2,
-    "showNoticeOnTrigger": true,
-    "maxOutputLinesPerRun": 5000,
-    "maxHistoryRuns": 50
   },
   "cimpoFolders": {
     "concepts": "10 - Cards",
@@ -507,6 +492,23 @@
         "llm-credentials"
       ],
       "grantedAt": 1784229150000
+    },
+    {
+      "sourceId": "paperbell-section",
+      "sourceName": "PaperBell Section",
+      "scopes": [
+        "config"
+      ],
+      "grantedAt": 1788797869308
     }
-  ]
+  ],
+  "agentAutoExec": {
+    "enabled": false,
+    "rules": [],
+    "binaryPaths": {},
+    "globalMaxConcurrent": 2,
+    "showNoticeOnTrigger": true,
+    "maxOutputLinesPerRun": 5000,
+    "maxHistoryRuns": 50
+  }
 }

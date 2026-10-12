@@ -545,6 +545,16 @@ body {
 .pb-cond-row {
   margin-top: 4px;
 }
+.pb-scope-text-input {
+  flex: 1 1 260px;
+  min-width: 180px;
+  font-size: 11px;
+  padding: 4px 7px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
+  background: var(--background-primary);
+  color: var(--text-normal);
+}
 .pb-pill {
   font-size: 10px;
   padding: 2px 8px;
@@ -3308,6 +3318,14 @@ body {
   border-color: color-mix(in srgb, var(--interactive-accent) 40%, var(--background-modifier-border));
   background: var(--background-primary-alt);
 }
+.pb-scheme-card.pb-scheme-unavailable {
+  opacity: .5;
+  cursor: not-allowed;
+}
+.pb-scheme-card.pb-scheme-unavailable:hover {
+  border-color: var(--background-modifier-border);
+  background: var(--background-primary);
+}
 .pb-scheme-card.selected {
   border-color: var(--interactive-accent);
   background: color-mix(in srgb, var(--interactive-accent) 6%, var(--background-primary));
@@ -3647,6 +3665,15 @@ body {
   color: var(--color-red);
   background: color-mix(in srgb, var(--color-red) 12%, transparent);
 }
+.pb-ls-lib-rename {
+  font-size: 10px;
+  color: var(--text-faint);
+  cursor: pointer;
+  opacity: 0;
+  padding: 3px 4px;
+}
+.pb-ls-lib-item:hover .pb-ls-lib-rename { opacity: 1; }
+.pb-ls-lib-rename:hover { color: var(--interactive-accent); }
 .pb-ls-open-btn,
 .pb-ls-del-btn {
   font-size: 10px;
@@ -5256,3 +5283,9 @@ body.is-mobile .pb-cite-panel[data-edge="left"]  .pb-cite-panel-body {
   margin-top: 18px;
 }
 .pb-build-summary-metrics{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* LLM 相关性说明来源状态 */
+.pb-llm-status { display:inline-block; margin-left:6px; padding:1px 5px; border-radius:4px; font-size:10px; font-weight:500; }
+.pb-llm-status.is-llm { color:var(--text-success,#2e7d32); background:color-mix(in srgb, var(--text-success,#2e7d32) 12%, transparent); }
+.pb-llm-status.is-fallback { color:var(--text-muted); background:var(--background-secondary); }
+.pb-llm-banner { margin:8px 0; padding:6px 10px; border:1px solid var(--background-modifier-border); border-radius:5px; color:var(--text-muted); font-size:11px; }

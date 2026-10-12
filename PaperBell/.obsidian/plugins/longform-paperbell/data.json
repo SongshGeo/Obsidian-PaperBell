@@ -131,7 +131,7 @@
         {
           "id": "supplementary-info",
           "optionValues": {
-            "abstract": true,
+            "abstract": "",
             "summarize-sections": true
           }
         },
@@ -148,7 +148,8 @@
             "template": "",
             "dry-run": false,
             "open-after": true,
-            "filename": "{acronym}_SI_{date}"
+            "filename": "{acronym}_SI_{date}",
+            "format": ""
           }
         },
         {

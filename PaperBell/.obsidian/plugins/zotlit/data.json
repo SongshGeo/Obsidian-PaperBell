@@ -1,9 +1,8 @@
 {
-  "__VERSION__": 9,
+  "__VERSION__": 10,
   "citation.show-citekey-in-suggester": true,
-  "note.literature-folder": "20 - Inputs/Zotero",
   "template.folder": "00 - Obsidian/模板",
-  "release.previous-version": "2.1.1",
+  "release.previous-version": "2.2.0-beta.3",
   "release.migration-pending": true,
   "citation.open-as-links": true,
   "zotero.library-scope": {
@@ -13,5 +12,14 @@
         "type": "personal"
       }
     ]
+  },
+  "note.default-profile": {
+    "bindings": {
+      "note.literature-folder": "20 - Inputs/Zotero",
+      "citation.references-style": null,
+      "note.import-folder": "zotero_notes",
+      "note.import-colored-highlights": false,
+      "note.import-annotations-as-template": false
+    }
   }
 }

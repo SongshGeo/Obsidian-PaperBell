@@ -35,10 +35,11 @@ __export(main_exports, {
 });
 module.exports = __toCommonJS(main_exports);
 var obsidian11 = __toESM(require("obsidian"));
-var nodeFs3 = __toESM(require("fs"));
+var nodeFs4 = __toESM(require("fs"));
 var nodePath5 = __toESM(require("path"));
 var nodeOs = __toESM(require("os"));
 var nodeCrypto2 = __toESM(require("crypto"));
+var nodeHttp = __toESM(require("http"));
 
 // src/constants.ts
 var VIEW_TYPE = "paperbell-papersearch";
@@ -721,7 +722,7 @@ function bibExtractPath(fileField) {
 // src/lib/file-picker.ts
 var nodePath = __toESM(require("path"));
 function pbPickFile({ accept = "", directory = false } = {}) {
-  return new Promise((resolve) => {
+  return new Promise((resolve2) => {
     const inp = document.createElement("input");
     inp.type = "file";
     if (accept) inp.accept = accept;
@@ -732,7 +733,7 @@ function pbPickFile({ accept = "", directory = false } = {}) {
         inp.remove();
       } catch (_) {
       }
-      resolve(f || null);
+      resolve2(f || null);
     };
     inp.onchange = () => done(inp.files && inp.files[0]);
     inp.oncancel = () => done(null);
@@ -763,6 +764,113 @@ function pbFilePath(file) {
   } catch (_) {
   }
   return file.path || "";
+}
+
+// src/lib/zip-entries.ts
+var nodeFs = __toESM(require("fs"));
+var zlib = __toESM(require("zlib"));
+var EOCD = 101010256;
+var ZIP64_LOCATOR = 117853008;
+var ZIP64_EOCD = 101075792;
+var CENTRAL = 33639248;
+var LOCAL = 67324752;
+function readAt(fd, pos, len) {
+  const buf = Buffer.alloc(len);
+  let off = 0;
+  while (off < len) {
+    const n = nodeFs.readSync(fd, buf, off, len - off, pos + off);
+    if (!n) break;
+    off += n;
+  }
+  return off === len ? buf : buf.subarray(0, off);
+}
+function applyZip64Extra(extra, entry) {
+  let p = 0;
+  while (p + 4 <= extra.length) {
+    const id = extra.readUInt16LE(p);
+    const size = extra.readUInt16LE(p + 2);
+    if (id === 1) {
+      let q = p + 4;
+      const take = () => {
+        const v = Number(extra.readBigUInt64LE(q));
+        q += 8;
+        return v;
+      };
+      if (entry.size === 4294967295) entry.size = take();
+      if (entry.compressedSize === 4294967295) entry.compressedSize = take();
+      if (entry.localOffset === 4294967295) entry.localOffset = take();
+      return;
+    }
+    p += 4 + size;
+  }
+}
+function readZipEntries(zipPath) {
+  const fd = nodeFs.openSync(zipPath, "r");
+  try {
+    const fileSize = nodeFs.fstatSync(fd).size;
+    const tailLen = Math.min(fileSize, 22 + 65535);
+    const tail = readAt(fd, fileSize - tailLen, tailLen);
+    let e = -1;
+    for (let i = tail.length - 22; i >= 0; i--) {
+      if (tail.readUInt32LE(i) === EOCD) {
+        e = i;
+        break;
+      }
+    }
+    if (e < 0) throw new Error("不是有效的 zip 文件（找不到目录结尾）");
+    let count = tail.readUInt16LE(e + 10);
+    let cdSize = tail.readUInt32LE(e + 12);
+    let cdOffset = tail.readUInt32LE(e + 16);
+    if (count === 65535 || cdSize === 4294967295 || cdOffset === 4294967295) {
+      const l = e - 20;
+      if (l < 0 || tail.readUInt32LE(l) !== ZIP64_LOCATOR) throw new Error("zip64 目录定位记录缺失");
+      const recPos = Number(tail.readBigUInt64LE(l + 8));
+      const rec = readAt(fd, recPos, 56);
+      if (rec.readUInt32LE(0) !== ZIP64_EOCD) throw new Error("zip64 目录结尾损坏");
+      count = Number(rec.readBigUInt64LE(32));
+      cdSize = Number(rec.readBigUInt64LE(40));
+      cdOffset = Number(rec.readBigUInt64LE(48));
+    }
+    const cd = readAt(fd, cdOffset, cdSize);
+    const entries = [];
+    let p = 0;
+    for (let i = 0; i < count; i++) {
+      if (p + 46 > cd.length || cd.readUInt32LE(p) !== CENTRAL) throw new Error("zip 中央目录损坏");
+      const nameLen = cd.readUInt16LE(p + 28);
+      const extraLen = cd.readUInt16LE(p + 30);
+      const commentLen = cd.readUInt16LE(p + 32);
+      const entry = {
+        name: cd.toString("utf8", p + 46, p + 46 + nameLen).replace(/\\/g, "/"),
+        method: cd.readUInt16LE(p + 10),
+        compressedSize: cd.readUInt32LE(p + 20),
+        size: cd.readUInt32LE(p + 24),
+        localOffset: cd.readUInt32LE(p + 42)
+      };
+      applyZip64Extra(cd.subarray(p + 46 + nameLen, p + 46 + nameLen + extraLen), entry);
+      entries.push(entry);
+      p += 46 + nameLen + extraLen + commentLen;
+    }
+    return entries;
+  } finally {
+    nodeFs.closeSync(fd);
+  }
+}
+function readZipEntryText(zipPath, name) {
+  const entry = readZipEntries(zipPath).find((x) => x.name === name || x.name === "./" + name);
+  if (!entry) return null;
+  if (entry.size > 1024 * 1024) throw new Error(`${name} 过大`);
+  const fd = nodeFs.openSync(zipPath, "r");
+  try {
+    const head = readAt(fd, entry.localOffset, 30);
+    if (head.readUInt32LE(0) !== LOCAL) throw new Error("zip 本地文件头损坏");
+    const start = entry.localOffset + 30 + head.readUInt16LE(26) + head.readUInt16LE(28);
+    const raw = readAt(fd, start, entry.compressedSize);
+    if (entry.method === 0) return raw.toString("utf8");
+    if (entry.method === 8) return zlib.inflateRawSync(raw).toString("utf8");
+    throw new Error(`不支持的压缩方式 ${entry.method}`);
+  } finally {
+    nodeFs.closeSync(fd);
+  }
 }
 
 // src/services/api.ts
@@ -809,6 +917,14 @@ var PBApi = class {
   async postJson(path, body) {
     return this._parseJson(await this._req(path, {
       method: "POST",
+      contentType: "application/json",
+      body: JSON.stringify(body != null ? body : {})
+    }));
+  }
+  // PATCH JSON → JSON（文献库重命名等管理操作）
+  async patchJson(path, body) {
+    return this._parseJson(await this._req(path, {
+      method: "PATCH",
       contentType: "application/json",
       body: JSON.stringify(body != null ? body : {})
     }));
@@ -1453,7 +1569,7 @@ var BuildManager = class {
 
 // src/services/core-manager.ts
 var obsidian4 = __toESM(require("obsidian"));
-var nodeFs = __toESM(require("fs"));
+var nodeFs2 = __toESM(require("fs"));
 var nodePath2 = __toESM(require("path"));
 var CoreManager = class {
   constructor(plugin) {
@@ -1525,7 +1641,7 @@ var CoreManager = class {
   // ── 核心包双形态：打包二进制（PaperRAGStudio.exe）or 源码 portable 包（start_app.py + python_runtime）──
   _pathExists(p) {
     try {
-      return !!p && nodeFs.existsSync(p);
+      return !!p && nodeFs2.existsSync(p);
     } catch (_) {
       return false;
     }
@@ -1533,7 +1649,7 @@ var CoreManager = class {
   hasBinaryCore() {
     try {
       const p = this.corePath();
-      return nodeFs.existsSync(p) && nodeFs.statSync(p).isFile();
+      return nodeFs2.existsSync(p) && nodeFs2.statSync(p).isFile();
     } catch (_) {
       return false;
     }
@@ -1552,9 +1668,9 @@ var CoreManager = class {
   }
   _isSourceCoreDir(dir) {
     try {
-      if (!dir || !nodeFs.existsSync(nodePath2.join(dir, "start_app.py"))) return false;
+      if (!dir || !nodeFs2.existsSync(nodePath2.join(dir, "start_app.py"))) return false;
       const rt = nodePath2.join(dir, "python_runtime");
-      if (!nodeFs.existsSync(rt)) return true;
+      if (!nodeFs2.existsSync(rt)) return true;
       return this._isRuntimeComplete(rt);
     } catch (_) {
       return false;
@@ -1566,11 +1682,11 @@ var CoreManager = class {
   _isRuntimeComplete(runtimeRoot) {
     try {
       const py = this.platform() === "win" ? nodePath2.join(runtimeRoot, "python.exe") : nodePath2.join(runtimeRoot, "bin", "python3");
-      if (!nodeFs.existsSync(py)) return false;
+      if (!nodeFs2.existsSync(py)) return false;
       const lib = nodePath2.join(runtimeRoot, "Lib");
-      if (!nodeFs.existsSync(lib)) return true;
+      if (!nodeFs2.existsSync(lib)) return true;
       for (const pkg of ["urllib", "xml", "unittest", "sqlite3"]) {
-        if (!nodeFs.existsSync(nodePath2.join(lib, pkg))) return false;
+        if (!nodeFs2.existsSync(nodePath2.join(lib, pkg))) return false;
       }
       return true;
     } catch (_) {
@@ -1584,11 +1700,11 @@ var CoreManager = class {
   _isInstalling() {
     try {
       const f = this._installingFlagPath();
-      if (!nodeFs.existsSync(f)) return false;
-      const age = Date.now() - nodeFs.statSync(f).mtimeMs;
+      if (!nodeFs2.existsSync(f)) return false;
+      const age = Date.now() - nodeFs2.statSync(f).mtimeMs;
       if (age > 3 * 3600 * 1e3) {
         try {
-          nodeFs.unlinkSync(f);
+          nodeFs2.unlinkSync(f);
         } catch (_) {
         }
         return false;
@@ -1603,8 +1719,8 @@ var CoreManager = class {
     const root = this.coreRoot();
     if (this._isSourceCoreDir(root)) return root;
     try {
-      if (!nodeFs.existsSync(root)) return "";
-      for (const e of nodeFs.readdirSync(root, { withFileTypes: true })) {
+      if (!nodeFs2.existsSync(root)) return "";
+      for (const e of nodeFs2.readdirSync(root, { withFileTypes: true })) {
         if (!e.isDirectory()) continue;
         const sub = nodePath2.join(root, e.name);
         if (this._isSourceCoreDir(sub)) return sub;
@@ -1613,9 +1729,58 @@ var CoreManager = class {
     }
     return "";
   }
+  // 程序本体在不在（不管组件）：安装后的校验用它，组件另走 missingComponents()
+  hasCoreProgram() {
+    return this.hasBinaryCore() || !!this._installedSourceDir();
+  }
   isInstalled() {
     if (this._isInstalling()) return false;
-    return this.hasBinaryCore() || !!this._installedSourceDir();
+    if (this.hasBinaryCore()) return this.missingComponents().length === 0;
+    return !!this._installedSourceDir();
+  }
+  // ── 分包：程序包 + 组件包（语义模型）─────────────────
+  // Rust 核心的程序包只有几十 MB，语义模型约 1 GB、很少变，单独成包：程序更新时不必再下一遍。
+  // 程序包根目录的 core-package.json 声明需要哪些组件（id / version / path / sha256 / 下载地址），
+  // 组件装好后在它的目录里写 .component.json，记下装的是哪个包（sha256）。
+  // 没有 core-package.json 的包（Python 核心）一切照旧。
+  packageManifestPath() {
+    return nodePath2.join(this.coreRoot(), "core-package.json");
+  }
+  readPackageManifest() {
+    try {
+      return JSON.parse(nodeFs2.readFileSync(this.packageManifestPath(), "utf8"));
+    } catch (_) {
+      return null;
+    }
+  }
+  // 组件目录必须落在 core/ 之内，且不能是用户数据目录——清单来自安装包，不能让它指到别处
+  _componentDir(comp) {
+    const root = nodePath2.resolve(this.coreRoot());
+    const dir = nodePath2.resolve(root, String((comp == null ? void 0 : comp.path) || ""));
+    const rel = nodePath2.relative(root, dir);
+    const head = rel.split(/[\\/]/)[0].toLowerCase();
+    if (!rel || rel.startsWith("..") || nodePath2.isAbsolute(rel) || ["data", "outputs"].includes(head)) {
+      throw new Error(`组件路径不合法：${comp == null ? void 0 : comp.path}`);
+    }
+    return dir;
+  }
+  readComponentMarker(comp) {
+    try {
+      return JSON.parse(nodeFs2.readFileSync(nodePath2.join(this._componentDir(comp), ".component.json"), "utf8"));
+    } catch (_) {
+      return null;
+    }
+  }
+  // 程序包要求、但还没装或装的不是那个包（sha256 不同）的组件
+  missingComponents() {
+    var _a;
+    const comps = (_a = this.readPackageManifest()) == null ? void 0 : _a.components;
+    if (!Array.isArray(comps)) return [];
+    return comps.filter((c) => {
+      const mark = this.readComponentMarker(c);
+      if (!mark || mark.id !== c.id) return true;
+      return !!c.sha256 && String(mark.sha256 || "").toLowerCase() !== String(c.sha256).toLowerCase();
+    });
   }
   // <dir>/.venv 下的 python（开发源码目录常见）
   _localVenvPython(dir) {
@@ -1664,7 +1829,11 @@ var CoreManager = class {
   _canLaunch() {
     this._migrateLegacyData();
     if (!this.hasBinaryCore()) this._flattenCoreDir();
-    return this.hasBinaryCore() || !!this._localBackend() || !!this._installedSourceBackend();
+    return this._binaryReady() || !!this._localBackend() || !!this._installedSourceBackend();
+  }
+  // 二进制核心连同它要的组件都齐了才能拉起：缺模型时启动只会立刻退出
+  _binaryReady() {
+    return this.hasBinaryCore() && this.missingComponents().length === 0;
   }
   // ── 数据目录：统一到 core/data ─────────────────────
   // 早期 portable 后端把用户数据放在 core/<源码包目录>/data，二进制核心又另建一套，
@@ -1676,10 +1845,10 @@ var CoreManager = class {
     const seen = /* @__PURE__ */ new Set();
     const add = (p) => {
       try {
-        const resolved = nodeFs.realpathSync(p);
+        const resolved = nodeFs2.realpathSync(p);
         if (seen.has(resolved)) return;
-        if (!nodeFs.statSync(resolved).isDirectory()) return;
-        const useful = ["libraries", "pdfs", "chroma"].some((name) => nodeFs.existsSync(nodePath2.join(resolved, name)));
+        if (!nodeFs2.statSync(resolved).isDirectory()) return;
+        const useful = ["libraries", "pdfs", "chroma"].some((name) => nodeFs2.existsSync(nodePath2.join(resolved, name)));
         if (useful) {
           seen.add(resolved);
           out.push(resolved);
@@ -1690,7 +1859,7 @@ var CoreManager = class {
     add(nodePath2.join(root, "data"));
     let entries = [];
     try {
-      entries = nodeFs.readdirSync(root, { withFileTypes: true });
+      entries = nodeFs2.readdirSync(root, { withFileTypes: true });
     } catch (_) {
     }
     for (const entry of entries) {
@@ -1699,7 +1868,7 @@ var CoreManager = class {
       add(nodePath2.join(child, "data"));
       let nested = [];
       try {
-        nested = nodeFs.readdirSync(child, { withFileTypes: true });
+        nested = nodeFs2.readdirSync(child, { withFileTypes: true });
       } catch (_) {
       }
       for (const sub of nested) {
@@ -1724,15 +1893,15 @@ var CoreManager = class {
   _copyMissingTree(src, dst) {
     let copied = 0;
     try {
-      const st = nodeFs.statSync(src);
+      const st = nodeFs2.statSync(src);
       if (st.isDirectory()) {
-        nodeFs.mkdirSync(dst, { recursive: true });
-        for (const entry of nodeFs.readdirSync(src, { withFileTypes: true })) {
+        nodeFs2.mkdirSync(dst, { recursive: true });
+        for (const entry of nodeFs2.readdirSync(src, { withFileTypes: true })) {
           copied += this._copyMissingTree(nodePath2.join(src, entry.name), nodePath2.join(dst, entry.name));
         }
-      } else if (!nodeFs.existsSync(dst)) {
-        nodeFs.mkdirSync(nodePath2.dirname(dst), { recursive: true });
-        nodeFs.copyFileSync(src, dst);
+      } else if (!nodeFs2.existsSync(dst)) {
+        nodeFs2.mkdirSync(nodePath2.dirname(dst), { recursive: true });
+        nodeFs2.copyFileSync(src, dst);
         copied++;
       }
     } catch (e) {
@@ -1762,7 +1931,7 @@ var CoreManager = class {
       const stack = [dir];
       while (stack.length) {
         const current = stack.pop();
-        for (const entry of nodeFs.readdirSync(current, { withFileTypes: true })) {
+        for (const entry of nodeFs2.readdirSync(current, { withFileTypes: true })) {
           if (entry.isFile()) return true;
           if (entry.isDirectory()) stack.push(nodePath2.join(current, entry.name));
         }
@@ -1784,8 +1953,8 @@ var CoreManager = class {
       const source = nonEmpty[i];
       const backup = nodePath2.join(backupRoot, `data-${i}`);
       try {
-        nodeFs.mkdirSync(nodePath2.dirname(backup), { recursive: true });
-        nodeFs.cpSync(source, backup, { recursive: true, force: false, errorOnExist: false });
+        nodeFs2.mkdirSync(nodePath2.dirname(backup), { recursive: true });
+        nodeFs2.cpSync(source, backup, { recursive: true, force: false, errorOnExist: false });
         entries.push({ source, backup });
       } catch (e) {
         this._appendLog(`[PaperSearch] upgrade backup failed: ${source}: ${e.message || e}`);
@@ -1805,8 +1974,8 @@ var CoreManager = class {
     let copied = 0;
     for (const entry of [...state.entries || []].reverse()) {
       try {
-        nodeFs.mkdirSync(target, { recursive: true });
-        nodeFs.cpSync(entry.backup, target, { recursive: true, force: true, errorOnExist: false });
+        nodeFs2.mkdirSync(target, { recursive: true });
+        nodeFs2.cpSync(entry.backup, target, { recursive: true, force: true, errorOnExist: false });
         copied++;
       } catch (e) {
         this._appendLog(`[PaperSearch] upgrade restore failed: ${entry.backup}: ${e.message || e}`);
@@ -1818,7 +1987,9 @@ var CoreManager = class {
   // 所有启动形态共用当前 vault 的数据目录，
   // 避免 Python 源码后端和二进制后端各自生成一套库。
   _sharedDataEnv(env) {
+    var _a, _b;
     const coreDataDir = nodePath2.join(this.coreRoot(), "data");
+    const llmBridge = ((_b = (_a = this.plugin)._paperbellLlmBridgeEnv) == null ? void 0 : _b.call(_a)) || {};
     return {
       ...env,
       USER_DATA_DIR: this.coreRoot(),
@@ -1826,7 +1997,11 @@ var CoreManager = class {
       CHROMA_DIR: nodePath2.join(coreDataDir, "chroma"),
       OUTPUT_DIR: nodePath2.join(this.coreRoot(), "outputs"),
       CHUNK_ENRICHMENT_CACHE_PATH: nodePath2.join(coreDataDir, "chunk_enrichment_cache.json"),
-      LIBRARY_ROOT_DIR: nodePath2.join(coreDataDir, "libraries")
+      LIBRARY_ROOT_DIR: nodePath2.join(coreDataDir, "libraries"),
+      // 集成运行时禁止 Core 因桥接暂时不可用而回退到 .env / runtime_settings.json
+      // 中的供应商密钥直连。没有桥接时，LLM 功能应明确失败，基础检索仍可用。
+      PAPERBELL_LLM_BRIDGE_REQUIRED: "1",
+      ...llmBridge
     };
   }
   // Python 启动配置：portable 运行时需注入 PATH（含 torch/lib 等 DLL 搜索路径）
@@ -1864,10 +2039,10 @@ var CoreManager = class {
     const sharedEnv = this._sharedDataEnv(env);
     const local = this._localBackend();
     if (local) return this._pythonLaunchConfig(local, sharedEnv);
-    if (this.hasBinaryCore()) {
+    if (this._binaryReady()) {
       if (this.platform() !== "win") {
         try {
-          nodeFs.chmodSync(this.corePath(), 493);
+          nodeFs2.chmodSync(this.corePath(), 493);
         } catch (_) {
         }
       }
@@ -1899,13 +2074,14 @@ var CoreManager = class {
     throw new Error(`8000-8020 端口都被占用`);
   }
   // 下载 zip（真实 chunk 进度 + 重定向 ≤5 + 状态机播报）
-  async _downloadZip(url, zipPath, onProgress, redirects = 0) {
+  // label：进度文案前缀（分包时区分「语义模型」与程序本体）
+  async _downloadZip(url, zipPath, onProgress, redirects = 0, label = "") {
     if (redirects > 5) throw new Error("下载重定向过多");
-    this._setStatus("downloading", redirects ? "跟随下载重定向…" : "准备下载…");
+    this._setStatus("downloading", label + (redirects ? "跟随下载重定向…" : "准备下载…"));
     const https = require("https");
     const http = require("http");
     const lib = /^https:/i.test(url) ? https : http;
-    await new Promise((resolve, reject) => {
+    await new Promise((resolve2, reject) => {
       const req = lib.get(url, (resp) => {
         const statusCode = resp.statusCode || 0;
         if ([301, 302, 303, 307, 308].includes(statusCode)) {
@@ -1915,7 +2091,7 @@ var CoreManager = class {
             reject(new Error(`HTTP ${statusCode} 重定向缺少 Location`));
             return;
           }
-          this._downloadZip(new URL(loc, url).href, zipPath, onProgress, redirects + 1).then(resolve, reject);
+          this._downloadZip(new URL(loc, url).href, zipPath, onProgress, redirects + 1, label).then(resolve2, reject);
           return;
         }
         if (statusCode !== 200) {
@@ -1925,7 +2101,7 @@ var CoreManager = class {
         }
         const total = parseInt(resp.headers["content-length"] || "0", 10) || 0;
         let got = 0;
-        const out = nodeFs.createWriteStream(zipPath);
+        const out = nodeFs2.createWriteStream(zipPath);
         const fail = (err) => {
           try {
             out.destroy();
@@ -1935,12 +2111,13 @@ var CoreManager = class {
         };
         resp.on("data", (chunk) => {
           got += chunk.length;
-          const progress = pbDownloadProgress(got, total);
+          const p = pbDownloadProgress(got, total);
+          const progress = label ? { ...p, text: label + p.text } : p;
           this._setStatus("downloading", progress.text);
           onProgress == null ? void 0 : onProgress(got, total, progress);
         });
         resp.on("error", fail);
-        out.on("finish", () => out.close(resolve));
+        out.on("finish", () => out.close(resolve2));
         out.on("error", fail);
         resp.pipe(out);
       });
@@ -1951,41 +2128,147 @@ var CoreManager = class {
   async download(url, sha256, onProgress) {
     const zipPath = nodePath2.join(this.coreRoot(), "_download.zip");
     try {
-      nodeFs.mkdirSync(this.coreRoot(), { recursive: true });
+      nodeFs2.mkdirSync(this.coreRoot(), { recursive: true });
     } catch (_) {
     }
     await this._downloadZip(url, zipPath, onProgress);
+    const phases = this._phaseReporter();
+    try {
+      await this.installFromZip(zipPath, sha256, { deleteZipAfter: true, onPhase: phases.onPhase });
+    } finally {
+      phases.stop();
+    }
+  }
+  // 校验 / 解压阶段的状态文案。解压器读中央目录时会几十秒不吐进度，靠心跳把「已等待 N 秒」刷出来
+  _phaseReporter(label = "") {
     const tick = pbMakeExtractTimer();
     let beat = null;
-    const stopBeat = () => {
+    const stop = () => {
       if (beat) {
         clearInterval(beat);
         beat = null;
       }
     };
+    const onPhase = (phase, p) => {
+      if (phase === "verify") {
+        stop();
+        this._setStatus("downloading", label + "正在校验下载包…");
+        return;
+      }
+      this._setStatus("downloading", label + tick(p).text);
+      if (!beat) beat = setInterval(() => this._setStatus("downloading", label + tick.stalled().text), 3e3);
+    };
+    return { onPhase, stop };
+  }
+  _componentLabel(comp) {
+    return `${(comp == null ? void 0 : comp.title) || "语义模型"} · `;
+  }
+  // 下载并安装一个组件包（程序包清单里的一项）。sha256 以清单为准：清单随程序包一起校验过
+  async downloadComponent(comp, url, onProgress) {
     try {
-      await this.installFromZip(zipPath, sha256, {
-        deleteZipAfter: true,
-        onPhase: (phase, p) => {
-          if (phase === "verify") {
-            stopBeat();
-            this._setStatus("downloading", "正在校验下载包…");
-            return;
-          }
-          this._setStatus("downloading", tick(p).text);
-          if (!beat) beat = setInterval(() => this._setStatus("downloading", tick.stalled().text), 3e3);
-        }
-      });
-    } finally {
-      stopBeat();
+      nodeFs2.mkdirSync(this.coreRoot(), { recursive: true });
+    } catch (_) {
     }
+    const safeId = String(comp.id || "component").replace(/[^\w.-]/g, "_");
+    const zipPath = nodePath2.join(this.coreRoot(), `_download-${safeId}.zip`);
+    const label = this._componentLabel(comp);
+    await this._downloadZip(url, zipPath, onProgress, 0, label);
+    const phases = this._phaseReporter(label);
+    try {
+      await this.installComponentFromZip(zipPath, { expect: comp, sha256: comp.sha256, deleteZipAfter: true, onPhase: phases.onPhase });
+    } finally {
+      phases.stop();
+    }
+  }
+  // 组件包：根目录 core-component.json（id / version / path）+ <path>/ 下的文件。
+  // 先解到 core/ 下的暂存目录，整目录换上去，再写标记——中途失败时旧组件原样保留，
+  // 也不会留下一个没有标记、看着像装好了的半截目录。
+  async installComponentFromZip(zipPath, opts = {}) {
+    const { expect = null, sha256 = "", deleteZipAfter = false, onPhase } = opts;
+    if (!zipPath || !nodeFs2.existsSync(zipPath)) throw new Error(`找不到压缩包：${zipPath || "(空)"}`);
+    const dropZip = () => {
+      if (deleteZipAfter) {
+        try {
+          nodeFs2.unlinkSync(zipPath);
+        } catch (_) {
+        }
+      }
+    };
+    let comp = null;
+    try {
+      comp = JSON.parse(readZipEntryText(zipPath, "core-component.json") || "null");
+    } catch (_) {
+    }
+    if (!(comp == null ? void 0 : comp.id) || !(comp == null ? void 0 : comp.path)) {
+      dropZip();
+      throw new Error("不是 PaperSearch 组件包（缺少 core-component.json）");
+    }
+    if (expect && (comp.id !== expect.id || nodePath2.normalize(comp.path) !== nodePath2.normalize(expect.path))) {
+      dropZip();
+      throw new Error(`组件包不匹配：需要 ${expect.id}，收到的是 ${comp.id}`);
+    }
+    const target = this._componentDir(comp);
+    onPhase == null ? void 0 : onPhase("verify");
+    const got = (await this._sha256File(zipPath)).toLowerCase();
+    if (sha256 && got !== String(sha256).toLowerCase()) {
+      dropZip();
+      throw new Error(`SHA-256 校验失败：期望 ${String(sha256).slice(0, 12)}…，实际 ${got.slice(0, 12)}…`);
+    }
+    const staging = nodePath2.join(this.coreRoot(), `.component-${nodePath2.basename(target)}.staging`);
+    const old = `${target}.old`;
+    try {
+      nodeFs2.rmSync(staging, { recursive: true, force: true });
+    } catch (_) {
+    }
+    onPhase == null ? void 0 : onPhase("extract");
+    try {
+      await this._extractZip(zipPath, staging, (p) => onPhase == null ? void 0 : onPhase("extract", p));
+      const src = nodePath2.join(staging, comp.path);
+      if (!nodeFs2.existsSync(src)) throw new Error(`组件包里没有 ${comp.path}`);
+      nodeFs2.rmSync(old, { recursive: true, force: true });
+      nodeFs2.mkdirSync(nodePath2.dirname(target), { recursive: true });
+      if (nodeFs2.existsSync(target)) {
+        try {
+          nodeFs2.renameSync(target, old);
+        } catch (e) {
+          throw new Error(`旧组件正被占用，请先停止本地服务后重试（${e.code || e.message}）`);
+        }
+      }
+      try {
+        nodeFs2.renameSync(src, target);
+      } catch (e) {
+        try {
+          if (nodeFs2.existsSync(old)) nodeFs2.renameSync(old, target);
+        } catch (_) {
+        }
+        throw e;
+      }
+      nodeFs2.writeFileSync(nodePath2.join(target, ".component.json"), JSON.stringify({
+        id: comp.id,
+        version: comp.version || "",
+        sha256: got,
+        installedAt: Date.now()
+      }, null, 1));
+    } finally {
+      try {
+        nodeFs2.rmSync(staging, { recursive: true, force: true });
+      } catch (_) {
+      }
+      try {
+        nodeFs2.rmSync(old, { recursive: true, force: true });
+      } catch (_) {
+      }
+      dropZip();
+    }
+    this._appendLog(`[PaperSearch] component installed: ${comp.id} ${comp.version || ""} → ${target}`);
+    return comp;
   }
   // 从本地 zip 安装核心：手动导入（用户已自备压缩包 / 离线 / 内网无法在线下载）与在线下载共用此路径。
   // opts.deleteZipAfter：在线下载的临时包用完即删；用户手选的原始文件保留不动。
   // opts.onPhase：'verify' | 'extract' 阶段回调（给 UI 显示文案）。
   async installFromZip(zipPath, sha256, opts = {}) {
     const { deleteZipAfter = false, onPhase } = opts;
-    if (!zipPath || !nodeFs.existsSync(zipPath)) {
+    if (!zipPath || !nodeFs2.existsSync(zipPath)) {
       throw new Error(`找不到压缩包：${zipPath || "(空)"}`);
     }
     const upgradeBackup = this._backupDataBeforeInstall();
@@ -1996,19 +2279,16 @@ var CoreManager = class {
       dataRestored = true;
     };
     try {
-      nodeFs.mkdirSync(this.coreRoot(), { recursive: true });
+      nodeFs2.mkdirSync(this.coreRoot(), { recursive: true });
     } catch (_) {
     }
     if (sha256) {
       onPhase == null ? void 0 : onPhase("verify");
-      const crypto = require("crypto");
-      const hash = crypto.createHash("sha256");
-      hash.update(nodeFs.readFileSync(zipPath));
-      const got = hash.digest("hex");
+      const got = await this._sha256File(zipPath);
       if (got.toLowerCase() !== sha256.toLowerCase()) {
         if (deleteZipAfter) {
           try {
-            nodeFs.unlinkSync(zipPath);
+            nodeFs2.unlinkSync(zipPath);
           } catch (_) {
           }
         }
@@ -2017,7 +2297,11 @@ var CoreManager = class {
     }
     onPhase == null ? void 0 : onPhase("extract");
     try {
-      nodeFs.writeFileSync(this._installingFlagPath(), String(Date.now()));
+      nodeFs2.writeFileSync(this._installingFlagPath(), String(Date.now()));
+    } catch (_) {
+    }
+    try {
+      nodeFs2.rmSync(this.packageManifestPath(), { force: true });
     } catch (_) {
     }
     try {
@@ -2028,14 +2312,14 @@ var CoreManager = class {
         if (now - lastTouch > 3e4) {
           lastTouch = now;
           try {
-            nodeFs.utimesSync(this._installingFlagPath(), /* @__PURE__ */ new Date(), /* @__PURE__ */ new Date());
+            nodeFs2.utimesSync(this._installingFlagPath(), /* @__PURE__ */ new Date(), /* @__PURE__ */ new Date());
           } catch (_) {
           }
         }
       });
     } catch (e) {
       try {
-        nodeFs.unlinkSync(this._installingFlagPath());
+        nodeFs2.unlinkSync(this._installingFlagPath());
       } catch (_) {
       }
       restoreOnFailure();
@@ -2043,19 +2327,19 @@ var CoreManager = class {
     }
     if (deleteZipAfter) {
       try {
-        nodeFs.unlinkSync(zipPath);
+        nodeFs2.unlinkSync(zipPath);
       } catch (_) {
       }
     }
     try {
-      nodeFs.unlinkSync(this._installingFlagPath());
+      nodeFs2.unlinkSync(this._installingFlagPath());
     } catch (_) {
     }
-    if (!this.isInstalled()) this._flattenCoreDir();
-    if (!this.isInstalled()) {
+    if (!this.hasCoreProgram()) this._flattenCoreDir();
+    if (!this.hasCoreProgram()) {
       const srcDir = this._installedSourceDir() || "";
       const rt = srcDir && nodePath2.join(srcDir, "python_runtime");
-      if (rt && nodeFs.existsSync(rt) && !this._isRuntimeComplete(rt)) {
+      if (rt && nodeFs2.existsSync(rt) && !this._isRuntimeComplete(rt)) {
         restoreOnFailure();
         throw new Error("安装包解压不完整（内置 Python 运行时缺少文件），常见原因是磁盘空间不足或解压被中断。请清理磁盘空间后重新安装。");
       }
@@ -2068,7 +2352,7 @@ var CoreManager = class {
     this._migrateLegacyData();
     if (this.platform() !== "win" && this.hasBinaryCore()) {
       try {
-        nodeFs.chmodSync(this.corePath(), 493);
+        nodeFs2.chmodSync(this.corePath(), 493);
       } catch (_) {
       }
       this._clearMacQuarantine();
@@ -2079,32 +2363,32 @@ var CoreManager = class {
   _flattenCoreDir() {
     try {
       const root = this.coreRoot();
-      for (const e of nodeFs.readdirSync(root, { withFileTypes: true })) {
+      for (const e of nodeFs2.readdirSync(root, { withFileTypes: true })) {
         if (!e.isDirectory()) continue;
         const sub = nodePath2.join(root, e.name);
-        const hasBinary = nodeFs.existsSync(nodePath2.join(sub, this.binName()));
-        const hasSource = nodeFs.existsSync(nodePath2.join(sub, "start_app.py"));
+        const hasBinary = nodeFs2.existsSync(nodePath2.join(sub, this.binName()));
+        const hasSource = nodeFs2.existsSync(nodePath2.join(sub, "start_app.py"));
         if (!hasBinary && !hasSource) continue;
-        for (const item of nodeFs.readdirSync(sub)) {
+        for (const item of nodeFs2.readdirSync(sub)) {
           const dst = nodePath2.join(root, item);
           const src = nodePath2.join(sub, item);
           const lower = item.toLowerCase();
-          if (["data", "outputs", ".runtime"].includes(lower) && nodeFs.existsSync(dst)) {
+          if (["data", "outputs", ".runtime"].includes(lower) && nodeFs2.existsSync(dst)) {
             this._copyMissingTree(src, dst);
             continue;
           }
-          if ([".env", "core.log", "core.lock"].includes(lower) && nodeFs.existsSync(dst)) continue;
-          if (nodeFs.existsSync(dst)) {
+          if ([".env", "core.log", "core.lock"].includes(lower) && nodeFs2.existsSync(dst)) continue;
+          if (nodeFs2.existsSync(dst)) {
             try {
-              nodeFs.rmSync(dst, { recursive: true, force: true });
+              nodeFs2.rmSync(dst, { recursive: true, force: true });
             } catch (_) {
               continue;
             }
           }
-          nodeFs.renameSync(src, dst);
+          nodeFs2.renameSync(src, dst);
         }
         try {
-          nodeFs.rmdirSync(sub);
+          nodeFs2.rmdirSync(sub);
         } catch (_) {
         }
         return true;
@@ -2123,8 +2407,8 @@ var CoreManager = class {
   _assertDiskSpace(zipPath, targetDir) {
     let need = 0, free = 0;
     try {
-      need = nodeFs.statSync(zipPath).size * 3;
-      const st = nodeFs.statfsSync(targetDir);
+      need = nodeFs2.statSync(zipPath).size * 3;
+      const st = nodeFs2.statfsSync(targetDir);
       free = st.bavail * st.bsize;
     } catch (_) {
       return;
@@ -2135,11 +2419,23 @@ var CoreManager = class {
       `磁盘空间不足：安装需要约 ${gb(need)} 可用空间，当前所在磁盘只剩 ${gb(free)}。请清理空间后重试，或把 vault 放到空间更充足的磁盘。`
     );
   }
+  // 流式算 SHA-256：核心包 1.8 GB 起步，readFileSync 会把整包读进渲染进程——
+  // 同步读期间 Obsidian 整个界面卡死，超过 Buffer 上限（约 2 GB）还会直接抛错。
+  _sha256File(filePath) {
+    const crypto = require("crypto");
+    return new Promise((resolve2, reject) => {
+      const hash = crypto.createHash("sha256");
+      const stream = nodeFs2.createReadStream(filePath, { highWaterMark: 4 * 1024 * 1024 });
+      stream.on("data", (chunk) => hash.update(chunk));
+      stream.on("error", reject);
+      stream.on("end", () => resolve2(hash.digest("hex")));
+    });
+  }
   // onProgress({ done, total }) —— 解压几万个条目要好几分钟，不报进度的话
   // 界面就是一动不动，用户分不清是在干活还是卡死了。
   async _extractZip(zipPath, targetDir, onProgress) {
     const { spawn } = require("child_process");
-    const run = (cmd, args, opts = {}) => new Promise((resolve, reject) => {
+    const run = (cmd, args, opts = {}) => new Promise((resolve2, reject) => {
       const p = spawn(cmd, args, { windowsHide: true, ...opts });
       let err = "", tail = "";
       p.stdout.setEncoding("utf8");
@@ -2158,11 +2454,11 @@ var CoreManager = class {
       p.on("close", (code) => {
         var _a;
         if (tail) (_a = opts.onLine) == null ? void 0 : _a.call(opts, tail);
-        code === 0 ? resolve() : reject(new Error((err || `退出码 ${code}`).slice(0, 300)));
+        code === 0 ? resolve2() : reject(new Error((err || `退出码 ${code}`).slice(0, 300)));
       });
     });
     try {
-      nodeFs.mkdirSync(targetDir, { recursive: true });
+      nodeFs2.mkdirSync(targetDir, { recursive: true });
     } catch (_) {
     }
     this._assertDiskSpace(zipPath, targetDir);
@@ -2259,7 +2555,7 @@ var CoreManager = class {
   }
   _readLock() {
     try {
-      return JSON.parse(nodeFs.readFileSync(this._lockPath(), "utf8"));
+      return JSON.parse(nodeFs2.readFileSync(this._lockPath(), "utf8"));
     } catch (_) {
       return null;
     }
@@ -2267,13 +2563,13 @@ var CoreManager = class {
   _writeLock() {
     var _a;
     try {
-      nodeFs.writeFileSync(this._lockPath(), JSON.stringify({ pid: ((_a = this.proc) == null ? void 0 : _a.pid) || 0, port: this.port, ts: Date.now() }));
+      nodeFs2.writeFileSync(this._lockPath(), JSON.stringify({ pid: ((_a = this.proc) == null ? void 0 : _a.pid) || 0, port: this.port, ts: Date.now() }));
     } catch (_) {
     }
   }
   _clearLock() {
     try {
-      nodeFs.unlinkSync(this._lockPath());
+      nodeFs2.unlinkSync(this._lockPath());
     } catch (_) {
     }
   }
@@ -2283,13 +2579,13 @@ var CoreManager = class {
   }
   _appendLog(s) {
     try {
-      nodeFs.mkdirSync(this.coreRoot(), { recursive: true });
+      nodeFs2.mkdirSync(this.coreRoot(), { recursive: true });
       const p = this._logPath();
       try {
-        if (nodeFs.statSync(p).size > 524288) nodeFs.writeFileSync(p, "");
+        if (nodeFs2.statSync(p).size > 524288) nodeFs2.writeFileSync(p, "");
       } catch (_) {
       }
-      nodeFs.appendFileSync(p, s.endsWith("\n") ? s : s + "\n");
+      nodeFs2.appendFileSync(p, s.endsWith("\n") ? s : s + "\n");
     } catch (_) {
     }
   }
@@ -2554,12 +2850,12 @@ var RateLimiter = class {
     this.last = now;
   }
   async take() {
-    return new Promise((resolve) => {
+    return new Promise((resolve2) => {
       const tryTake = () => {
         this._refill();
         if (this.tokens >= 1) {
           this.tokens -= 1;
-          resolve();
+          resolve2();
         } else {
           const waitMs = (1 - this.tokens) / this.rate * 1e3;
           setTimeout(tryTake, Math.max(50, waitMs));
@@ -2908,7 +3204,7 @@ var MetadataResolver = class {
 
 // src/settings-tab.ts
 var obsidian8 = __toESM(require("obsidian"));
-var nodeFs2 = __toESM(require("fs"));
+var nodeFs3 = __toESM(require("fs"));
 var nodePath3 = __toESM(require("path"));
 
 // src/ui/confirm-modal.ts
@@ -2955,8 +3251,8 @@ var ConfirmModal = class extends obsidian6.Modal {
   }
 };
 function pbConfirm(app, opts) {
-  return new Promise((resolve) => {
-    new ConfirmModal(app, { ...opts, onConfirm: resolve }).open();
+  return new Promise((resolve2) => {
+    new ConfirmModal(app, { ...opts, onConfirm: resolve2 }).open();
   });
 }
 
@@ -3049,11 +3345,9 @@ var OnboardingWizard = class extends obsidian7.Modal {
       next.disabled = true;
       next.textContent = "检查中…";
       try {
-        const cfg = await this.plugin._requestPaperbellLLMCredentials();
-        if (!(cfg == null ? void 0 : cfg.apiKey) || !(cfg == null ? void 0 : cfg.model)) {
-          throw new Error("请先在 PaperBell 中完成 AI 提供方、模型和密钥配置");
-        }
-        status.textContent = `已连接 PaperBell AI：${cfg.model}`;
+        const capability = this.plugin._paperbellLLMCapability();
+        if (!(capability == null ? void 0 : capability.ok)) throw new Error("当前 PaperBell AI 桥接不可用");
+        status.textContent = "已连接 PaperBell AI 桥接（模型与密钥由 PaperBell 决定）";
         this.step = 2;
         this._render();
       } catch (e) {
@@ -3345,10 +3639,10 @@ var PaperSearchSettingTab = class extends obsidian8.PluginSettingTab {
         if (btn) btn.disabled = true;
         rAi.set("warn", "检查中…");
         try {
-          const cfg = await ((_a2 = plugin._requestPaperbellLLMCredentials) == null ? void 0 : _a2.call(plugin));
+          const capability = await ((_a2 = plugin._paperbellLLMCapability) == null ? void 0 : _a2.call(plugin));
           if (isStale()) return;
-          if ((cfg == null ? void 0 : cfg.apiKey) && (cfg == null ? void 0 : cfg.model)) {
-            rAi.set("ok", `可用 · ${cfg.providerName ? `${cfg.providerName} / ` : ""}${cfg.model}`);
+          if (capability == null ? void 0 : capability.ok) {
+            rAi.set("ok", "可用 · 统一经 PaperBell 主插件");
           } else {
             rAi.set("warn", "未配置 · 在 PaperBell 中填写提供方、模型和密钥");
           }
@@ -3898,7 +4192,7 @@ var PaperSearchSettingTab = class extends obsidian8.PluginSettingTab {
       const _pbib = this.plugin._paperbellBibPath();
       let _orphan = 0;
       try {
-        if (_pbib && nodeFs2.existsSync(_pbib)) _orphan = (parseBibTeX(nodeFs2.readFileSync(_pbib, "utf8")) || []).length;
+        if (_pbib && nodeFs3.existsSync(_pbib)) _orphan = (parseBibTeX(nodeFs3.readFileSync(_pbib, "utf8")) || []).length;
       } catch (_) {
       }
       const _bibs = [_bbt];
@@ -3997,23 +4291,21 @@ var PaperSearchSettingTab = class extends obsidian8.PluginSettingTab {
     });
   }
   // ── Tab: AI 与联网（什么会出网）─────────────────────────
-  // 产品里有两套 AI，此前藏在折叠标题后面，导致「密钥统一在 PaperBell」和
-  // 「自定义 API Key 明文保存在本机」看起来自相矛盾。现在开门见山说清楚。
   _secNetwork(el) {
     el.createEl("p", {
       cls: "setting-item-description",
-      text: "写作时的 AI 转述、核查、综合，用的是 PaperBell 里配置的服务；检索时的检索词优化、相关性说明、文献概要，由本地服务自己调用模型，配置在「高级」页。"
+      text: "集成运行时，写作、检索和建库中的所有 LLM 请求均经 PaperBell 主插件转发。API Key、模型、额度和授权只在 PaperBell 中配置，PaperSearch 不再直连供应商。"
     });
     el.createEl("p", {
       cls: "setting-item-description",
       text: "PDF、笔记和索引默认保存在本机。联网元数据补全默认开启并在检索后自动运行，可在本页关闭。"
     });
-    new obsidian8.Setting(el).setName("PaperBell AI 连接状态").setDesc("写作类 AI 的提供方、模型和密钥都在 PaperBell 中配置，PaperSearch 不再保存第二份密钥。").addButton((btn) => btn.setButtonText("检查").setCta().onClick(async () => {
+    new obsidian8.Setting(el).setName("PaperBell AI 桥接状态").setDesc("所有 LLM 请求均经 PaperBell 主插件处理；PaperSearch 不读取、不保存供应商密钥，也不自行直连。").addButton((btn) => btn.setButtonText("检查").setCta().onClick(async () => {
       var _a, _b;
       btn.setDisabled(true);
       try {
-        const cfg = await ((_b = (_a = this.plugin)._requestPaperbellLLMCredentials) == null ? void 0 : _b.call(_a));
-        new obsidian8.Notice((cfg == null ? void 0 : cfg.apiKey) && (cfg == null ? void 0 : cfg.model) ? "PaperBell AI 连接正常" : "PaperBell AI 尚未配置");
+        const capability = (_b = (_a = this.plugin)._paperbellLLMCapability) == null ? void 0 : _b.call(_a);
+        new obsidian8.Notice((capability == null ? void 0 : capability.ok) ? "PaperBell AI 桥接可用（实际模型由 PaperBell 决定）" : "PaperBell AI 尚未就绪");
       } catch (e) {
         new obsidian8.Notice(`检查失败：${(e == null ? void 0 : e.message) || e}`);
       } finally {
@@ -4228,7 +4520,7 @@ var PaperSearchSettingTab = class extends obsidian8.PluginSettingTab {
       if (!f) return;
       const dir = pbPickedDirPath(f);
       if (dir) {
-        if (nodeFs2.existsSync(nodePath3.join(dir, "start_app.py"))) {
+        if (nodeFs3.existsSync(nodePath3.join(dir, "start_app.py"))) {
           this.plugin.settings.localBackendDir = dir;
           await this.plugin.saveSettings();
           this.display();
@@ -4241,9 +4533,9 @@ var PaperSearchSettingTab = class extends obsidian8.PluginSettingTab {
       this.plugin.settings.localBackendPython = v.trim();
       await this.plugin.saveSettings();
     }));
-    el.createEl("h4", { text: "本地服务的检索模型" });
+    el.createEl("h4", { text: "Core 的 LLM 设置（仅独立运行时）" });
     el.createEl("p", {
-      text: "这里配置的模型保存在本地服务中，供检索词优化、相关性说明和文献概要使用，与 PaperBell 里配置的写作 AI 相互独立。",
+      text: "通过 PaperSearch 插件启动时，Core 的所有 LLM 请求统一经 PaperBell 主插件处理，下面的 API/模型字段会被桥接覆盖，不会用于直连。只有你单独启动 Core（不由插件托管）时，这些字段才生效。Embedding 仍可使用本地模型或单独配置的远程 Embedding 服务。",
       cls: "setting-item-description"
     });
     const rt = {
@@ -4257,6 +4549,7 @@ var PaperSearchSettingTab = class extends obsidian8.PluginSettingTab {
     let keyDirty = false;
     const rtPassthrough = { custom_openai_wire_api: "", reranker_model_override: "" };
     let modeDD, keyT, baseT, modelT, embT, bundleTG;
+    let paperbellBridgeMode = false;
     const effectiveBox = el.createDiv({ cls: "pb-st-effective" });
     const renderEffective = (s) => {
       effectiveBox.empty();
@@ -4268,9 +4561,9 @@ var PaperSearchSettingTab = class extends obsidian8.PluginSettingTab {
         return;
       }
       const rows = [
-        ["当前模式", s.api_mode === "custom" ? "自定义接口" : "内置接入"],
-        ["对话模型", s.effective_openai_chat_model || "—"],
-        ["接入地址", s.effective_openai_base_url || "—"],
+        ["当前模式", paperbellBridgeMode ? "PaperBell 主插件桥接" : s.api_mode === "custom" ? "自定义接口" : "内置接入"],
+        ["对话模型", paperbellBridgeMode ? "由 PaperBell 决定" : s.effective_openai_chat_model || "—"],
+        ["接入地址", paperbellBridgeMode ? "paperbell://bridge" : s.effective_openai_base_url || "—"],
         ["Embedding 模型", s.effective_embedding_model || "—"],
         ["内置 Embedding", s.bundled_embedding_available ? `可用（${s.bundled_embedding_path || "—"}）` : "不可用"]
       ];
@@ -4283,6 +4576,7 @@ var PaperSearchSettingTab = class extends obsidian8.PluginSettingTab {
     renderEffective(null);
     const applyRuntime = (s) => {
       var _a, _b, _c, _d, _e, _f, _g;
+      paperbellBridgeMode = Boolean((s == null ? void 0 : s.paperbell_bridge_available) || (s == null ? void 0 : s.paperbell_bridge_required));
       rt.api_mode = (_a = s.api_mode) != null ? _a : "default";
       rt.custom_openai_base_url = (_b = s.custom_openai_base_url) != null ? _b : "";
       rt.custom_openai_chat_model = (_c = s.custom_openai_chat_model) != null ? _c : "";
@@ -4295,16 +4589,20 @@ var PaperSearchSettingTab = class extends obsidian8.PluginSettingTab {
       modelT == null ? void 0 : modelT.setValue(rt.custom_openai_chat_model);
       embT == null ? void 0 : embT.setValue(rt.embedding_model_override);
       bundleTG == null ? void 0 : bundleTG.setValue(rt.use_bundled_embedding);
+      if (modeDD == null ? void 0 : modeDD.selectEl) modeDD.selectEl.disabled = paperbellBridgeMode;
+      if (keyT == null ? void 0 : keyT.inputEl) keyT.inputEl.disabled = paperbellBridgeMode;
+      if (baseT == null ? void 0 : baseT.inputEl) baseT.inputEl.disabled = paperbellBridgeMode;
+      if (modelT == null ? void 0 : modelT.inputEl) modelT.inputEl.disabled = paperbellBridgeMode;
       if (keyT == null ? void 0 : keyT.inputEl) keyT.inputEl.placeholder = s.custom_api_key_present ? "已保存 · 留空不改动" : "sk-…";
       renderEffective(s);
     };
-    new obsidian8.Setting(el).setName("API 模式").setDesc("内置 = 使用本地服务自带的接入；自定义 = 填入你自己的 OpenAI 兼容接口。").addDropdown((d) => {
+    new obsidian8.Setting(el).setName("API 模式").setDesc("插件托管模式下由 PaperBell 主插件接管；仅独立运行 Core 时才可选择自定义 OpenAI 兼容接口。").addDropdown((d) => {
       modeDD = d;
       d.addOption("default", "内置接入").addOption("custom", "自定义接口").setValue(rt.api_mode).onChange((v) => {
         rt.api_mode = v;
       });
     });
-    new obsidian8.Setting(el).setName("自定义 API Key").setDesc("仅「自定义接口」模式生效。密钥明文保存在本机，并仅随请求发送给你配置的服务端。留空表示沿用已保存的密钥。").addText((t) => {
+    new obsidian8.Setting(el).setName("自定义 API Key").setDesc("仅独立运行 Core 的「自定义接口」模式生效；插件托管模式不会读取或发送此密钥。密钥如填写会保存在本机。").addText((t) => {
       keyT = t;
       t.inputEl.type = "password";
       t.setPlaceholder("sk-…").onChange((v) => {
@@ -4312,13 +4610,13 @@ var PaperSearchSettingTab = class extends obsidian8.PluginSettingTab {
         keyDirty = true;
       });
     });
-    new obsidian8.Setting(el).setName("自定义接入地址").setDesc("OpenAI 兼容接口的 Base URL，例如 https://api.openai.com/v1").addText((t) => {
+    new obsidian8.Setting(el).setName("自定义接入地址").setDesc("仅独立运行 Core 时使用的 OpenAI 兼容接口 Base URL，例如 https://api.openai.com/v1").addText((t) => {
       baseT = t;
       t.setPlaceholder("https://api.openai.com/v1").onChange((v) => {
         rt.custom_openai_base_url = v.trim();
       });
     });
-    new obsidian8.Setting(el).setName("自定义对话模型").setDesc("用于优化检索词、生成相关性说明和文献概要的模型名。").addText((t) => {
+    new obsidian8.Setting(el).setName("自定义对话模型").setDesc("仅独立运行 Core 时使用；插件托管模式由 PaperBell 中配置的模型决定。").addText((t) => {
       modelT = t;
       t.setPlaceholder("例如 gpt-4o-mini / deepseek-chat").onChange((v) => {
         rt.custom_openai_chat_model = v.trim();
@@ -4336,7 +4634,7 @@ var PaperSearchSettingTab = class extends obsidian8.PluginSettingTab {
         rt.embedding_model_override = v.trim();
       });
     });
-    new obsidian8.Setting(el).setName("与本地服务同步配置").setDesc("「读取」拉取本地服务当前配置；「保存」写回 API 模式、接入地址、对话模型和 Embedding 选项，密钥留空则不改动已保存的密钥；「测试」检查接口连通性。").addButton((b) => b.setButtonText("读取").onClick(async () => {
+    new obsidian8.Setting(el).setName("与本地服务同步配置").setDesc("「读取」拉取 Core 当前配置；插件托管模式会显示 PaperBell bridge。独立运行时可保存/测试 Core 的 API 配置；插件托管时不会绕过 PaperBell。").addButton((b) => b.setButtonText("读取").onClick(async () => {
       b.setButtonText("读取中…");
       b.setDisabled(true);
       try {
@@ -4759,6 +5057,9 @@ function rowHTML(r) {
 ${rm.hint}`;
   const hasPage = r.page !== null && r.page !== void 0 && r.page !== "";
   const page = pbEscapeHtml((_b = r.page) != null ? _b : "");
+  const llmSource = String(r.annotationSource || "").toLowerCase();
+  const llmLabel = llmSource === "llm" ? "AI 生成" : llmSource === "fallback" ? "本地兜底" : !r.llmReady ? "LLM 不可用" : "";
+  const llmClass = llmSource === "llm" ? "is-llm" : llmLabel ? "is-fallback" : "";
   return `
 <div class="pb-result-card" data-id="${pbEscapeHtml(r.id)}" data-relation="${pbEscapeHtml(relKey)}" data-rel="${pbEscapeQuotes(relText)}" data-doc="${(_c = r.docScore) != null ? _c : 0}" data-doc-id="${pbEscapeHtml(r._docId || "")}" data-source-file="${pbEscapeHtml(r._sourceFile || "")}">
   <div class="pb-card-top">
@@ -4794,6 +5095,7 @@ ${rm.hint}`;
 
   <!-- 固定标签：让下面这段文字的身份永远清楚是「检索解释」，不是文献自己的结论 -->
   <div class="pb-reason-label">为何命中</div>
+  ${llmLabel ? `<span class="pb-llm-status ${llmClass}" title="${pbEscapeQuotes((r.llmWarnings || []).join("；"))}">${pbEscapeHtml(llmLabel)}</span>` : ""}
   <div class="pb-reason-wrap">
     <div class="pb-reason-short">${r.reasonShort}</div>
     <span class="pb-expand-hint" title="悬停查看完整相关说明">${CHEV}</span>
@@ -4826,6 +5128,26 @@ ${rm.hint}`;
   </div>
   <div class="pb-drag-hint">⠿ 拖到笔记中插入原文与出处</div>
 </div>`;
+}
+
+// src/services/backend-contract.ts
+function isObj(v) {
+  return !!v && typeof v === "object" && !Array.isArray(v);
+}
+function unwrap(v) {
+  if (!isObj(v)) return {};
+  return isObj(v.result) ? v.result : v;
+}
+function readLlmReady(evt) {
+  const src = unwrap(evt);
+  const v = src.llm_ready !== void 0 ? src.llm_ready : src.llm_available;
+  if (typeof v === "boolean") return v;
+  if (typeof v === "string") {
+    const s = v.trim().toLowerCase();
+    if (s === "true" || s === "1") return true;
+    if (s === "false" || s === "0") return false;
+  }
+  return null;
 }
 
 // src/views/search-view.ts
@@ -5069,6 +5391,13 @@ var PaperSearchView = class extends obsidian10.ItemView {
            value="2" min="0" max="20"
            title="每篇文献最多展示几个相关片段，0=不限">
     <span class="pb-scope-label">段</span>
+  </div>
+
+  <div class="pb-scope-row pb-doc-scope-row">
+    <span class="pb-scope-label">限定文献</span>
+    <input class="pb-scope-text-input" data-field="document_ids" type="text"
+           placeholder="document_id（多个用逗号分隔，留空为全库）"
+           title="只检索指定 document_id；留空表示整个文献库">
   </div>
 
   <div class="pb-scope-row pb-cond-row">
@@ -5385,21 +5714,21 @@ var PaperSearchView = class extends obsidian10.ItemView {
       var _a2;
       const seen = /* @__PURE__ */ new Set();
       const items = ((_a2 = data.items) != null ? _a2 : []).filter((it) => {
-        const q = parsed.query;
-        const key = `${q}\0${parsed.intent || ""}\0${it.library || ""}`;
-        if (!q || seen.has(key)) return false;
+        var _a3;
+        const q = String((_a3 = it == null ? void 0 : it.query) != null ? _a3 : "").trim();
+        if (!q) return false;
+        const key = JSON.stringify([q, it.library || ""]);
+        if (seen.has(key)) return false;
         seen.add(key);
-        it._pbParsedQuery = parsed;
         return true;
       });
       this._searchHistory = items.slice(0, 20).map((it) => {
-        var _a3, _b2;
+        var _a3;
         return {
-          q: ((_a3 = it._pbParsedQuery) == null ? void 0 : _a3.query) || it.query.trim(),
+          q: String((_a3 = it.query) != null ? _a3 : "").trim(),
           ts: Date.parse(it.logged_at) || Date.now(),
           requestId: it.request_id || "",
           library: it.library || "",
-          intent: it.intent || ((_b2 = it._pbParsedQuery) == null ? void 0 : _b2.intent) || "support",
           preset: it.ui_preset_mode || "balanced"
         };
       });
@@ -5420,17 +5749,33 @@ var PaperSearchView = class extends obsidian10.ItemView {
     const libWidget = root.querySelector(".pb-lib-widget");
     const normalizeLibraries = (list) => (Array.isArray(list) ? list : []).map((item) => typeof item === "string" ? item : (item == null ? void 0 : item.name) || (item == null ? void 0 : item.library) || (item == null ? void 0 : item.id) || "").filter(Boolean);
     if (!this._libStats) this._libStats = /* @__PURE__ */ new Map();
+    if (!this._libDetailsAt) this._libDetailsAt = 0;
     const fetchStat = async (name) => {
-      var _a2, _b2;
+      var _a2, _b2, _c2, _d2, _e, _f;
       const cached = this._libStats.get(name);
       if (cached && Date.now() - (cached.at || 0) < 15e3) return cached;
       try {
-        const d = await this.plugin.api.get(`/libraries/${encodeURIComponent(name)}/documents`);
-        const s = { count: (_a2 = d.document_count) != null ? _a2 : 0, chunks: (_b2 = d.chunk_count) != null ? _b2 : 0, at: Date.now() };
+        let d = null;
+        if (Date.now() - this._libDetailsAt < 15e3 && this._libDetails) d = this._libDetails.get(name);
+        if (!d) {
+          const payload = await this.plugin.api.get("/libraries/details");
+          this._libDetails = new Map(((_a2 = payload.libraries) != null ? _a2 : []).map((item) => [String(item.library || ""), item]));
+          this._libDetailsAt = Date.now();
+          d = this._libDetails.get(name);
+        }
+        if (!d) throw new Error("library details unavailable");
+        const s = { count: (_c2 = (_b2 = d.document_count) != null ? _b2 : d.pdf_count) != null ? _c2 : 0, chunks: (_d2 = d.chunk_count) != null ? _d2 : 0, at: Date.now() };
         this._libStats.set(name, s);
         return s;
       } catch (_) {
-        return { count: null, chunks: null };
+        try {
+          const legacy = await this.plugin.api.get(`/libraries/${encodeURIComponent(name)}/documents`);
+          const s = { count: (_e = legacy.document_count) != null ? _e : 0, chunks: (_f = legacy.chunk_count) != null ? _f : 0, at: Date.now() };
+          this._libStats.set(name, s);
+          return s;
+        } catch (_2) {
+          return { count: null, chunks: null };
+        }
       }
     };
     const setLib = (name, { persist = true } = {}) => {
@@ -6341,6 +6686,10 @@ var PaperSearchView = class extends obsidian10.ItemView {
       origFull: ptxt,
       reasonShort: esc(c.relevance_label || (expectsAnnotation ? "正在生成相关性说明…" : "快速模式不生成相关性说明")),
       reasonFull: esc(c.connection_reason || c.relevance_label || (expectsAnnotation ? "—" : "快速模式不生成相关性说明")),
+      // 后端明确标记相关性说明来源，避免把本地兜底文案误认为 AI 生成。
+      annotationSource: String(c.annotation_source || "").toLowerCase(),
+      llmReady: c.llm_ready !== false,
+      llmWarnings: Array.isArray(c.llm_warnings) ? c.llm_warnings : [],
       _docId: c.document_id || "",
       _sourceFile: c.source_file || "",
       _sourcePath: c.source_path || ""
@@ -6355,6 +6704,8 @@ var PaperSearchView = class extends obsidian10.ItemView {
       top_k: p.top_k,
       recall_top_k: p.recall_top_k,
       max_chunks_per_document: p.max_chunks_per_document,
+      document_ids: Array.isArray(p.document_ids) ? p.document_ids : [],
+      source_files: Array.isArray(p.source_files) ? p.source_files : [],
       optimize_query: p.optimize_query,
       annotate_chunks: p.annotate_chunks,
       ui_mode_scope: p.mode_scope || "preset",
@@ -6472,16 +6823,6 @@ var PaperSearchView = class extends obsidian10.ItemView {
           }
         }
       }
-      if (star) {
-        const top = card.querySelector(".pb-card-top");
-        if (top && !top.querySelector(".pb-star-badge")) {
-          const s = document.createElement("span");
-          s.className = "pb-star-badge";
-          s.title = `高影响力引用 ${entry.s2.influentialCitationCount} 条`;
-          s.textContent = "★";
-          top.appendChild(s);
-        }
-      }
       if (tldr) {
         let tldrEl = card.querySelector(".pb-tldr");
         if (!tldrEl) {
@@ -6555,6 +6896,21 @@ var PaperSearchView = class extends obsidian10.ItemView {
       }
     }
   }
+  // 在结果区顶部提示 LLM 状态；具体每条结果的来源由卡片「AI 生成 / 本地兜底」标签标明。
+  _applyLlmStatus(root, result) {
+    var _a;
+    const container = root.querySelector(".pb-results");
+    if (!container) return;
+    (_a = container.querySelector(".pb-llm-banner")) == null ? void 0 : _a.remove();
+    const ready = result == null ? void 0 : result.llm_ready;
+    const warnings = Array.isArray(result == null ? void 0 : result.llm_warnings) ? result.llm_warnings.filter(Boolean) : [];
+    if (ready !== false && !warnings.length) return;
+    const text = warnings.length ? warnings.join("；") : "LLM 未配置或暂时不可用，相关性说明使用本地兜底文案。";
+    const banner = document.createElement("div");
+    banner.className = "pb-llm-banner";
+    banner.textContent = text;
+    container.prepend(banner);
+  }
   _stopSearchTimer() {
     if (this._searchTimer) window.clearInterval(this._searchTimer);
     this._searchTimer = null;
@@ -6596,7 +6952,7 @@ var PaperSearchView = class extends obsidian10.ItemView {
   }
   // ── 检索流程（POST /analyze-stream，NDJSON 流式）────────
   _runSearch(root) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p2;
     if (this._librariesReady === false) {
       new obsidian10.Notice("正在选择可用文献库，请稍候");
       return;
@@ -6629,8 +6985,10 @@ var PaperSearchView = class extends obsidian10.ItemView {
       top_k: parseInt((_e = (_d = _p("top_k")) == null ? void 0 : _d.value) != null ? _e : 5),
       recall_top_k: parseInt((_g = (_f = _p("recall_top_k")) == null ? void 0 : _f.value) != null ? _g : 20),
       max_chunks_per_document: parseInt((_i = (_h = _p("max_chunks_per_document")) == null ? void 0 : _h.value) != null ? _i : 2),
-      optimize_query: (_k = (_j = root.querySelector('.pb-ai-toggle[data-key="optimize"]')) == null ? void 0 : _j.classList.contains("active")) != null ? _k : false,
-      annotate_chunks: (_m = (_l = root.querySelector('.pb-ai-toggle[data-key="annotate"]')) == null ? void 0 : _l.classList.contains("active")) != null ? _m : false
+      document_ids: (((_j = _p("document_ids")) == null ? void 0 : _j.value) || "").split(",").map((v) => v.trim()).filter(Boolean),
+      source_files: [],
+      optimize_query: (_l = (_k = root.querySelector('.pb-ai-toggle[data-key="optimize"]')) == null ? void 0 : _k.classList.contains("active")) != null ? _l : false,
+      annotate_chunks: (_n = (_m = root.querySelector('.pb-ai-toggle[data-key="annotate"]')) == null ? void 0 : _m.classList.contains("active")) != null ? _n : false
     };
     this._stopSearchTimer();
     const searchStartedAt = performance.now();
@@ -6650,7 +7008,7 @@ var PaperSearchView = class extends obsidian10.ItemView {
     };
     refreshProgress();
     this._searchTimer = window.setInterval(refreshProgress, 100);
-    (_n = root.querySelector(".pb-qrewrite")) == null ? void 0 : _n.style.setProperty("display", "none");
+    (_o = root.querySelector(".pb-qrewrite")) == null ? void 0 : _o.style.setProperty("display", "none");
     container.classList.remove("pb-results-idle");
     container.innerHTML = `
       <div class="pb-search-running">
@@ -6678,7 +7036,7 @@ var PaperSearchView = class extends obsidian10.ItemView {
       this._updateSelection(root);
       const cnt = root.querySelector(".pb-footer strong");
       if (cnt) cnt.textContent = String(this._rows.length);
-      const hEntry = this._searchHistory.find((h) => h.q === query && h.intent === intent && h.library === library);
+      const hEntry = this._searchHistory.find((h) => h.q === query && h.library === library);
       if (hEntry) {
         hEntry.cachedRows = [...this._rows];
         hEntry.cachedResult = this._lastResult;
@@ -6688,7 +7046,7 @@ var PaperSearchView = class extends obsidian10.ItemView {
     this._lastSearchParams = searchParams;
     const body = this._buildAnalyzeBody(searchParams);
     let gotAny = false;
-    (_o = this._searchAbortCtl) == null ? void 0 : _o.abort();
+    (_p2 = this._searchAbortCtl) == null ? void 0 : _p2.abort();
     const ctl = this._searchAbortCtl = new AbortController();
     this.plugin.api.streamJson("/analyze-stream", body, (evt) => {
       var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2;
@@ -6703,6 +7061,7 @@ var PaperSearchView = class extends obsidian10.ItemView {
         const chunks = (_b2 = (_a2 = evt.result) == null ? void 0 : _a2.retrieved_chunks) != null ? _b2 : [];
         this._rows = chunks.map((c, i) => this._chunkToRow(c, i));
         this._lastResult = evt.result;
+        this._applyLlmStatus(root, evt.result);
         this._hasSearched = true;
         root.querySelector(".pb-footer").style.display = "";
         if (!this._rows.length) {
@@ -6710,6 +7069,7 @@ var PaperSearchView = class extends obsidian10.ItemView {
              <p>试试换一种问法，或在设置中使用「深度」检索</p></div>`;
         } else {
           renderRows();
+          this._applyLlmStatus(root, evt.result);
           setStatus(
             searchParams.annotate_chunks ? `已找到 ${this._rows.length} 条结果，正在生成相关性说明…` : "正在整理检索结果…",
             this._searchTimingDetail(evt.result || {})
@@ -6748,6 +7108,7 @@ ${rm.hint}`;
         const chunks = (_e2 = (_d2 = evt.result) == null ? void 0 : _d2.retrieved_chunks) != null ? _e2 : [];
         this._rows = chunks.map((c, i) => this._chunkToRow(c, i));
         this._lastResult = evt.result;
+        this._applyLlmStatus(root, evt.result);
         this._requestId = (_g2 = (_f2 = evt.result) == null ? void 0 : _f2.request_id) != null ? _g2 : "";
         this._hasSearched = true;
         root.querySelector(".pb-footer").style.display = "";
@@ -6756,6 +7117,7 @@ ${rm.hint}`;
              <p>试试换一种问法，或在设置中使用「深度」检索</p></div>`;
         } else {
           renderRows();
+          this._applyLlmStatus(root, evt.result);
           this._patchRowsFromCache(root);
           this._prefetchPaperFocus(
             this._rows.slice(0, 3),
@@ -6929,9 +7291,9 @@ ${rm.hint}`;
       maxTokens: 1500,
       responseFormat: { type: "json_object" }
     });
-    let parsed2;
+    let parsed;
     try {
-      parsed2 = JSON.parse(out);
+      parsed = JSON.parse(out);
     } catch (e) {
       throw new Error("LLM 返回非 JSON");
     }
@@ -6944,11 +7306,11 @@ ${rm.hint}`;
       scene_rel: ctx.focusSceneRel || "",
       scene_title: ctx.focusSceneTitle || "",
       scene_mtime: ctx.focusSceneMtime || 0,
-      fit_summary: parsed2.fit_summary || "",
-      best_placement: parsed2.best_placement || "",
-      specific_use: parsed2.specific_use || [],
-      risks: parsed2.risks || [],
-      suggested_angle: parsed2.suggested_angle || ""
+      fit_summary: parsed.fit_summary || "",
+      best_placement: parsed.best_placement || "",
+      specific_use: parsed.specific_use || [],
+      risks: parsed.risks || [],
+      suggested_angle: parsed.suggested_angle || ""
     };
     const existing = this.plugin._readAnalysisCache(cacheKey) || {};
     this.plugin._writeAnalysisCache(cacheKey, {
@@ -7612,6 +7974,7 @@ ${rm.hint}`;
                   stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
+        <div class="pb-ls-lib-rename" data-name="${pbEscapeHtml(name)}" role="button" title="重命名文献库">改名</div>
         <svg class="pb-ls-lib-arrow" width="8" height="12" viewBox="0 0 8 12" fill="none">
           <path d="M2 2l4 4-4 4" stroke="currentColor" stroke-width="1.5"
                 stroke-linecap="round" stroke-linejoin="round"/>
@@ -7663,9 +8026,31 @@ ${rm.hint}`;
         this._renderLibModule(root);
       });
     });
+    body.querySelectorAll(".pb-ls-lib-rename").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const oldName = btn.dataset.name;
+        if (oldName === "default") {
+          new obsidian10.Notice("默认库不可重命名");
+          return;
+        }
+        const nextName = window.prompt(`将文献库「${oldName}」重命名为：`, oldName);
+        if (!nextName || nextName.trim() === oldName) return;
+        try {
+          await this.plugin.api.patchJson(`/libraries/${encodeURIComponent(oldName)}`, { new_name: nextName.trim() });
+          if (this.plugin.state.lastLibrary === oldName) this.plugin.state.lastLibrary = nextName.trim();
+          await this.plugin.saveSettings();
+          new obsidian10.Notice(`已将文献库重命名为「${nextName.trim()}」`);
+          this._libs = null;
+          this._renderLibModule(root);
+        } catch (err) {
+          new obsidian10.Notice(`重命名失败：${err.message}`);
+        }
+      });
+    });
     body.querySelectorAll(".pb-ls-lib-del").forEach((btn) => {
       btn.addEventListener("click", async (e) => {
-        var _a2, _b;
+        var _a2, _b, _c;
         e.stopPropagation();
         const name = btn.dataset.name;
         if (name === "default") {
@@ -7693,25 +8078,29 @@ ${rm.hint}`;
               const data = await this.plugin.api.get("/libraries");
               const remaining = (Array.isArray(data.libraries) ? data.libraries : []).map((item) => typeof item === "string" ? item : (item == null ? void 0 : item.name) || (item == null ? void 0 : item.library) || (item == null ? void 0 : item.id) || "").filter(Boolean);
               this._libs = remaining;
-              const ranked = await Promise.all(remaining.map(async (libraryName) => {
-                var _a3, _b2, _c;
-                try {
-                  const stat = await this.plugin.api.get(`/libraries/${encodeURIComponent(libraryName)}/documents`);
-                  const value = { count: (_a3 = stat.document_count) != null ? _a3 : 0, chunks: (_b2 = stat.chunk_count) != null ? _b2 : 0, at: Date.now() };
-                  (_c = this._libStats) == null ? void 0 : _c.set(libraryName, value);
-                  return { name: libraryName, ...value };
-                } catch (_) {
-                  return { name: libraryName, count: null };
-                }
-              }));
+              let detailMap = /* @__PURE__ */ new Map();
+              try {
+                const details = await this.plugin.api.get("/libraries/details");
+                detailMap = new Map(((_b = details.libraries) != null ? _b : []).map((item) => [String(item.library || ""), item]));
+                this._libDetails = detailMap;
+                this._libDetailsAt = Date.now();
+              } catch (_) {
+              }
+              const ranked = remaining.map((libraryName) => {
+                var _a3, _b2, _c2, _d;
+                const stat = detailMap.get(libraryName);
+                const value = { count: stat ? (_b2 = (_a3 = stat.document_count) != null ? _a3 : stat.pdf_count) != null ? _b2 : 0 : null, chunks: (_c2 = stat == null ? void 0 : stat.chunk_count) != null ? _c2 : null, at: Date.now() };
+                (_d = this._libStats) == null ? void 0 : _d.set(libraryName, value);
+                return { name: libraryName, ...value };
+              });
               ranked.sort((a, b) => {
                 var _a3, _b2;
                 return ((_a3 = b.count) != null ? _a3 : 0) - ((_b2 = a.count) != null ? _b2 : 0);
               });
-              const next = ((_b = ranked.find((item) => {
+              const next = ((_c = ranked.find((item) => {
                 var _a3;
                 return ((_a3 = item.count) != null ? _a3 : 0) > 0;
-              })) == null ? void 0 : _b.name) || remaining.find((libraryName) => libraryName !== "default") || remaining[0] || "";
+              })) == null ? void 0 : _c.name) || remaining.find((libraryName) => libraryName !== "default") || remaining[0] || "";
               if (next) {
                 this.plugin.state.lastLibrary = next;
                 this._hasLibraries = true;
@@ -7749,30 +8138,37 @@ ${rm.hint}`;
         }
       });
     });
-    if (this._noDocsEndpoint) {
-      body.querySelectorAll(".pb-ls-lib-stats").forEach((s) => s.textContent = "点击进入");
-      return;
-    }
     (async () => {
-      var _a2, _b, _c;
+      var _a2, _b, _c, _d, _e, _f, _g;
+      try {
+        const details = await this.plugin.api.get("/libraries/details");
+        const byName = new Map(((_a2 = details.libraries) != null ? _a2 : []).map((d) => [String(d.library || ""), d]));
+        for (const name of libs) {
+          const stat = body.querySelector(`.pb-ls-lib-stats[data-name="${name}"]`);
+          const d = byName.get(name);
+          if (!stat || !d) continue;
+          stat.innerHTML = [
+            `${pbEscapeHtml((_c = (_b = d.document_count) != null ? _b : d.pdf_count) != null ? _c : 0)} 篇`,
+            `<span class="pb-ls-stat-ok">${(_d = d.chunk_count) != null ? _d : 0} 片段</span>`
+          ].join(" · ");
+        }
+        return;
+      } catch (_) {
+      }
+      if (this._noDocsEndpoint) {
+        body.querySelectorAll(".pb-ls-lib-stats").forEach((s) => s.textContent = "点击进入");
+        return;
+      }
       for (const name of libs) {
         const stat = body.querySelector(`.pb-ls-lib-stats[data-name="${name}"]`);
         try {
-          const d = await this.plugin.api.get(
-            `/libraries/${encodeURIComponent(name)}/documents`
-          );
-          const docs = (_a2 = d.documents) != null ? _a2 : [];
+          const d = await this.plugin.api.get(`/libraries/${encodeURIComponent(name)}/documents`);
+          const docs = (_e = d.documents) != null ? _e : [];
           const failed = docs.filter((f) => {
             var _a3, _b2;
             return ((_a3 = f.retrievable_chunk_count) != null ? _a3 : 0) === 0 && ((_b2 = f.chunk_count) != null ? _b2 : 0) === 0;
           }).length;
-          if (stat) {
-            stat.innerHTML = [
-              `${pbEscapeHtml((_b = d.document_count) != null ? _b : docs.length)} 篇`,
-              `<span class="pb-ls-stat-ok">${(_c = d.chunk_count) != null ? _c : 0} 片段</span>`,
-              failed ? `<span class="pb-ls-stat-fail">异常 ${failed}</span>` : ""
-            ].filter(Boolean).join(" · ");
-          }
+          if (stat) stat.innerHTML = [`${pbEscapeHtml((_f = d.document_count) != null ? _f : docs.length)} 篇`, `<span class="pb-ls-stat-ok">${(_g = d.chunk_count) != null ? _g : 0} 片段</span>`, failed ? `<span class="pb-ls-stat-fail">异常 ${failed}</span>` : ""].filter(Boolean).join(" · ");
         } catch (err) {
           if (/HTTP 404/.test(err.message)) {
             this._noDocsEndpoint = true;
@@ -7978,6 +8374,22 @@ ${rm.hint}`;
       });
     });
     concInput == null ? void 0 : concInput.addEventListener("input", updateExpertSummary);
+    this.plugin.api.get("/runtime-settings").then((settings) => {
+      if (readLlmReady(settings) !== false || !body.isConnected) return;
+      body.querySelectorAll(".pb-scheme-card").forEach((card) => {
+        if (card.dataset.value === "raw") return;
+        card.classList.add("pb-scheme-unavailable");
+        card.title = "当前本地服务还不支持 AI 建库";
+        card.querySelector(".pb-scheme-radio").disabled = true;
+        card.querySelector(".pb-scheme-sub").textContent = "当前本地服务暂不支持";
+      });
+      const raw = body.querySelector('.pb-scheme-radio[value="raw"]');
+      if (raw && !raw.checked) {
+        raw.checked = true;
+        raw.dispatchEvent(new Event("change"));
+      }
+    }).catch(() => {
+    });
     updateExpertSummary();
     body.querySelectorAll(".pb-lc-src-btn").forEach((btn) => {
       const activate = () => {
@@ -8007,6 +8419,17 @@ ${rm.hint}`;
     const fileList = body.querySelector(".pb-lc-pane[data-pane=upload] .pb-lc-file-list");
     let selectedFolderFiles = [];
     let selectedUploadFiles = [];
+    const mergePickedFiles = (existing, incoming, source) => {
+      const merged = [...existing, ...incoming].filter((f) => /\.pdf$/i.test(f.name));
+      const seen = /* @__PURE__ */ new Set();
+      return merged.filter((f) => {
+        const relative2 = fileRelativeName(f, source).toLowerCase();
+        const key = `${relative2}|${f.size}|${f.lastModified}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    };
     const fileRelativeName = (file, source) => source === "folder" && file.webkitRelativePath ? file.webkitRelativePath : file.name;
     const renderPickedFiles = (container, files, source) => {
       if (!container) return;
@@ -8034,7 +8457,7 @@ ${rm.hint}`;
       folderPickerInput == null ? void 0 : folderPickerInput.click();
     });
     folderPickerInput == null ? void 0 : folderPickerInput.addEventListener("change", () => {
-      selectedFolderFiles = [...folderPickerInput.files].filter((f) => /\.pdf$/i.test(f.name));
+      selectedFolderFiles = mergePickedFiles(selectedFolderFiles, [...folderPickerInput.files], "folder");
       renderPickedFiles(folderList, selectedFolderFiles, "folder");
       folderPickerInput.value = "";
     });
@@ -8043,7 +8466,7 @@ ${rm.hint}`;
       fileInput == null ? void 0 : fileInput.click();
     });
     fileInput == null ? void 0 : fileInput.addEventListener("change", () => {
-      selectedUploadFiles = [...fileInput.files].filter((f) => /\.pdf$/i.test(f.name));
+      selectedUploadFiles = mergePickedFiles(selectedUploadFiles, [...fileInput.files], "upload");
       renderPickedFiles(fileList, selectedUploadFiles, "upload");
       fileInput.value = "";
     });
@@ -9123,13 +9546,19 @@ ${body}
 
 // src/main.ts
 var PaperSearchPlugin = class extends obsidian11.Plugin {
+  constructor() {
+    super(...arguments);
+    this._paperbellLlmBridgeServer = null;
+    this._paperbellLlmBridgePort = 0;
+    this._paperbellLlmBridgeToken = "";
+  }
   // 构建时注入的版本号 vs 磁盘 manifest.json 里声明的版本号。
   // 两者不一致意味着上次更新只换了其中一个文件——最典型的是自动更新写进了新
   // manifest 却没换掉 main.js，于是插件顶着新版本号跑着旧代码，任何「这版已修复」
   // 的判断都不成立。宁可启动时吵一声，也不要让它静默错位。
   _assertBuildMatchesManifest() {
     var _a;
-    const built = true ? "0.10.0" : "";
+    const built = true ? "0.12.0" : "";
     const declared = ((_a = this.manifest) == null ? void 0 : _a.version) || "";
     if (!built || !declared || built === declared) return;
     console.error(`PaperSearch: 版本错位——运行中的代码构建自 ${built}，manifest.json 声明的是 ${declared}。`);
@@ -9790,6 +10219,11 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
   }
   // 拉起 Core 后端 → 检测健康 → 不健康也不阻塞 UI（自愈交给 CoreManager）
   async _bootCoreThenViews() {
+    try {
+      await this._ensurePaperbellLlmBridge();
+    } catch (e) {
+      console.warn("[PaperSearch] PaperBell LLM bridge unavailable:", (e == null ? void 0 : e.message) || e);
+    }
     if (this.coreManager._canLaunch()) {
       try {
         this.coreManager._restartAttempts = 0;
@@ -9804,8 +10238,111 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
       new obsidian11.Notice("PaperSearch：已开启源码运行，但源码目录里没找到可启动的服务。请在设置 →「高级」页确认源码目录", 8e3);
       return;
     }
+    const missing = this.coreManager.hasBinaryCore() ? this.coreManager.missingComponents() : [];
+    if (missing.length) {
+      const what = missing.map((c) => c.title || c.id).join("、");
+      this.coreManager._setStatus("idle", `缺少${what}`);
+      new obsidian11.Notice(`PaperSearch：本地服务还缺少${what}。在设置 →「文献库」点「安装 / 更新」会只补下这一部分，也可以从本地导入组件包`, 9e3);
+      return;
+    }
     this.coreManager._setStatus("idle", "本地服务未安装");
     new obsidian11.Notice("PaperSearch：本地服务尚未安装，点击状态栏中的「PaperSearch 未就绪」即可安装", 7e3);
+  }
+  // 为由插件托管的 Core 提供本机 LLM 桥接。Core 只拿到随机令牌和本机地址，
+  // 不接触 PaperBell API Key；实际请求始终由 PaperBell requestCompletion 执行。
+  async _ensurePaperbellLlmBridge() {
+    if (this._paperbellLlmBridgeServer && this._paperbellLlmBridgePort && this._paperbellLlmBridgeToken) {
+      return { url: `http://127.0.0.1:${this._paperbellLlmBridgePort}/paperbell/llm`, token: this._paperbellLlmBridgeToken };
+    }
+    const token = nodeCrypto2.randomBytes(32).toString("hex");
+    const server = nodeHttp.createServer((req, res) => {
+      const finish = (status, payload) => {
+        const body = JSON.stringify(payload != null ? payload : {});
+        res.statusCode = status;
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+        res.setHeader("Content-Length", Buffer.byteLength(body));
+        res.end(body);
+      };
+      if (req.method !== "POST" || req.url !== "/paperbell/llm") {
+        finish(404, { ok: false, error: "not_found" });
+        return;
+      }
+      const auth = String(req.headers.authorization || "");
+      if (auth !== `Bearer ${token}`) {
+        finish(401, { ok: false, error: "unauthorized" });
+        return;
+      }
+      let size = 0;
+      const chunks = [];
+      req.on("data", (chunk) => {
+        size += chunk.length;
+        if (size > 32 * 1024 * 1024) {
+          try {
+            req.destroy();
+          } catch (_) {
+          }
+        } else chunks.push(chunk);
+      });
+      req.on("error", () => {
+      });
+      req.on("end", async () => {
+        if (size > 32 * 1024 * 1024) {
+          finish(413, { ok: false, error: "request_too_large" });
+          return;
+        }
+        try {
+          const body = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
+          const system = String(body.system || "");
+          const user = String(body.user || "");
+          if (!user) {
+            finish(400, { ok: false, error: "user_prompt_required" });
+            return;
+          }
+          const text = await this._completionViaHost({
+            ...system ? { system } : {},
+            messages: [{ role: "user", content: user }],
+            ...body.max_tokens != null ? { maxTokens: Number(body.max_tokens) } : {},
+            ...body.temperature != null ? { temperature: Number(body.temperature) } : {}
+          });
+          finish(200, { ok: true, text: String(text || "") });
+        } catch (e) {
+          finish(502, { ok: false, error: (e == null ? void 0 : e.message) || String(e) });
+        }
+      });
+    });
+    await new Promise((resolve2, reject) => {
+      const onError = (err) => {
+        server.removeListener("listening", onListening);
+        reject(err);
+      };
+      const onListening = () => {
+        server.removeListener("error", onError);
+        resolve2();
+      };
+      server.once("error", onError);
+      server.once("listening", onListening);
+      server.listen(0, "127.0.0.1");
+    });
+    const address = server.address();
+    const port = typeof address === "object" && address ? Number(address.port) : 0;
+    if (!port) {
+      try {
+        server.close();
+      } catch (_) {
+      }
+      throw new Error("无法获取 PaperBell LLM 桥接端口");
+    }
+    this._paperbellLlmBridgeServer = server;
+    this._paperbellLlmBridgePort = port;
+    this._paperbellLlmBridgeToken = token;
+    return { url: `http://127.0.0.1:${port}/paperbell/llm`, token };
+  }
+  _paperbellLlmBridgeEnv() {
+    if (!this._paperbellLlmBridgeServer || !this._paperbellLlmBridgePort || !this._paperbellLlmBridgeToken) return {};
+    return {
+      PAPERBELL_LLM_BRIDGE_URL: `http://127.0.0.1:${this._paperbellLlmBridgePort}/paperbell/llm`,
+      PAPERBELL_LLM_BRIDGE_TOKEN: this._paperbellLlmBridgeToken
+    };
   }
   // 打开核心安装/管理向导（状态栏 + 检索失败「安装/修复」按钮都走这里）
   _openCoreSetup() {
@@ -9950,6 +10487,17 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
     const baseUrl = (_a = this._siteBase) == null ? void 0 : _a.call(this);
     const platform = this.coreManager.platform();
     const arch = this.coreManager.arch();
+    if (platform !== "win") {
+      try {
+        const platformTicket2 = await client.requestProtectedDownloadTicket({
+          product: `paperbell-core-${platform}-${arch}`,
+          baseUrl
+        });
+        if (platformTicket2 == null ? void 0 : platformTicket2.url) return platformTicket2;
+      } catch (e) {
+        console.warn("[PaperSearch] platform core product unavailable:", (e == null ? void 0 : e.message) || e);
+      }
+    }
     const ticket = await client.requestProtectedDownloadTicket({
       product: "paperbell-core",
       baseUrl,
@@ -9990,7 +10538,60 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
     await this.coreManager.download(ticket.url, sha256, onProgress);
     this._rememberInstalledCore(ticket);
     await this.saveSettings();
+    await this._ensureCoreComponents(onProgress);
     return ticket;
+  }
+  // 分包的程序包会在 core-package.json 里声明组件（语义模型）。缺哪个补哪个：
+  // 已经装着同一个包（sha256 相同）的组件不再下载，所以程序更新只下几十 MB。
+  async _ensureCoreComponents(onProgress) {
+    var _a;
+    const cm = this.coreManager;
+    for (const comp of cm.missingComponents()) {
+      const sources = await this._coreComponentSources(comp);
+      if (!sources.length) {
+        throw new Error(`没有「${comp.title || comp.id}」的下载地址，请从本地导入该组件包`);
+      }
+      let lastErr = null;
+      for (const url of sources) {
+        try {
+          await cm.downloadComponent(comp, url, onProgress);
+          lastErr = null;
+          break;
+        } catch (e) {
+          lastErr = e;
+          (_a = cm._appendLog) == null ? void 0 : _a.call(cm, `[PaperSearch] component ${comp.id} from ${url.split("?")[0]} failed: ${(e == null ? void 0 : e.message) || e}`);
+          if (/磁盘空间|占用|不匹配|不是 PaperSearch 组件包/.test((e == null ? void 0 : e.message) || "")) break;
+        }
+      }
+      if (lastErr) throw lastErr;
+    }
+  }
+  // 组件下载地址：声明了 product 时先向 PaperBell 要受保护票据，再按清单里的 urls 依次备选。
+  // 票据拿不到（宿主不支持、服务端没配这个 product）不算错，只是少一个来源。
+  async _coreComponentSources(comp) {
+    var _a;
+    const out = [];
+    if (comp.product) {
+      try {
+        const client = this._ensurePaperbellClient();
+        if (client == null ? void 0 : client.requestProtectedDownloadTicket) {
+          const ticket = await client.requestProtectedDownloadTicket({
+            product: comp.product,
+            baseUrl: (_a = this._siteBase) == null ? void 0 : _a.call(this),
+            platform: this.coreManager.platform(),
+            arch: this.coreManager.arch(),
+            version: comp.version
+          });
+          if (ticket == null ? void 0 : ticket.url) out.push(ticket.url);
+        }
+      } catch (e) {
+        console.warn("[PaperSearch] component ticket unavailable:", comp.product, (e == null ? void 0 : e.message) || e);
+      }
+    }
+    for (const u of Array.isArray(comp.urls) ? comp.urls : []) {
+      if (/^https?:\/\//i.test(String(u)) && !out.includes(u)) out.push(u);
+    }
+    return out;
   }
   // 记录本次安装的核心指纹（供「检查并更新」判断是否已是最新）
   _rememberInstalledCore(ticket = {}) {
@@ -10021,41 +10622,21 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
     if (installedFilename && ticketFilename) return installedFilename === ticketFilename;
     return false;
   }
-  // ── AI 调用：credentials 从 PaperBell 授权读取，请求由 PaperSearch 自己发 ──
-  async _requestPaperbellLLMCredentials() {
+  // ── AI 配置状态：由 PaperBell 主插件统一管理 ──
+  _paperbellLLMCapability() {
     const client = this._ensurePaperbellClient();
-    if (!client.requestLLMCredentials) {
-      throw new Error("当前 PaperBell 版本不支持提供 AI 密钥，请更新 PaperBell 插件");
+    if (typeof client.requestCompletion !== "function") {
+      throw new Error("当前 PaperBell 版本不支持统一 AI 请求，请更新 PaperBell 插件");
     }
-    const config = await client.requestLLMCredentials();
-    if (!config) throw new Error("PaperBell AI 密钥授权被拒绝");
-    if (!config.apiKey || !config.model) {
-      throw new Error("请先在 PaperBell 中完成 AI 提供方、模型和密钥配置");
-    }
-    return config;
+    return { ok: true };
   }
-  // 统一 AI 请求。两条通道，对调用方签名不变：
-  //
-  //   · 直连——从宿主取密钥，自己发请求。少一跳，OpenAI 侧有 JSON mode。
-  //   · 代跑——宿主替我们发。所有用户可用：免费档每天 5 次，已激活不限。
-  //
-  // 宿主的付费墙就建在这个分界上：requestLLMCredentials 只对已激活用户返回，
-  // 理由是「拿到 key 之后子插件直连厂商，任何计数都失效」（宿主源码原话）。
-  // 此前我们只走 credentials，等于未激活用户一调 AI 就撞「授权被拒绝」——
-  // 宿主明明留了带免费额度的代跑通道，我们没接。
+  // 统一 AI 请求：PaperSearch 自己不再读取密钥，也不再直连任何供应商；
+  // 所有请求都交给 PaperBell 主插件，由主插件统一处理模型、授权、额度和供应商。
   async _requestPaperbellCompletion(params) {
-    if (this.hasValidActivation()) {
-      try {
-        return await this._completionDirect(params);
-      } catch (e) {
-        console.warn("PaperSearch: 直连 AI 失败，改由 PaperBell 代跑：" + (e.message || e));
-      }
-    }
     return this._completionViaHost(params);
   }
   // 要 JSON 时剥掉代码块围栏。调用点是裸 JSON.parse，模型多打一对围栏就抛异常。
-  // 两条通道都要剥：代跑不接 response_format；直连走 Anthropic 时我们也没传，
-  // 只有 OpenAI 那条真有 JSON mode。
+  // PaperBell 代跑接口不接 response_format，因此这里通过提示词约束后统一清理。
   // 用字符串切而不用正则：跨行围栏的正则容易被转义写坏，切法更直白。
   _unfenceIfJson(text, params) {
     var _a;
@@ -10068,6 +10649,7 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
     return t.slice(nl + 1, close).trim();
   }
   // 宿主代跑。免费额度耗尽时返回 errorCode: "quota-exhausted"。
+  // 不把调用方传入的 model 下发：实际模型始终由 PaperBell 主插件配置决定。
   async _completionViaHost(params) {
     var _a, _b;
     const client = this._ensurePaperbellClient();
@@ -10078,7 +10660,6 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
     const r = await client.requestCompletion({
       messages: params.messages,
       ...system ? { system } : {},
-      ...params.model ? { model: params.model } : {},
       ...params.maxTokens !== void 0 ? { maxTokens: params.maxTokens } : {},
       ...params.temperature !== void 0 ? { temperature: params.temperature } : {}
     });
@@ -10100,59 +10681,6 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
       throw new Error(r.error || "AI 请求失败");
     }
     const out = this._unfenceIfJson(String(r.text || "").trim(), params);
-    if (!out) throw new Error("模型返回空");
-    return out;
-  }
-  // 直连：从宿主取密钥自己发。openai / anthropic 双协议。
-  async _completionDirect(params) {
-    var _a, _b, _c, _d, _e, _f;
-    const cfg = await this._requestPaperbellLLMCredentials();
-    const api = cfg.api || "openai";
-    const key = cfg.apiKey;
-    const model = params.model || cfg.model || "";
-    const baseUrl = String(
-      cfg.baseUrl || (api === "anthropic" ? "https://api.anthropic.com/v1" : "https://api.openai.com/v1")
-    ).replace(/\/+$/, "");
-    if (!Array.isArray(params.messages) || params.messages.length === 0) {
-      throw new Error("messages 不能为空");
-    }
-    if (!key || !model) {
-      throw new Error("请先在 PaperBell 中完成 AI 提供方、模型和密钥配置");
-    }
-    const isAnthropic = api === "anthropic";
-    const body = isAnthropic ? {
-      model,
-      max_tokens: (_a = params.maxTokens) != null ? _a : 1024,
-      ...params.system ? { system: params.system } : {},
-      ...params.temperature !== void 0 ? { temperature: params.temperature } : {},
-      messages: params.messages
-    } : {
-      model,
-      ...params.maxTokens !== void 0 ? { max_tokens: params.maxTokens } : {},
-      ...params.temperature !== void 0 ? { temperature: params.temperature } : {},
-      ...params.responseFormat ? { response_format: params.responseFormat } : {},
-      messages: params.system ? [{ role: "system", content: params.system }, ...params.messages] : params.messages
-    };
-    const res = await obsidian11.requestUrl({
-      url: isAnthropic ? `${baseUrl}/messages` : `${baseUrl}/chat/completions`,
-      method: "POST",
-      contentType: "application/json",
-      headers: isAnthropic ? { "x-api-key": key, "anthropic-version": "2023-06-01" } : { Authorization: `Bearer ${key}` },
-      body: JSON.stringify(body),
-      throw: false
-    });
-    const json = res.json || (() => {
-      try {
-        return JSON.parse(res.text || "{}");
-      } catch (_) {
-        return {};
-      }
-    })();
-    if (res.status < 200 || res.status >= 300) {
-      throw new Error((json == null ? void 0 : json.message) || ((_b = json == null ? void 0 : json.error) == null ? void 0 : _b.message) || (json == null ? void 0 : json.error) || `AI 请求失败（HTTP ${res.status}）`);
-    }
-    const text = isAnthropic ? Array.isArray(json == null ? void 0 : json.content) ? json.content.filter((b) => (b == null ? void 0 : b.type) === "text").map((b) => b.text).join("") : "" : (_f = (_e = (_d = (_c = json == null ? void 0 : json.choices) == null ? void 0 : _c[0]) == null ? void 0 : _d.message) == null ? void 0 : _e.content) != null ? _f : "";
-    const out = this._unfenceIfJson(String(text || "").trim(), params);
     if (!out) throw new Error("模型返回空");
     return out;
   }
@@ -10278,7 +10806,6 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
       new obsidian11.Notice("本地安装包正在导入，请稍候…");
       return;
     }
-    const cm = this.coreManager;
     const f = await pbPickFile({ accept: ".zip" });
     if (!f) return;
     const zipPath = pbFilePath(f);
@@ -10289,6 +10816,22 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
     if (!/\.zip$/i.test(zipPath)) {
       new obsidian11.Notice("请选择 .zip 压缩包");
       return;
+    }
+    return this._importCoreZipFile(zipPath, onSuccess);
+  }
+  // 导入一个本地 zip：程序包走 installFromZip；组件包（含 core-component.json，如语义模型）
+  // 只换掉对应组件目录，不动程序和文献库。
+  async _importCoreZipFile(zipPath, onSuccess) {
+    var _a;
+    if (this._importingCore) {
+      new obsidian11.Notice("本地安装包正在导入，请稍候…");
+      return;
+    }
+    const cm = this.coreManager;
+    let component = null;
+    try {
+      component = JSON.parse(readZipEntryText(zipPath, "core-component.json") || "null");
+    } catch (_) {
     }
     this._importingCore = true;
     const wasUp = cm.status === "healthy" || !!cm.proc;
@@ -10307,7 +10850,6 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
         } catch (_) {
         }
       }
-      const expectedSha = (this.state.coreInstalledSha256 || "").trim();
       let beat = null;
       const stopBeat = () => {
         if (beat) {
@@ -10319,24 +10861,29 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
         say(text);
         cm._setStatus("downloading", text);
       };
+      const onPhase = (phase, p) => {
+        if (phase === "verify") {
+          stopBeat();
+          push("正在校验安装包…");
+          return;
+        }
+        push(tick(p).text);
+        if (!beat) beat = setInterval(() => push(tick.stalled().text), 3e3);
+      };
       try {
-        await cm.installFromZip(zipPath, expectedSha, {
-          deleteZipAfter: false,
-          onPhase: (phase, p) => {
-            if (phase === "verify") {
-              stopBeat();
-              push("正在校验安装包…");
-              return;
-            }
-            push(tick(p).text);
-            if (!beat) beat = setInterval(() => push(tick.stalled().text), 3e3);
-          }
-        });
+        if (component) {
+          const expect = (((_a = cm.readPackageManifest()) == null ? void 0 : _a.components) || []).find((c) => c.id === component.id) || null;
+          await cm.installComponentFromZip(zipPath, { expect, sha256: (expect == null ? void 0 : expect.sha256) || "", onPhase });
+        } else {
+          const expectedSha = (this.state.coreInstalledSha256 || "").trim();
+          await cm.installFromZip(zipPath, expectedSha, { deleteZipAfter: false, onPhase });
+        }
       } finally {
         stopBeat();
       }
       notice.hide();
-      new obsidian11.Notice("本地服务导入完成");
+      const missing = cm.hasBinaryCore() ? cm.missingComponents() : [];
+      new obsidian11.Notice(missing.length ? `已导入。还缺少${missing.map((c) => c.title || c.id).join("、")}：联网时点「安装 / 更新」会只补下这一部分，或继续导入组件包` : component ? `已导入${component.title || component.id}` : "本地服务导入完成", missing.length ? 9e3 : 4e3);
       if (onSuccess) {
         onSuccess();
       } else {
@@ -10361,6 +10908,15 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
     this._unloading = true;
     (_b = (_a = this._paperbellClient) == null ? void 0 : _a.unregister) == null ? void 0 : _b.call(_a);
     this._paperbellClient = null;
+    if (this._paperbellLlmBridgeServer) {
+      try {
+        this._paperbellLlmBridgeServer.close();
+      } catch (_) {
+      }
+      this._paperbellLlmBridgeServer = null;
+      this._paperbellLlmBridgePort = 0;
+      this._paperbellLlmBridgeToken = "";
+    }
     if (this._linkbackDebounce) {
       for (const t of this._linkbackDebounce.values()) clearTimeout(t);
       this._linkbackDebounce.clear();
@@ -10748,7 +11304,7 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
       if (!inferredHash && pdfRef) {
         try {
           const localFile = this.app.vault.getAbstractFileByPath(String(pdfRef).replace(/^\[\[|\]\]$/g, ""));
-          pdfAbs = (localFile == null ? void 0 : localFile.path) ? nodePath5.join(this.app.vault.adapter.getBasePath(), localFile.path) : nodeFs3.existsSync(pdfRef) ? pdfRef : "";
+          pdfAbs = (localFile == null ? void 0 : localFile.path) ? nodePath5.join(this.app.vault.adapter.getBasePath(), localFile.path) : nodeFs4.existsSync(pdfRef) ? pdfRef : "";
           if (pdfAbs) inferredHash = await this._sha256File(pdfAbs);
         } catch (_) {
         }
@@ -10976,7 +11532,7 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
       const vaultFile = (_c = (_b = (_a = this.app) == null ? void 0 : _a.vault) == null ? void 0 : _b.getAbstractFileByPath) == null ? void 0 : _c.call(_b, value.replace(/\\/g, "/"));
       if (vaultFile == null ? void 0 : vaultFile.path) return "local";
       try {
-        if (nodeFs3.existsSync(value)) return "local";
+        if (nodeFs4.existsSync(value)) return "local";
       } catch (_) {
       }
     }
@@ -11458,22 +12014,22 @@ var PaperSearchPlugin = class extends obsidian11.Plugin {
   }
   _sha256File(filePath) {
     if (!filePath) return Promise.resolve("");
-    return new Promise((resolve) => {
+    return new Promise((resolve2) => {
       const hash = nodeCrypto2.createHash("sha256");
       let stream;
       try {
-        stream = nodeFs3.createReadStream(filePath);
+        stream = nodeFs4.createReadStream(filePath);
       } catch (_) {
-        resolve("");
+        resolve2("");
         return;
       }
       stream.on("data", (chunk) => hash.update(chunk));
-      stream.on("error", () => resolve(""));
+      stream.on("error", () => resolve2(""));
       stream.on("end", () => {
         try {
-          resolve(hash.digest("hex"));
+          resolve2(hash.digest("hex"));
         } catch (_) {
-          resolve("");
+          resolve2("");
         }
       });
     });
@@ -12466,16 +13022,16 @@ ${claimText}${pandoc}
       const fm = (_a = this.app.metadataCache.getFileCache(f)) == null ? void 0 : _a.frontmatter;
       const lf = fm == null ? void 0 : fm.longform;
       if (!lf) continue;
-      const isObj = typeof lf === "object" && lf !== null;
-      const format = isObj ? lf.format || "single" : "single";
-      const title = isObj && lf.title || fm.title || f.basename;
+      const isObj2 = typeof lf === "object" && lf !== null;
+      const format = isObj2 ? lf.format || "single" : "single";
+      const title = isObj2 && lf.title || fm.title || f.basename;
       out.push({
         path: f.path,
         folder: ((_b = f.parent) == null ? void 0 : _b.path) || "",
         format,
         title,
-        scenes: isObj && Array.isArray(lf.scenes) ? lf.scenes : null,
-        drafts: isObj && Array.isArray(lf.drafts) ? lf.drafts : null
+        scenes: isObj2 && Array.isArray(lf.scenes) ? lf.scenes : null,
+        drafts: isObj2 && Array.isArray(lf.drafts) ? lf.drafts : null
       });
     }
     return out;
@@ -12500,12 +13056,12 @@ ${claimText}${pandoc}
     const files = [this._paperbellBibPath(), bbt].filter(Boolean);
     let total = 0, firstErr = null;
     for (const path of files) {
-      if (!nodeFs3.existsSync(path)) {
+      if (!nodeFs4.existsSync(path)) {
         if (path === bbt) firstErr = ".bib 文件不存在";
         continue;
       }
       try {
-        const entries = parseBibTeX(nodeFs3.readFileSync(path, "utf8"));
+        const entries = parseBibTeX(nodeFs4.readFileSync(path, "utf8"));
         for (const e of entries) {
           if (e.citekey) this.bbtIndex.byCitekey.set(e.citekey, e);
           if (e.doi) this.bbtIndex.byDoi.set(e.doi.toLowerCase().trim().replace(/^https?:\/\/(dx\.)?doi\.org\//, ""), e);
@@ -12550,9 +13106,9 @@ ${claimText}${pandoc}
       this._bbtTimer = null;
     }
     const path = (_a = this.settings.bbtBibPath) == null ? void 0 : _a.trim();
-    if (!path || !nodeFs3.existsSync(path)) return;
+    if (!path || !nodeFs4.existsSync(path)) return;
     try {
-      this._bbtWatcher = nodeFs3.watch(path, () => {
+      this._bbtWatcher = nodeFs4.watch(path, () => {
         if (this._bbtTimer) clearTimeout(this._bbtTimer);
         this._bbtTimer = setTimeout(() => {
           this._bbtTimer = null;
@@ -12753,7 +13309,7 @@ ${claimText}${pandoc}
         doi: spec.doi
       });
       const p = ((_a = hit == null ? void 0 : hit.entry) == null ? void 0 : _a.file) ? bibExtractPath(hit.entry.file) : "";
-      return p && nodeFs3.existsSync(p) ? p : "";
+      return p && nodeFs4.existsSync(p) ? p : "";
     } catch (_) {
       return "";
     }
@@ -12766,7 +13322,7 @@ ${claimText}${pandoc}
     let abs = "";
     if (spec.srcPath) {
       try {
-        if (nodeFs3.existsSync(spec.srcPath)) abs = spec.srcPath;
+        if (nodeFs4.existsSync(spec.srcPath)) abs = spec.srcPath;
       } catch (_) {
       }
     }
@@ -12776,7 +13332,7 @@ ${claimText}${pandoc}
     }
     if (abs) {
       try {
-        return new Uint8Array(nodeFs3.readFileSync(abs));
+        return new Uint8Array(nodeFs4.readFileSync(abs));
       } catch (e) {
         console.warn("PaperSearch: 直接读 PDF 失败，回退缓存/后端", e);
       }
@@ -13433,7 +13989,7 @@ ${block}`;
     const mode = this.state.annoSilentFile;
     if (mode === "never") return null;
     if (mode !== "always") {
-      const ans = await new Promise((resolve) => {
+      const ans = await new Promise((resolve2) => {
         new ConfirmModal(this.app, {
           title: "这篇还没有文献笔记",
           message: `「${item.pdfStem}」还没有文献笔记。
@@ -13441,7 +13997,7 @@ ${block}`;
           confirmText: "创建并收录",
           cancelText: "只存到标注库",
           checkboxLabel: "以后静默处理，不再询问",
-          onConfirm: (ok, checked) => resolve({ ok, checked })
+          onConfirm: (ok, checked) => resolve2({ ok, checked })
         }).open();
       });
       if (ans.checked) {
@@ -13655,7 +14211,7 @@ ${block}`;
     }
     menu.showAtPosition({ x: window.innerWidth / 2, y: 120 });
   }
-  // ── 共享 LLM 调用：credentials 向 PaperBell 请求，PaperSearch 自己发请求 ──
+  // ── 共享 LLM 调用：所有请求统一交给 PaperBell 主插件 ──
   async _aiChat(sys, user) {
     let out = await this._requestPaperbellCompletion({
       system: sys,
@@ -13774,11 +14330,11 @@ ${origText}`;
     const path = this._paperbellBibPath();
     if (!path) throw new Error("未配置 .bib 路径（设置 → 文献库与 Zotero → Better BibTeX）");
     const citekey = csl.citekey || this._genCitekey(csl);
-    const exists = nodeFs3.existsSync(path);
+    const exists = nodeFs4.existsSync(path);
     let txt = "";
     if (exists) {
       try {
-        txt = nodeFs3.readFileSync(path, "utf8");
+        txt = nodeFs4.readFileSync(path, "utf8");
       } catch (_) {
       }
     }
@@ -13789,7 +14345,7 @@ ${origText}`;
   title={${csl.title || ""}}
 }`;
     const header = exists ? "" : "% PaperSearch 发现、尚未在 Zotero 的文献。请把本文件也加入 pandoc / enhancing-export 的 bibliography（与你的 BBT .bib 并列）。\n";
-    nodeFs3.appendFileSync(path, header + (txt.endsWith("\n") || !txt ? "" : "\n") + "\n" + bib + "\n");
+    nodeFs4.appendFileSync(path, header + (txt.endsWith("\n") || !txt ? "" : "\n") + "\n" + bib + "\n");
     this._loadBbtBib();
     return citekey;
   }
@@ -14205,9 +14761,9 @@ ${evidenceText}` }],
     if (latestEvidence.some((citation) => !citation)) invalidateAndThrow("evidence_missing");
     if (latestEvidence.some((citation) => !String(citation.source_quote || "").trim())) invalidateAndThrow("evidence_quote_missing");
     if (this._evidenceHash(latestEvidence) !== requestEvidenceHash) invalidateAndThrow("evidence_changed_during_verification");
-    const parsed2 = JSON.parse(String(raw || "{}").replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, ""));
-    const verdict = ["faithful", "partial", "distorted"].includes(parsed2.verdict) ? parsed2.verdict : "partial";
-    const note = String(parsed2.note || "");
+    const parsed = JSON.parse(String(raw || "{}").replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, ""));
+    const verdict = ["faithful", "partial", "distorted"].includes(parsed.verdict) ? parsed.verdict : "partial";
+    const note = String(parsed.note || "");
     const claimHash = requestClaimHash;
     const evidenceHash = requestEvidenceHash;
     const now = Date.now();
@@ -14689,7 +15245,7 @@ ${paraphrase}
     const K = unmatched.length;
     const uniq = [...new Set(unmatched)];
     const unmatchedList = K ? "\n未匹配（建议补 BBT / 元数据）：\n" + uniq.slice(0, 20).join("\n") + (uniq.length > 20 ? "\n…（更多省略）" : "") : "";
-    await new Promise((resolve) => {
+    await new Promise((resolve2) => {
       new ConfirmModal(this.app, {
         title: "已有引用检查结果",
         message: `共发现 ${hits.length} 处已有引用。
@@ -14697,7 +15253,7 @@ ${paraphrase}
 可为这些位置记录出处；因未关联原文片段，只能追溯到文献和页码，暂不能进行 AI 证据核查。` + unmatchedList,
         confirmText: "知道了",
         cancelText: "关闭",
-        onConfirm: () => resolve()
+        onConfirm: () => resolve2()
       }).open();
     });
     const doAnchor = await pbConfirm(this.app, {
@@ -15146,7 +15702,7 @@ ${body}
   _detectZoteroSync() {
     const p = this._zoteroDefaultPath();
     try {
-      const st = nodeFs3.statSync(p);
+      const st = nodeFs4.statSync(p);
       return st.isDirectory() ? p : null;
     } catch (_) {
       return null;
@@ -15173,10 +15729,10 @@ ${body}
     const handleHit = (relPath) => {
       const full = nodePath5.join(dirPath, relPath);
       try {
-        const st = nodeFs3.statSync(full);
+        const st = nodeFs4.statSync(full);
         if (st.isDirectory()) {
           try {
-            for (const f of nodeFs3.readdirSync(full)) {
+            for (const f of nodeFs4.readdirSync(full)) {
               if (/\.pdf$/i.test(f)) {
                 const p = nodePath5.join(full, f);
                 if (!this._ingestQueue.get(libraryName)) this._ingestQueue.set(libraryName, /* @__PURE__ */ new Set());
@@ -15194,7 +15750,7 @@ ${body}
       debouncedFlush();
     };
     try {
-      const watcher = nodeFs3.watch(dirPath, { recursive: true }, (_evt, fname) => {
+      const watcher = nodeFs4.watch(dirPath, { recursive: true }, (_evt, fname) => {
         if (fname) handleHit(fname);
       });
       watcher.on("error", (e) => console.warn("PaperSearch watcher error:", e));
@@ -15270,7 +15826,7 @@ ${body}
     for (const p of absPaths) {
       let size = 0;
       try {
-        size = nodeFs3.statSync(p).size;
+        size = nodeFs4.statSync(p).size;
       } catch (_) {
         continue;
       }
@@ -15294,7 +15850,7 @@ ${body}
       const inThisBatch = [];
       for (const p of batches[i]) {
         try {
-          const buf = nodeFs3.readFileSync(p);
+          const buf = nodeFs4.readFileSync(p);
           fd.append("files", new Blob([buf], { type: "application/pdf" }), nodePath5.basename(p));
           inThisBatch.push(p);
         } catch (e) {
@@ -15329,7 +15885,7 @@ ${body}
       if (depth > maxDepth || out.length >= maxFiles) return;
       let entries;
       try {
-        entries = await nodeFs3.promises.readdir(dir, { withFileTypes: true });
+        entries = await nodeFs4.promises.readdir(dir, { withFileTypes: true });
       } catch (_) {
         return;
       }

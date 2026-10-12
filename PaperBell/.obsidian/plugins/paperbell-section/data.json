@@ -1,5 +1,6 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
+  "profileSource": "host",
   "profile": {
     "name": "用户",
     "title": "研究者",
@@ -55,6 +56,21 @@
     "bookShelf": {
       "title": "书架",
       "description": "展示个人图书收藏和阅读进度"
+    }
+  },
+  "vaultSchema": {
+    "draft": {
+      "field": "status",
+      "values": [
+        "draft",
+        "in-progress"
+      ]
+    },
+    "published": {
+      "field": "status",
+      "values": [
+        "published"
+      ]
     }
   },
   "researchFocus": {

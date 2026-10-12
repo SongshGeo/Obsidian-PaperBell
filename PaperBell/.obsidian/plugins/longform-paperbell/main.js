@@ -20843,10 +20843,11 @@ const draftWordCounts = writable({});
  */
 const waitingForSync = writable(false);
 /**
- * Writeable store of the basenames (without `.yaml`) of the downloaded Pandoc
- * `defaults/` presets. Populates the "Template / preset" dropdown on the Run
- * Pandoc Export compile step. Refreshed on layout-ready and after assets are
- * downloaded via `refreshPandocTemplates`.
+ * Writeable store of the downloaded Pandoc `defaults/` presets — basename
+ * (without `.yaml`) plus the extension each exports to. Populates the
+ * "Template / preset" dropdown on the Run Pandoc Export compile step, which
+ * labels every entry with its format. Refreshed on layout-ready and after
+ * assets are downloaded via `refreshPandocTemplates`.
  */
 const pandocTemplates = writable([]);
 // DERIVED STORES
@@ -21331,6 +21332,14 @@ var CompileStepOptionType;
     /** A single-select dropdown. Choices come from `choices` or `dynamicChoices`. */
     CompileStepOptionType[CompileStepOptionType["Dropdown"] = 3] = "Dropdown";
 })(CompileStepOptionType || (CompileStepOptionType = {}));
+/**
+ * Fill `{placeholder}`s in an option's text. A placeholder with no value is left
+ * standing rather than blanked, so a typo shows up as itself instead of as a
+ * hole in the sentence.
+ */
+function fillOptionText(text, vars) {
+    return text.replace(/\{(\w+)\}/g, (whole, name) => { var _a; return (_a = vars[name]) !== null && _a !== void 0 ? _a : whole; });
+}
 function makeBuiltinStep(v, isScript = false) {
     return Object.assign(Object.assign({}, v), { description: Object.assign(Object.assign({}, v.description), { canonicalID: v.id, isScript: isScript }), optionValues: v.description.options.reduce((agg, opt) => {
             return Object.assign(Object.assign({}, agg), { [opt.id]: opt.default });
@@ -21843,7 +21852,7 @@ const DEFAULT_WORKFLOWS = {
             },
             {
                 id: "supplementary-info",
-                optionValues: { abstract: true, "summarize-sections": true },
+                optionValues: { abstract: "", "summarize-sections": true },
             },
             { id: "write-to-note", optionValues: { target: "$1_$2.md", "open-after": true } },
             {
@@ -23128,6 +23137,8 @@ const EXPORT_EXTENSIONS = new Set([
     ".rtf",
     ".md",
     ".txt",
+    // A submission-package recipe writes one of these, via a custom Lua writer.
+    ".zip",
 ]);
 /** Does this user-entered output path name a file rather than a folder? */
 function isFullOutputPath(p) {
@@ -23187,38 +23198,102 @@ function baseWriterName(raw) {
     return scalar(raw).split(/[+-]/)[0].trim().toLowerCase();
 }
 /**
+ * Does `to:` point at a **custom Lua writer** instead of naming a format?
+ *
+ * Pandoc 3 accepts a path there, and the submission-package recipes use one
+ * (`to: ${USERDATA}/writers/latex-submission.lua`). A path is not a writer
+ * name: {@link baseWriterName} splits it on the first `-` and yields
+ * `${userdata}/writers/latex`, which — used as an extension — turned the export
+ * into a *directory tree* named after the writer's path. Such a preset says
+ * what it produces in `output-file` instead.
+ */
+function isCustomWriter(raw) {
+    const to = scalar(raw).toLowerCase();
+    return (to.endsWith(".lua") || to.indexOf("/") !== -1 || to.indexOf("\\") !== -1);
+}
+/**
+ * A Lua filter *invoking* pandoc-crossref: the binary's name as a string
+ * literal, which is how `run_json_filter` / `pandoc.pipe` are handed it. The
+ * quotes are the whole point — these filters discuss crossref at length in
+ * their header comments, and a comment is not a dependency.
+ */
+const CROSSREF_CALL = /['"]pandoc-crossref['"]/;
+/**
+ * Does this `filters:` entry end up running pandoc-crossref?
+ *
+ * A preset can name the binary outright (`filters: [pandoc-crossref]`), or go
+ * through a Lua filter that calls `run_json_filter(doc, 'pandoc-crossref', …)`
+ * — which is how a chain with a custom writer pins the format crossref sees.
+ * Both need the binary installed, so preflight reads the wrapper when it can.
+ */
+function filterUsesCrossref(entry, read) {
+    var _a;
+    if (!entry)
+        return false;
+    if (entry.toLowerCase().endsWith("pandoc-crossref"))
+        return true;
+    if (!read || !entry.toLowerCase().endsWith(".lua"))
+        return false;
+    return CROSSREF_CALL.test((_a = read(entry)) !== null && _a !== void 0 ? _a : "");
+}
+/**
+ * Expand the placeholders a preset writes into its paths, so we can read a file
+ * it points at. Pandoc expands `${USERDATA}` to its data directory — the assets
+ * folder, which is what every shipped preset sets `data-dir:` to — and `${.}`
+ * to the folder holding the preset; a relative path is relative to that folder.
+ */
+function resolvePresetPath(raw, dirs) {
+    const expanded = scalar(raw)
+        .split("${USERDATA}")
+        .join(dirs.userData)
+        .split("${.}")
+        .join(dirs.presetDir);
+    return path__namespace.isAbsolute(expanded)
+        ? path__namespace.normalize(expanded)
+        : path__namespace.join(dirs.presetDir, expanded);
+}
+/**
  * What a Pandoc defaults preset actually produces, read off its parsed YAML.
  *
  * Extension resolution, in order:
- *  1. `to:` names a writer that emits its own binary/text format (docx, odt,
+ *  1. `to:` is a path to a custom Lua writer — it names no format at all, so
+ *     only `output-file` can say what comes out.
+ *  2. `to:` names a writer that emits its own binary/text format (docx, odt,
  *     pptx, epub, …) — use that writer's extension and ignore `output-file`,
  *     since asking pandoc for `.pdf` there is a hard error.
- *  2. `to:` names a PDF-capable writer (latex, beamer, …) — honor an explicit
+ *  3. `to:` names a PDF-capable writer (latex, beamer, …) — honor an explicit
  *     `output-file` extension (the author may really want `.tex`), else `.pdf`.
- *  3. No `to:` — use `output-file`'s extension, else `.pdf`.
+ *  4. No `to:` — use `output-file`'s extension, else `.pdf`.
  *
  * Unknown writer names fall back to using the format name as the extension
  * (`to: rst` → `.rst`), which ages better than an exhaustive table.
  *
  * `pdfEngine` and `needsCrossref` ride along because the caller needs them for
- * the same preflight check and they come from the same parse.
+ * the same preflight check and they come from the same parse. Pass
+ * `readPresetFile` to let a Lua filter be read for an indirect crossref call;
+ * without it only a filter naming the binary counts.
  */
-function exportTargetForDefaults(parsed) {
+function exportTargetForDefaults(parsed, readPresetFile) {
     var _a;
     const doc = typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)
         ? parsed
         : {};
     const pdfEngine = scalar(doc["pdf-engine"]) || null;
     const filters = Array.isArray(doc["filters"]) ? doc["filters"] : [];
-    const needsCrossref = filters.some((f) => scalar(f).toLowerCase().endsWith("pandoc-crossref"));
+    const needsCrossref = filters.some((f) => filterUsesCrossref(scalar(f), readPresetFile));
     const outputExt = path__namespace.extname(scalar(doc["output-file"])).toLowerCase();
-    const to = baseWriterName(scalar(doc["to"]));
-    // A writer that emits its own format wins outright; asking pandoc for .pdf
-    // there is a hard error, so an `output-file: out.pdf` left over in the preset
-    // must not override it. Otherwise the author's `output-file` decides.
-    const ext = to && !PDF_CAPABLE_WRITERS.has(to)
-        ? (_a = WRITER_EXTENSIONS[to]) !== null && _a !== void 0 ? _a : `.${to}`
-        : outputExt || ".pdf";
+    const rawTo = scalar(doc["to"]);
+    const to = baseWriterName(rawTo);
+    // A custom writer's path says nothing about the output, so `output-file`
+    // is the whole story — `.bin` only if the preset left even that unsaid.
+    // Otherwise a writer that emits its own format wins outright; asking pandoc
+    // for .pdf there is a hard error, so an `output-file: out.pdf` left over in
+    // the preset must not override it. Failing those, `output-file` decides.
+    const ext = isCustomWriter(rawTo)
+        ? outputExt || ".bin"
+        : to && !PDF_CAPABLE_WRITERS.has(to)
+            ? (_a = WRITER_EXTENSIONS[to]) !== null && _a !== void 0 ? _a : `.${to}`
+            : outputExt || ".pdf";
     return { ext, pdfEngine, needsCrossref };
 }
 /** Output formats the built-in, preset-free export can produce. */
@@ -23441,14 +23516,63 @@ function buildPandocArgs(p) {
 }
 
 /**
+ * Pair each preset name with the extension it exports to, given a `readPreset`
+ * that yields one preset's *parsed* yaml.
+ *
+ * Reading is best-effort, exactly as the export step's own preflight is (see
+ * `pandoc-export.ts`, "assuming PDF output"): a preset that cannot be read or
+ * parsed loses its format label and nothing else — it stays in the list and
+ * stays selectable, because the export may well succeed where our peek failed.
+ *
+ * The reader is injected because the real one needs `fs` and Obsidian's
+ * `parseYaml`, neither of which loads under vitest; this half is the half worth
+ * testing. See `pandoc-templates.ts` for the wiring.
+ */
+function pandocTemplateChoices(names, readPreset) {
+    return names.map((name) => ({ name, ext: presetExtension(name, readPreset) }));
+}
+function presetExtension(name, readPreset) {
+    try {
+        return exportTargetForDefaults(readPreset(name)).ext;
+    }
+    catch (e) {
+        console.warn(`[Pandoc Export] Could not read the preset ${name}.yaml.`, e);
+        return "";
+    }
+}
+/** `paperbell` + `.pdf` → `paperbell — PDF`; an unread preset keeps its bare name. */
+function templateLabel(template) {
+    const ext = formatName(template.ext);
+    return ext ? `${template.name} — ${ext}` : template.name;
+}
+/** `.pdf` → `PDF`, for prose and labels. `""` when the extension is unknown. */
+function formatName(ext) {
+    return ext.replace(/^\./, "").toUpperCase();
+}
+/**
+ * The same format as a parenthetical aside — `" (PDF)"`, or `""` when we could
+ * not read it. It carries its own leading space so a sentence can end with
+ * `…output format{format}.` and read correctly either way.
+ */
+function formatAside(ext) {
+    const name = formatName(ext);
+    return name ? ` (${name})` : "";
+}
+
+/**
  * Preset basenames that aren't user-selectable manuscript templates: `crossref`
  * is an include fragment, `undefined` is the no-template fallback.
  */
 const EXCLUDED = new Set(["crossref", "undefined"]);
 /**
- * List the downloaded Pandoc presets — the basenames (without `.yaml`) of the
- * files in `<assets>/defaults/`. Desktop only (needs Node fs to read outside the
- * vault); returns `[]` on mobile or if the folder can't be read.
+ * List the downloaded Pandoc presets — the files in `<assets>/defaults/`, by
+ * basename, each paired with the extension it exports to. Desktop only (needs
+ * Node fs to read outside the vault); returns `[]` on mobile or if the folder
+ * can't be read.
+ *
+ * This is the Obsidian-bound half: locate the folder, read the files. The
+ * pairing and its degradation live in `pandoc-templates-utils.ts`, where they
+ * can be tested.
  */
 function listPandocTemplates(app) {
     var _a;
@@ -23458,6 +23582,16 @@ function listPandocTemplates(app) {
     const settings = get_store_value(pluginSettings);
     const assetsSetting = ((_a = settings === null || settings === void 0 ? void 0 : settings.pandocAssetsFolder) !== null && _a !== void 0 ? _a : "").trim() || DEFAULT_ASSETS_DIR;
     const defaultsDir = path__namespace.join(resolveUserPath(assetsSetting, adapter.getBasePath(), currentPlatformEnv()), "defaults");
+    return pandocTemplateChoices(presetNames(defaultsDir), (name) => obsidian.parseYaml(fs__namespace.readFileSync(path__namespace.join(defaultsDir, name + ".yaml"), "utf8")));
+}
+/**
+ * Just the preset names, for callers that have no use for the formats — reading
+ * every yaml to throw the answer away would be silly on an error path.
+ */
+function listPandocTemplateNames(app) {
+    return listPandocTemplates(app).map((t) => t.name);
+}
+function presetNames(defaultsDir) {
     try {
         return fs__namespace
             .readdirSync(defaultsDir)
@@ -23466,7 +23600,7 @@ function listPandocTemplates(app) {
             .filter((name) => !EXCLUDED.has(name))
             .sort();
     }
-    catch (_b) {
+    catch (_a) {
         return [];
     }
 }
@@ -23475,8 +23609,288 @@ function refreshPandocTemplates(app) {
     pandocTemplates.set(listPandocTemplates(app));
 }
 
+/**
+ * The Pandoc asset marketplace: types + pure logic for a machine-readable index
+ * of downloadable Pandoc assets (recipes / filters / templates / CSL) and bundles,
+ * hosted as a single `index.json` in an external assets repository. This module is
+ * pure and unit-tested (no obsidian import); fetching (`fetchMarketIndex`) and
+ * installing live in `pandoc-assets.ts`, the browse UI in `src/view/pandoc-market/`.
+ * See docs/ASSET_MARKETPLACE_SPEC.md for the repo spec.
+ */
+/**
+ * Default marketplace index — the `index.json` published as a release asset of the
+ * assets repo. `releases/latest/download/…` always resolves to the newest release,
+ * so this URL is stable across versions. Overridable in settings.
+ */
+const DEFAULT_MARKET_INDEX_URL = "https://github.com/PaperBell-Org/paperout-assets-market/releases/latest/download/index.json";
+/** The index schema version this plugin understands. */
+const MARKET_SCHEMA_VERSION = 1;
+/** File name of the install manifest, written at the assets root. */
+const INSTALLED_MANIFEST_NAME = "installed.json";
+/** Validate a parsed index against the schema this plugin supports. Throws on mismatch. */
+function validateIndex(parsed) {
+    const idx = parsed;
+    if (!idx || typeof idx !== "object") {
+        throw new Error("Marketplace index is empty or not an object.");
+    }
+    if (idx.schemaVersion !== MARKET_SCHEMA_VERSION) {
+        throw new Error(`Unsupported marketplace schemaVersion ${idx.schemaVersion} (this plugin supports ${MARKET_SCHEMA_VERSION}). Update the plugin or the index.`);
+    }
+    if (!Array.isArray(idx.assets) || !Array.isArray(idx.bundles)) {
+        throw new Error("Marketplace index must have `assets` and `bundles` arrays.");
+    }
+    return idx;
+}
+/**
+ * Normalize an index entry from the assets repo's published shape into the shape
+ * the plugin consumes. The `build-index.mjs` output uses `title`, a single `url` +
+ * `sourcePath` (+ `extraFiles`), and bundle `url`; internally we use `name` and a
+ * `files[]` array with a `download` URL each. Already-internal entries pass through.
+ */
+function normalizeAssetFiles(raw) {
+    var _a;
+    if (Array.isArray(raw.files))
+        return raw.files;
+    const files = [];
+    const src = ((_a = raw.sourcePath) !== null && _a !== void 0 ? _a : raw.path);
+    const url = raw.url;
+    if (src && url) {
+        files.push({ path: src, download: url, sha256: raw.sha256 });
+        // extraFiles are bare repo-relative paths; derive their URL from the main
+        // one's base (the `.../<tag>/` prefix before sourcePath).
+        const extra = raw.extraFiles;
+        if (Array.isArray(extra) && url.endsWith(src)) {
+            const base = url.slice(0, url.length - src.length);
+            for (const ef of extra)
+                files.push({ path: ef, download: base + ef });
+        }
+    }
+    return files;
+}
+/** Pick a localized string from a plain string or a `{ locale: string }` map. */
+function pickLocalized(v, locale) {
+    var _a, _b;
+    if (v == null)
+        return undefined;
+    if (typeof v === "string")
+        return v;
+    if (typeof v === "object") {
+        const o = v;
+        return (_b = (_a = o[locale]) !== null && _a !== void 0 ? _a : o.en) !== null && _b !== void 0 ? _b : Object.values(o)[0];
+    }
+    return String(v);
+}
+function normalizeIndex(idx, locale = "en") {
+    const raw = idx;
+    const repo = raw.repo;
+    const tag = raw.tag;
+    const rawBase = repo && tag ? `https://raw.githubusercontent.com/${repo}/${tag}/` : "";
+    const url = (path) => typeof path === "string" && rawBase ? rawBase + path : undefined;
+    const asset = (a) => {
+        var _a, _b, _c;
+        return ({
+            id: a.id,
+            type: a.type,
+            name: (_b = pickLocalized((_a = a.title) !== null && _a !== void 0 ? _a : a.name, locale)) !== null && _b !== void 0 ? _b : a.id,
+            description: pickLocalized(a.description, locale),
+            version: ((_c = a.version) !== null && _c !== void 0 ? _c : "0.0.0"),
+            author: a.author,
+            tags: a.tags,
+            files: normalizeAssetFiles(a),
+            requires: a.requires,
+            systemDeps: a.systemDeps,
+            tier: a.tier,
+            reviewed: a.reviewed,
+            readmePath: a.readmePath,
+            previewPath: a.previewPath,
+            readmeUrl: url(a.readmePath),
+            previewUrl: url(a.previewPath),
+        });
+    };
+    const assets = idx.assets.map((a) => asset(a));
+    // A bundle is a recipe's packaging and shares its id. Upstream only localizes
+    // recipes (bundle title/description stay English), so reuse the same-id recipe's
+    // localized name/description when present; fall back to the bundle's own.
+    const recipeName = new Map();
+    const recipeDesc = new Map();
+    for (const a of assets)
+        if (a.type === "recipe") {
+            recipeName.set(a.id, a.name);
+            recipeDesc.set(a.id, a.description);
+        }
+    const bundle = (b) => {
+        var _a, _b, _c, _d, _e, _f;
+        const id = b.id;
+        return {
+            id,
+            name: (_c = (_a = recipeName.get(id)) !== null && _a !== void 0 ? _a : pickLocalized((_b = b.title) !== null && _b !== void 0 ? _b : b.name, locale)) !== null && _c !== void 0 ? _c : id,
+            description: (_d = recipeDesc.get(id)) !== null && _d !== void 0 ? _d : pickLocalized(b.description, locale),
+            version: ((_e = b.version) !== null && _e !== void 0 ? _e : "0.0.0"),
+            author: b.author,
+            tags: b.tags,
+            download: ((_f = b.download) !== null && _f !== void 0 ? _f : b.url),
+            sha256: b.sha256,
+            assets: b.assets,
+            workflows: b.workflows,
+            tier: b.tier,
+            reviewed: b.reviewed,
+            readmePath: b.readmePath,
+            previewPath: b.previewPath,
+            readmeUrl: url(b.readmePath),
+            previewUrl: url(b.previewPath),
+        };
+    };
+    return Object.assign(Object.assign({}, idx), { assets, bundles: idx.bundles.map((b) => bundle(b)) });
+}
+/**
+ * Expand an asset id into the ordered install set: its `requires` closure first,
+ * then the asset itself, deduplicated. Throws on an unknown dependency id; cycles
+ * are tolerated (each id installs once). Used to auto-install a recipe's
+ * filters/template/csl alongside it.
+ */
+function resolveInstallSet(index, assetId) {
+    const byId = new Map(index.assets.map((a) => [a.id, a]));
+    const out = [];
+    const seen = new Set();
+    const visit = (id) => {
+        var _a;
+        if (seen.has(id))
+            return;
+        const asset = byId.get(id);
+        if (!asset)
+            throw new Error(`Unknown asset id referenced as a dependency: ${id}`);
+        seen.add(id); // mark before recursing so a cycle back to `id` short-circuits
+        for (const dep of (_a = asset.requires) !== null && _a !== void 0 ? _a : [])
+            visit(dep);
+        out.push(asset);
+    };
+    visit(assetId);
+    return out;
+}
+/**
+ * Minimal numeric semver compare (ignores pre-release tags): returns -1 / 0 / 1
+ * for a < / = / > b. Used to flag "update available".
+ */
+function compareVersions(a, b) {
+    var _a, _b;
+    const norm = (v) => v
+        .split("-")[0]
+        .split(".")
+        .map((n) => parseInt(n, 10) || 0);
+    const pa = norm(a);
+    const pb = norm(b);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+        const d = ((_a = pa[i]) !== null && _a !== void 0 ? _a : 0) - ((_b = pb[i]) !== null && _b !== void 0 ? _b : 0);
+        if (d !== 0)
+            return d < 0 ? -1 : 1;
+    }
+    return 0;
+}
+/** The `defaults/*.yaml` an asset installs — its recipe presets. */
+function presetFiles(asset) {
+    var _a;
+    return ((_a = asset.files) !== null && _a !== void 0 ? _a : [])
+        .map((f) => f.path)
+        .filter((p) => /^defaults\/[^/]+\.ya?ml$/i.test(p));
+}
+/**
+ * Map each recipe preset these assets install to the system tools it declares,
+ * for {@link InstalledRecord.presetDeps}. Assets with no `systemDeps` and files
+ * that aren't presets drop out, so the result is empty for most installs.
+ */
+function presetSystemDeps(assets) {
+    var _a;
+    const out = {};
+    for (const asset of assets) {
+        const deps = (_a = asset.systemDeps) !== null && _a !== void 0 ? _a : [];
+        if (deps.length === 0)
+            continue;
+        for (const preset of presetFiles(asset))
+            out[preset] = deps;
+    }
+    return out;
+}
+/**
+ * Is every file of this asset among `paths`? The rule for "this asset is here":
+ * used against the files found on disk (`detectPresentIds`) and against the
+ * files a bundle declares (`bundledAssets`). An asset that installs nothing is
+ * never "here" — it would otherwise match vacuously.
+ */
+function assetFilesAllIn(asset, paths) {
+    var _a;
+    const files = (_a = asset.files) !== null && _a !== void 0 ? _a : [];
+    return files.length > 0 && files.every((f) => paths.has(f.path));
+}
+/**
+ * The assets a bundle zip contains: every index asset whose files it all lists.
+ * A bundle names files, not asset ids, so its recipes' `systemDeps` can only be
+ * recovered this way.
+ */
+function bundledAssets(index, bundle) {
+    var _a;
+    const contents = new Set((_a = bundle.assets) !== null && _a !== void 0 ? _a : []);
+    return index.assets.filter((a) => assetFilesAllIn(a, contents));
+}
+/**
+ * The system tools the recipe at `presetPath` (`defaults/<name>.yaml`) declares,
+ * according to the install manifest. Union across records, since an asset
+ * install and a bundle install can both own the same preset.
+ */
+function systemDepsForPreset(manifest, presetPath) {
+    var _a, _b;
+    const out = new Set();
+    for (const rec of Object.values(manifest !== null && manifest !== void 0 ? manifest : {})) {
+        for (const dep of (_b = (_a = rec === null || rec === void 0 ? void 0 : rec.presetDeps) === null || _a === void 0 ? void 0 : _a[presetPath]) !== null && _b !== void 0 ? _b : [])
+            out.add(dep);
+    }
+    return [...out];
+}
+function installStateFor(manifest, id, marketVersion, presentIds) {
+    const rec = manifest[id];
+    if (rec) {
+        return compareVersions(rec.version, marketVersion) < 0
+            ? "update-available"
+            : "installed";
+    }
+    if (presentIds === null || presentIds === void 0 ? void 0 : presentIds.has(id))
+        return "present";
+    return "not-installed";
+}
+
 function line(ok, label, detail) {
     return `[${ok ? "✓" : "✗"}] ${label}` + (detail ? `\n       ${detail}` : "");
+}
+/** Read a file preflight only wants to peek at; unreadable → null. */
+function readTextFile(abs) {
+    try {
+        return fs__namespace.readFileSync(abs, "utf8");
+    }
+    catch (e) {
+        return null;
+    }
+}
+/**
+ * The marketplace install manifest at the assets root, or `{}` when nothing
+ * wrote one: only the marketplace panel does, so assets pulled by the setup
+ * modal's "Download assets" or rsynced from the canonical vault have none.
+ * Preflight must work either way — reading the preset's own filters is what
+ * covers those, and this is the extra word of the recipe author when it exists.
+ *
+ * Deliberately not `pandoc-assets.readInstalledManifest`: that one reads
+ * through the vault adapter, which cannot reach an assets folder outside the
+ * vault, and this step has resolved an absolute path already.
+ */
+function readInstalledManifestAt(assetsAbs) {
+    const text = readTextFile(path__namespace.join(assetsAbs, INSTALLED_MANIFEST_NAME));
+    if (!text)
+        return {};
+    try {
+        return JSON.parse(text);
+    }
+    catch (e) {
+        console.warn(`[Pandoc Export] Could not read ${INSTALLED_MANIFEST_NAME}.`, e);
+        return {};
+    }
 }
 /**
  * Resolve a CSL style into the assets `csl/` folder and return its absolute path,
@@ -23528,7 +23942,7 @@ function ensureCsl(csl, cslDir, home) {
  * `template:` frontmatter key rather than any project metadata.
  */
 function missingPresetHelp(app, template, templateSource) {
-    const installed = listPandocTemplates(app);
+    const installed = listPandocTemplateNames(app);
     const where = `The preset "${template}" comes from ${templateSource}.`;
     if (installed.length === 0) {
         return (`${where} No presets are installed yet. Run 'Set up Pandoc export' → Download assets, ` +
@@ -23563,6 +23977,27 @@ function attachmentResourcePaths(app, base) {
     }
     return paths;
 }
+/**
+ * Why a Format the user set had no effect. Declared once, because two places
+ * report it: the step editor greys the control out and shows this, and an export
+ * that runs with both set (a workflow saved before the control was greyed, or
+ * the headless `Run workflow:` command) says the same thing in a notice.
+ *
+ * `{value}` is the preset; `{format}` the aside naming what it produces.
+ */
+const FORMAT_OVERRIDDEN = 'the preset "{value}" decides the output format{format}. Clear the preset to ' +
+    "export with Format instead.";
+const FORMAT_OPTION = {
+    id: "format",
+    name: "Format (no preset)",
+    description: "Export without any preset, using pandoc on its own — no downloaded assets needed. Word needs nothing but pandoc; PDF also needs a TeX engine (xelatex, for CJK). Setting this overrides the note's `template:` frontmatter; only the Template / preset option above wins over it. Leave blank to require a preset, as the PaperBell pipelines do.",
+    type: CompileStepOptionType.Dropdown,
+    choices: [...BUILTIN_FORMATS],
+    emptyLabel: "(require a preset)",
+    default: "",
+    disabledBy: "template",
+    disabledDescription: `Ignored — ${FORMAT_OVERRIDDEN}`,
+};
 const RunPandocExportStep = makeBuiltinStep({
     id: "run-pandoc-export",
     description: {
@@ -23579,15 +24014,7 @@ const RunPandocExportStep = makeBuiltinStep({
                 emptyLabel: "(use metadata template)",
                 default: "",
             },
-            {
-                id: "format",
-                name: "Format (no preset)",
-                description: "Export without any preset, using pandoc on its own — no downloaded assets needed. Word needs nothing but pandoc; PDF also needs a TeX engine (xelatex, for CJK). Setting this overrides the note's `template:` frontmatter; only the Template / preset option above wins over it. Leave blank to require a preset, as the PaperBell pipelines do.",
-                type: CompileStepOptionType.Dropdown,
-                choices: [...BUILTIN_FORMATS],
-                emptyLabel: "(require a preset)",
-                default: "",
-            },
+            FORMAT_OPTION,
             {
                 id: "filename",
                 name: "File name",
@@ -23646,11 +24073,7 @@ const RunPandocExportStep = makeBuiltinStep({
             // assets. See `resolveBuiltinFormat` for the precedence.
             const formatOption = String((_d = context.optionValues["format"]) !== null && _d !== void 0 ? _d : "").trim();
             const builtinFormat = resolveBuiltinFormat(optionTemplate, formatOption);
-            if (!builtinFormat && optionTemplate && formatOption) {
-                console.warn(`[Pandoc Export] Both a preset ("${optionTemplate}") and a Format ` +
-                    `("${formatOption}") are set on this step; the preset wins. Clear the ` +
-                    `Template / preset option to export with Format instead.`);
-            }
+            const formatOverridden = !builtinFormat && !!optionTemplate && !!formatOption;
             // Unused in built-in mode: no preset is read, and `{template}` must not
             // expand to a name that had no effect on the output.
             const template = builtinFormat
@@ -23667,9 +24090,11 @@ const RunPandocExportStep = makeBuiltinStep({
             const cwd = builtinFormat ? projectAbs : assetsAbs;
             const dirs = binSearchDirs(platform);
             const pandocBin = resolveBinary(((_e = settings.pandocBinary) !== null && _e !== void 0 ? _e : "pandoc").trim() || "pandoc", fs__namespace.existsSync, dirs, platform.isWindows);
-            const defaultsFile = builtinFormat
-                ? null
-                : path__namespace.join(defaultsDir, template + ".yaml");
+            // One name for the preset, in the two forms its two readers want: an
+            // absolute path to parse, and the assets-relative path the install manifest
+            // keys its records by. They must name the same file.
+            const presetRel = `defaults/${template}.yaml`;
+            const defaultsFile = builtinFormat ? null : path__namespace.join(assetsAbs, presetRel);
             // The assets folder is only a requirement when a preset is read out of it.
             const assetsOk = !!builtinFormat || fs__namespace.existsSync(assetsAbs);
             const defaultsOk = !defaultsFile || fs__namespace.existsSync(defaultsFile);
@@ -23687,11 +24112,43 @@ const RunPandocExportStep = makeBuiltinStep({
             }
             else if (defaultsFile && defaultsOk) {
                 try {
-                    target = exportTargetForDefaults(obsidian.parseYaml(fs__namespace.readFileSync(defaultsFile, "utf8")));
+                    target = exportTargetForDefaults(obsidian.parseYaml(fs__namespace.readFileSync(defaultsFile, "utf8")), 
+                    // Lets a `filters:` entry that *wraps* pandoc-crossref be recognized
+                    // as needing it. Reading is best-effort and never throws.
+                    (raw) => readTextFile(resolvePresetPath(raw, {
+                        userData: assetsAbs,
+                        presetDir: defaultsDir,
+                    })));
                 }
                 catch (e) {
                     console.warn(`[Pandoc Export] Could not read preset ${defaultsFile}; assuming PDF output.`, e);
                 }
+                // A recipe also declares what it needs outright: `systemDeps` in the
+                // marketplace index, recorded per preset when it was installed. That is
+                // the recipe author's own word, so it settles cases no amount of reading
+                // the preset can — a tool reached from a template or a custom writer.
+                //
+                // Only pandoc-crossref is acted on, though every declared tool is read:
+                // the other name in use is `citeproc`, which pandoc 3 has built in and no
+                // machine has on PATH. Requiring each declared name as a binary would
+                // fail preflight for eight recipes that export perfectly well today.
+                const declared = systemDepsForPreset(readInstalledManifestAt(assetsAbs), presetRel);
+                if (declared.indexOf("pandoc-crossref") !== -1) {
+                    target = Object.assign(Object.assign({}, target), { needsCrossref: true });
+                }
+            }
+            // The step editor greys the Format control out while a preset is set, but that
+            // only reaches someone who opens it: a workflow saved before it did, or run
+            // headlessly from the `Run workflow: <name>` command, still arrives here with
+            // both. Say it where a writer will see it — and say it in the editor's own
+            // words, now that the target is known and can name the format.
+            if (formatOverridden) {
+                const why = fillOptionText(FORMAT_OVERRIDDEN, {
+                    value: optionTemplate,
+                    format: formatAside(target.ext),
+                });
+                console.warn(`[Pandoc Export] Format "${formatOption}" is set alongside a preset: ${why}`);
+                new obsidian.Notice(`PaperOut: the Format option is ignored — ${why}`, 8000);
             }
             // Only require the tools this preset actually asks for. A docx preset needs
             // neither a TeX engine nor pandoc-crossref.
@@ -23789,9 +24246,9 @@ const RunPandocExportStep = makeBuiltinStep({
                 line(!target.needsCrossref || !!crossrefBin, "pandoc-crossref — " +
                     (target.needsCrossref
                         ? crossrefBin || "not found"
-                        : "not needed (not in this preset’s filters)"), !target.needsCrossref || crossrefBin
+                        : "not needed (this preset doesn’t call it)"), !target.needsCrossref || crossrefBin
                     ? ""
-                    : `The "${template}" preset runs pandoc-crossref for @fig / @tbl references, but it isn’t installed. Install it (macOS: brew install pandoc-crossref).`),
+                    : `The "${template}" preset runs pandoc-crossref for @fig / @tbl references — directly, through a filter that wraps it, or by its own declared system dependencies — but it isn’t installed. Install it (macOS: brew install pandoc-crossref).`),
             ];
             // xelatex and pandoc-crossref are hard requirements only when the preset
             // asks for them; without this, a missing engine surfaced as a raw pandoc
@@ -24418,6 +24875,14 @@ function summarizeSections(titles) {
         : `${base}, comprising: ${titles.join("; ")}.`;
 }
 /**
+ * The `abstract` option is free text. Anything else stored there (older
+ * default workflows saved the boolean `true`) is treated as blank, so it falls
+ * back to the auto-summary instead of becoming the literal abstract "true".
+ */
+function coerceAbstractOption(raw) {
+    return typeof raw === "string" ? raw : "";
+}
+/**
  * Transform a compiled manuscript into a Supplementary Information document:
  *
  * 1. Prepend the S-numbering raw-LaTeX block (figures/tables → S1, S2, …).
@@ -24476,14 +24941,13 @@ const SupplementaryInfoStep = makeBuiltinStep({
         ],
     },
     compile(input, context) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             if (context.kind !== CompileStepKind.Manuscript) {
                 throw new Error("Cannot run Supplementary Information on a non-manuscript.");
             }
             return {
                 contents: transformToSupplementary(input.contents, {
-                    abstract: String((_a = context.optionValues["abstract"]) !== null && _a !== void 0 ? _a : ""),
+                    abstract: coerceAbstractOption(context.optionValues["abstract"]),
                     summarizeSections: context.optionValues["summarize-sections"] !== false,
                 }),
             };
@@ -25628,6 +26092,57 @@ function translate(key, vars) {
  */
 const t = derived(locale, ($locale) => (key, vars) => lookup($locale, key, vars));
 
+/**
+ * Whether `option` is currently overridden by the option it declares as
+ * `disabledBy`. A whitespace-only value doesn't count — the steps themselves
+ * trim before deciding (see `resolveBuiltinFormat`).
+ */
+function optionIsInert(option, optionValues) {
+    return overridingValue(option, optionValues) !== null;
+}
+/**
+ * The description to show under `option`: its `disabledDescription` while it is
+ * overridden, otherwise its own.
+ *
+ * `templates` answers the `{format}` placeholder — a preset that overrides the
+ * Format option should say *which* format it imposes, and only the preset list
+ * knows that. Absent or unreadable, the sentence simply omits the aside.
+ */
+function optionDescription(option, optionValues, templates = []) {
+    var _a, _b;
+    const value = overridingValue(option, optionValues);
+    if (value === null || !option.disabledDescription)
+        return option.description;
+    const ext = (_b = (_a = templates.find((t) => t.name === value)) === null || _a === void 0 ? void 0 : _a.ext) !== null && _b !== void 0 ? _b : "";
+    return fillOptionText(option.disabledDescription, {
+        value,
+        format: formatAside(ext),
+    });
+}
+/** The trimmed value of the option overriding this one, or null if none does. */
+function overridingValue(option, optionValues) {
+    if (!option.disabledBy)
+        return null;
+    const raw = optionValues[option.disabledBy];
+    // Every option that can override one today is a text field or a dropdown, so a
+    // non-string value means the step declared a `disabledBy` it shouldn't have.
+    const value = typeof raw === "string" ? raw.trim() : "";
+    return value ? value : null;
+}
+/**
+ * The entries of a Dropdown option. Static `choices` are their own labels;
+ * `dynamicChoices: "pandoc-templates"` resolves to the downloaded presets, each
+ * labelled with the format it exports to — the answer to "which of these gives
+ * me a Word file?", which otherwise means opening the preset's yaml.
+ */
+function dropdownChoices(option, templates) {
+    var _a;
+    if (option.dynamicChoices === "pandoc-templates") {
+        return templates.map((t) => ({ value: t.name, label: templateLabel(t) }));
+    }
+    return ((_a = option.choices) !== null && _a !== void 0 ? _a : []).map((c) => ({ value: c, label: c }));
+}
+
 /* src/view/compile/CompileStepView.svelte generated by Svelte v3.49.0 */
 
 function add_css$f(target) {
@@ -25648,7 +26163,7 @@ function get_each_context_1$3(ctx, list, i) {
 	return child_ctx;
 }
 
-// (44:2) {:else}
+// (45:2) {:else}
 function create_else_block$6(ctx) {
 	let div1;
 	let div0;
@@ -25787,7 +26302,7 @@ function create_else_block$6(ctx) {
 	};
 }
 
-// (28:2) {#if step.description.canonicalID === PLACEHOLDER_MISSING_STEP.description.canonicalID}
+// (29:2) {#if step.description.canonicalID === PLACEHOLDER_MISSING_STEP.description.canonicalID}
 function create_if_block$d(ctx) {
 	let div1;
 	let div0;
@@ -25842,7 +26357,7 @@ function create_if_block$d(ctx) {
 	};
 }
 
-// (48:8) {#if calculatedKind !== null}
+// (49:8) {#if calculatedKind !== null}
 function create_if_block_6$4(ctx) {
 	let div;
 	let t_value = formatStepKind(/*calculatedKind*/ ctx[2]) + "";
@@ -25873,7 +26388,7 @@ function create_if_block_6$4(ctx) {
 	};
 }
 
-// (64:4) {#if step.description.options.length > 0}
+// (65:4) {#if step.description.options.length > 0}
 function create_if_block_2$9(ctx) {
 	let div1;
 	let div0;
@@ -25912,7 +26427,7 @@ function create_if_block_2$9(ctx) {
 			}
 		},
 		p(ctx, dirty) {
-			if (dirty & /*step, CompileStepOptionType, $pandocTemplates*/ 17) {
+			if (dirty & /*optionDescription, step, $pandocTemplates, CompileStepOptionType, optionIsInert, dropdownChoices*/ 17) {
 				each_value = /*step*/ ctx[0].description.options;
 				let i;
 
@@ -25944,7 +26459,7 @@ function create_if_block_2$9(ctx) {
 	};
 }
 
-// (98:14) {:else}
+// (100:14) {:else}
 function create_else_block_1$3(ctx) {
 	let div;
 	let input;
@@ -25991,17 +26506,17 @@ function create_else_block_1$3(ctx) {
 		p(new_ctx, dirty) {
 			ctx = new_ctx;
 
-			if (dirty & /*step, $pandocTemplates*/ 17 && input_id_value !== (input_id_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17 && input_id_value !== (input_id_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
 				attr(input, "id", input_id_value);
 			}
 
-			if (dirty & /*step, $pandocTemplates*/ 17) {
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17) {
 				input.checked = /*step*/ ctx[0].optionValues[/*option*/ ctx[12].id];
 			}
 
 			if (dirty & /*step*/ 1 && t1_value !== (t1_value = /*option*/ ctx[12].name + "")) set_data(t1, t1_value);
 
-			if (dirty & /*step, $pandocTemplates*/ 17 && label_for_value !== (label_for_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17 && label_for_value !== (label_for_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
 				attr(label, "for", label_for_value);
 			}
 		},
@@ -26013,7 +26528,7 @@ function create_else_block_1$3(ctx) {
 	};
 }
 
-// (87:71) 
+// (88:71) 
 function create_if_block_5$5(ctx) {
 	let label;
 	let t0_value = /*option*/ ctx[12].name + "";
@@ -26025,13 +26540,10 @@ function create_if_block_5$5(ctx) {
 	let t2_value = (/*option*/ ctx[12].emptyLabel ?? "(default)") + "";
 	let t2;
 	let select_id_value;
+	let select_disabled_value;
 	let mounted;
 	let dispose;
-
-	let each_value_1 = /*option*/ ctx[12].dynamicChoices === "pandoc-templates"
-	? /*$pandocTemplates*/ ctx[4]
-	: /*option*/ ctx[12].choices ?? [];
-
+	let each_value_1 = dropdownChoices(/*option*/ ctx[12], /*$pandocTemplates*/ ctx[4]);
 	let each_blocks = [];
 
 	for (let i = 0; i < each_value_1.length; i += 1) {
@@ -26060,6 +26572,7 @@ function create_if_block_5$5(ctx) {
 			option.__value = "";
 			option.value = option.__value;
 			attr(select, "id", select_id_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id);
+			select.disabled = select_disabled_value = optionIsInert(/*option*/ ctx[12], /*step*/ ctx[0].optionValues);
 			attr(select, "class", "svelte-1cn3ejz");
 			if (/*step*/ ctx[0].optionValues[/*option*/ ctx[12].id] === void 0) add_render_callback(select_change_handler);
 		},
@@ -26086,17 +26599,14 @@ function create_if_block_5$5(ctx) {
 			ctx = new_ctx;
 			if (dirty & /*step*/ 1 && t0_value !== (t0_value = /*option*/ ctx[12].name + "")) set_data(t0, t0_value);
 
-			if (dirty & /*step, $pandocTemplates*/ 17 && label_for_value !== (label_for_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17 && label_for_value !== (label_for_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
 				attr(label, "for", label_for_value);
 			}
 
 			if (dirty & /*step*/ 1 && t2_value !== (t2_value = (/*option*/ ctx[12].emptyLabel ?? "(default)") + "")) set_data(t2, t2_value);
 
-			if (dirty & /*step, $pandocTemplates*/ 17) {
-				each_value_1 = /*option*/ ctx[12].dynamicChoices === "pandoc-templates"
-				? /*$pandocTemplates*/ ctx[4]
-				: /*option*/ ctx[12].choices ?? [];
-
+			if (dirty & /*dropdownChoices, step, $pandocTemplates*/ 17) {
+				each_value_1 = dropdownChoices(/*option*/ ctx[12], /*$pandocTemplates*/ ctx[4]);
 				let i;
 
 				for (i = 0; i < each_value_1.length; i += 1) {
@@ -26118,11 +26628,15 @@ function create_if_block_5$5(ctx) {
 				each_blocks.length = each_value_1.length;
 			}
 
-			if (dirty & /*step, $pandocTemplates*/ 17 && select_id_value !== (select_id_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17 && select_id_value !== (select_id_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
 				attr(select, "id", select_id_value);
 			}
 
-			if (dirty & /*step, $pandocTemplates*/ 17) {
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17 && select_disabled_value !== (select_disabled_value = optionIsInert(/*option*/ ctx[12], /*step*/ ctx[0].optionValues))) {
+				select.disabled = select_disabled_value;
+			}
+
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17) {
 				select_option(select, /*step*/ ctx[0].optionValues[/*option*/ ctx[12].id]);
 			}
 		},
@@ -26137,7 +26651,7 @@ function create_if_block_5$5(ctx) {
 	};
 }
 
-// (80:76) 
+// (81:76) 
 function create_if_block_4$5(ctx) {
 	let label;
 	let t0_value = /*option*/ ctx[12].name + "";
@@ -26181,15 +26695,15 @@ function create_if_block_4$5(ctx) {
 			ctx = new_ctx;
 			if (dirty & /*step*/ 1 && t0_value !== (t0_value = /*option*/ ctx[12].name + "")) set_data(t0, t0_value);
 
-			if (dirty & /*step, $pandocTemplates*/ 17 && label_for_value !== (label_for_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17 && label_for_value !== (label_for_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
 				attr(label, "for", label_for_value);
 			}
 
-			if (dirty & /*step, $pandocTemplates*/ 17 && textarea_id_value !== (textarea_id_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17 && textarea_id_value !== (textarea_id_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
 				attr(textarea, "id", textarea_id_value);
 			}
 
-			if (dirty & /*step, $pandocTemplates*/ 17) {
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17) {
 				set_input_value(textarea, /*step*/ ctx[0].optionValues[/*option*/ ctx[12].id]);
 			}
 		},
@@ -26203,7 +26717,7 @@ function create_if_block_4$5(ctx) {
 	};
 }
 
-// (72:14) {#if option.type === CompileStepOptionType.Text}
+// (73:14) {#if option.type === CompileStepOptionType.Text}
 function create_if_block_3$5(ctx) {
 	let label;
 	let t0_value = /*option*/ ctx[12].name + "";
@@ -26249,19 +26763,19 @@ function create_if_block_3$5(ctx) {
 			ctx = new_ctx;
 			if (dirty & /*step*/ 1 && t0_value !== (t0_value = /*option*/ ctx[12].name + "")) set_data(t0, t0_value);
 
-			if (dirty & /*step, $pandocTemplates*/ 17 && label_for_value !== (label_for_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17 && label_for_value !== (label_for_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
 				attr(label, "for", label_for_value);
 			}
 
-			if (dirty & /*step, $pandocTemplates*/ 17 && input_id_value !== (input_id_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17 && input_id_value !== (input_id_value = /*step*/ ctx[0].id + "-" + /*option*/ ctx[12].id)) {
 				attr(input, "id", input_id_value);
 			}
 
-			if (dirty & /*step, $pandocTemplates*/ 17 && input_placeholder_value !== (input_placeholder_value = /*option*/ ctx[12].default.replace(/\n/g, "\\n"))) {
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17 && input_placeholder_value !== (input_placeholder_value = /*option*/ ctx[12].default.replace(/\n/g, "\\n"))) {
 				attr(input, "placeholder", input_placeholder_value);
 			}
 
-			if (dirty & /*step, $pandocTemplates*/ 17 && input.value !== /*step*/ ctx[0].optionValues[/*option*/ ctx[12].id]) {
+			if (dirty & /*step, dropdownChoices, $pandocTemplates*/ 17 && input.value !== /*step*/ ctx[0].optionValues[/*option*/ ctx[12].id]) {
 				set_input_value(input, /*step*/ ctx[0].optionValues[/*option*/ ctx[12].id]);
 			}
 		},
@@ -26275,10 +26789,10 @@ function create_if_block_3$5(ctx) {
 	};
 }
 
-// (94:18) {#each option.dynamicChoices === "pandoc-templates" ? $pandocTemplates : option.choices ?? [] as choice}
+// (96:18) {#each dropdownChoices(option, $pandocTemplates) as choice}
 function create_each_block_1$3(ctx) {
 	let option;
-	let t_value = /*choice*/ ctx[15] + "";
+	let t_value = /*choice*/ ctx[15].label + "";
 	let t;
 	let option_value_value;
 
@@ -26286,7 +26800,7 @@ function create_each_block_1$3(ctx) {
 		c() {
 			option = element("option");
 			t = text(t_value);
-			option.__value = option_value_value = /*choice*/ ctx[15];
+			option.__value = option_value_value = /*choice*/ ctx[15].value;
 			option.value = option.__value;
 		},
 		m(target, anchor) {
@@ -26294,9 +26808,9 @@ function create_each_block_1$3(ctx) {
 			append(option, t);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*step, $pandocTemplates*/ 17 && t_value !== (t_value = /*choice*/ ctx[15] + "")) set_data(t, t_value);
+			if (dirty & /*step, $pandocTemplates*/ 17 && t_value !== (t_value = /*choice*/ ctx[15].label + "")) set_data(t, t_value);
 
-			if (dirty & /*step, $pandocTemplates*/ 17 && option_value_value !== (option_value_value = /*choice*/ ctx[15])) {
+			if (dirty & /*step, $pandocTemplates, dropdownChoices*/ 17 && option_value_value !== (option_value_value = /*choice*/ ctx[15].value)) {
 				option.__value = option_value_value;
 				option.value = option.__value;
 			}
@@ -26307,12 +26821,12 @@ function create_each_block_1$3(ctx) {
 	};
 }
 
-// (70:10) {#each step.description.options as option}
+// (71:10) {#each step.description.options as option}
 function create_each_block$8(ctx) {
 	let div;
 	let t0;
 	let p;
-	let t1_value = /*option*/ ctx[12].description + "";
+	let t1_value = optionDescription(/*option*/ ctx[12], /*step*/ ctx[0].optionValues, /*$pandocTemplates*/ ctx[4]) + "";
 	let t1;
 	let t2;
 
@@ -26358,7 +26872,7 @@ function create_each_block$8(ctx) {
 				}
 			}
 
-			if (dirty & /*step*/ 1 && t1_value !== (t1_value = /*option*/ ctx[12].description + "")) set_data(t1, t1_value);
+			if (dirty & /*step, $pandocTemplates*/ 17 && t1_value !== (t1_value = optionDescription(/*option*/ ctx[12], /*step*/ ctx[0].optionValues, /*$pandocTemplates*/ ctx[4]) + "")) set_data(t1, t1_value);
 		},
 		d(detaching) {
 			if (detaching) detach(div);
@@ -26367,7 +26881,7 @@ function create_each_block$8(ctx) {
 	};
 }
 
-// (116:4) {#if error}
+// (118:4) {#if error}
 function create_if_block_1$a(ctx) {
 	let div;
 	let p;
@@ -29747,7 +30261,7 @@ function get_each_context_3(ctx, list, i) {
 	return child_ctx;
 }
 
-// (209:10) {#each allWorkflowNames as name}
+// (210:10) {#each allWorkflowNames as name}
 function create_each_block_3(ctx) {
 	let option;
 	let t_1_value = /*name*/ ctx[52] + "";
@@ -29772,7 +30286,7 @@ function create_each_block_3(ctx) {
 	};
 }
 
-// (251:10) {:else}
+// (252:10) {:else}
 function create_else_block_4(ctx) {
 	let div;
 	let t0_value = /*$t*/ ctx[9]("matrix.skipped") + "";
@@ -29811,7 +30325,7 @@ function create_else_block_4(ctx) {
 	};
 }
 
-// (217:10) {#if item.runnable}
+// (218:10) {#if item.runnable}
 function create_if_block_15$1(ctx) {
 	let div0;
 	let t0;
@@ -29892,7 +30406,7 @@ function create_if_block_15$1(ctx) {
 	};
 }
 
-// (245:18) {:else}
+// (246:18) {:else}
 function create_else_block_3$1(ctx) {
 	let span;
 	let t_1_value = /*i*/ ctx[51] + 1 + "";
@@ -29914,7 +30428,7 @@ function create_else_block_3$1(ctx) {
 	};
 }
 
-// (243:68) 
+// (244:68) 
 function create_if_block_18$1(ctx) {
 	let span;
 
@@ -29933,7 +30447,7 @@ function create_if_block_18$1(ctx) {
 	};
 }
 
-// (241:67) 
+// (242:67) 
 function create_if_block_17$1(ctx) {
 	let span;
 
@@ -29952,7 +30466,7 @@ function create_if_block_17$1(ctx) {
 	};
 }
 
-// (239:18) {#if nodeClass(item.state, i) === "is-active"}
+// (240:18) {#if nodeClass(item.state, i) === "is-active"}
 function create_if_block_16$1(ctx) {
 	let span;
 
@@ -29970,7 +30484,7 @@ function create_if_block_16$1(ctx) {
 	};
 }
 
-// (224:14) {#each item.steps as s, i}
+// (225:14) {#each item.steps as s, i}
 function create_each_block_2(ctx) {
 	let button;
 	let show_if;
@@ -30088,7 +30602,7 @@ function create_each_block_2(ctx) {
 	};
 }
 
-// (257:8) {#if item.runnable}
+// (258:8) {#if item.runnable}
 function create_if_block_10$1(ctx) {
 	let div;
 
@@ -30133,7 +30647,7 @@ function create_if_block_10$1(ctx) {
 	};
 }
 
-// (285:12) {:else}
+// (286:12) {:else}
 function create_else_block_2$1(ctx) {
 	let span;
 	let t_1_value = /*$t*/ ctx[9]("matrix.clickStepHint") + "";
@@ -30158,7 +30672,7 @@ function create_else_block_2$1(ctx) {
 	};
 }
 
-// (273:52) 
+// (274:52) 
 function create_if_block_14$1(ctx) {
 	let button;
 	let span;
@@ -30215,7 +30729,7 @@ function create_if_block_14$1(ctx) {
 	};
 }
 
-// (271:51) 
+// (272:51) 
 function create_if_block_13$1(ctx) {
 	let span;
 	let t_1_value = /*$t*/ ctx[9]("matrix.finished") + "";
@@ -30240,7 +30754,7 @@ function create_if_block_13$1(ctx) {
 	};
 }
 
-// (266:91) 
+// (267:91) 
 function create_if_block_12$1(ctx) {
 	let span0;
 	let t0_value = /*item*/ ctx[41].state.activeStep + 1 + "";
@@ -30287,7 +30801,7 @@ function create_if_block_12$1(ctx) {
 	};
 }
 
-// (261:12) {#if hovered.id === item.id && item.steps[hovered.i]}
+// (262:12) {#if hovered.id === item.id && item.steps[hovered.i]}
 function create_if_block_11$1(ctx) {
 	let span0;
 	let t0_value = /*hovered*/ ctx[6].i + 1 + "";
@@ -30334,7 +30848,7 @@ function create_if_block_11$1(ctx) {
 	};
 }
 
-// (299:50) 
+// (300:50) 
 function create_if_block_9$2(ctx) {
 	let span;
 
@@ -30354,7 +30868,7 @@ function create_if_block_9$2(ctx) {
 	};
 }
 
-// (297:48) 
+// (298:48) 
 function create_if_block_8$2(ctx) {
 	let span;
 	let t_1;
@@ -30382,7 +30896,7 @@ function create_if_block_8$2(ctx) {
 	};
 }
 
-// (295:47) 
+// (296:47) 
 function create_if_block_7$3(ctx) {
 	let span;
 
@@ -30402,7 +30916,7 @@ function create_if_block_7$3(ctx) {
 	};
 }
 
-// (293:8) {#if item.state.status === "running"}
+// (294:8) {#if item.state.status === "running"}
 function create_if_block_6$3(ctx) {
 	let span;
 
@@ -30421,7 +30935,7 @@ function create_if_block_6$3(ctx) {
 	};
 }
 
-// (305:4) {#if item.state.status === "error" && openError === item.id}
+// (306:4) {#if item.state.status === "error" && openError === item.id}
 function create_if_block_5$4(ctx) {
 	let div1;
 	let div0;
@@ -30499,7 +31013,7 @@ function create_if_block_5$4(ctx) {
 	};
 }
 
-// (317:4) {#if item.runnable && item.openStep >= 0 && item.workflow.steps[item.openStep]}
+// (318:4) {#if item.runnable && item.openStep >= 0 && item.workflow.steps[item.openStep]}
 function create_if_block$c(ctx) {
 	let div1;
 	let div0;
@@ -30624,7 +31138,7 @@ function create_if_block$c(ctx) {
 	};
 }
 
-// (387:8) {:else}
+// (390:8) {:else}
 function create_else_block_1$2(ctx) {
 	let p;
 	let t_1_value = /*$t*/ ctx[9]("matrix.noOptions") + "";
@@ -30649,7 +31163,7 @@ function create_else_block_1$2(ctx) {
 	};
 }
 
-// (331:8) {#if step.description.options.length > 0}
+// (332:8) {#if step.description.options.length > 0}
 function create_if_block_1$9(ctx) {
 	let div;
 	let each_value = /*step*/ ctx[42].description.options;
@@ -30677,7 +31191,7 @@ function create_if_block_1$9(ctx) {
 			}
 		},
 		p(ctx, dirty) {
-			if (dirty[0] & /*running, setOption, $pandocTemplates*/ 263169 | dirty[1] & /*item*/ 1024) {
+			if (dirty[0] & /*$pandocTemplates, running, setOption*/ 263169 | dirty[1] & /*item*/ 1024) {
 				each_value = /*step*/ ctx[42].description.options;
 				let i;
 
@@ -30707,7 +31221,7 @@ function create_if_block_1$9(ctx) {
 	};
 }
 
-// (370:16) {:else}
+// (371:16) {:else}
 function create_else_block$5(ctx) {
 	let div;
 	let input;
@@ -30781,7 +31295,7 @@ function create_else_block$5(ctx) {
 	};
 }
 
-// (356:73) 
+// (357:73) 
 function create_if_block_4$4(ctx) {
 	let label;
 	let t0_value = /*option*/ ctx[43].name + "";
@@ -30793,14 +31307,11 @@ function create_if_block_4$4(ctx) {
 	let t2_value = (/*option*/ ctx[43].emptyLabel ?? "(default)") + "";
 	let t2;
 	let select_id_value;
+	let select_disabled_value;
 	let select_value_value;
 	let mounted;
 	let dispose;
-
-	let each_value_1 = /*option*/ ctx[43].dynamicChoices === "pandoc-templates"
-	? /*$pandocTemplates*/ ctx[10]
-	: /*option*/ ctx[43].choices ?? [];
-
+	let each_value_1 = dropdownChoices(/*option*/ ctx[43], /*$pandocTemplates*/ ctx[10]);
 	let each_blocks = [];
 
 	for (let i = 0; i < each_value_1.length; i += 1) {
@@ -30829,7 +31340,7 @@ function create_if_block_4$4(ctx) {
 			option.__value = "";
 			option.value = option.__value;
 			attr(select, "id", select_id_value = /*step*/ ctx[42].id + "-" + /*option*/ ctx[43].id);
-			select.disabled = /*running*/ ctx[0];
+			select.disabled = select_disabled_value = /*running*/ ctx[0] || optionIsInert(/*option*/ ctx[43], /*step*/ ctx[42].optionValues);
 			attr(select, "class", "svelte-1d84fds");
 		},
 		m(target, anchor) {
@@ -30862,10 +31373,7 @@ function create_if_block_4$4(ctx) {
 			if (dirty[1] & /*item*/ 1024 && t2_value !== (t2_value = (/*option*/ ctx[43].emptyLabel ?? "(default)") + "")) set_data(t2, t2_value);
 
 			if (dirty[0] & /*$pandocTemplates*/ 1024 | dirty[1] & /*item*/ 1024) {
-				each_value_1 = /*option*/ ctx[43].dynamicChoices === "pandoc-templates"
-				? /*$pandocTemplates*/ ctx[10]
-				: /*option*/ ctx[43].choices ?? [];
-
+				each_value_1 = dropdownChoices(/*option*/ ctx[43], /*$pandocTemplates*/ ctx[10]);
 				let i;
 
 				for (i = 0; i < each_value_1.length; i += 1) {
@@ -30891,8 +31399,8 @@ function create_if_block_4$4(ctx) {
 				attr(select, "id", select_id_value);
 			}
 
-			if (dirty[0] & /*running*/ 1) {
-				select.disabled = /*running*/ ctx[0];
+			if (dirty[0] & /*running, allWorkflowNames*/ 32769 | dirty[1] & /*item*/ 1024 && select_disabled_value !== (select_disabled_value = /*running*/ ctx[0] || optionIsInert(/*option*/ ctx[43], /*step*/ ctx[42].optionValues))) {
+				select.disabled = select_disabled_value;
 			}
 
 			if (dirty[0] & /*allWorkflowNames*/ 32768 | dirty[1] & /*item*/ 1024 && select_value_value !== (select_value_value = /*step*/ ctx[42].optionValues[/*option*/ ctx[43].id] ?? "")) {
@@ -30910,7 +31418,7 @@ function create_if_block_4$4(ctx) {
 	};
 }
 
-// (346:78) 
+// (347:78) 
 function create_if_block_3$4(ctx) {
 	let label;
 	let t0_value = /*option*/ ctx[43].name + "";
@@ -30982,7 +31490,7 @@ function create_if_block_3$4(ctx) {
 	};
 }
 
-// (335:16) {#if option.type === CompileStepOptionType.Text}
+// (336:16) {#if option.type === CompileStepOptionType.Text}
 function create_if_block_2$8(ctx) {
 	let label;
 	let t0_value = /*option*/ ctx[43].name + "";
@@ -31060,10 +31568,10 @@ function create_if_block_2$8(ctx) {
 	};
 }
 
-// (366:20) {#each option.dynamicChoices === "pandoc-templates" ? $pandocTemplates : option.choices ?? [] as choice}
+// (367:20) {#each dropdownChoices(option, $pandocTemplates) as choice}
 function create_each_block_1$2(ctx) {
 	let option;
-	let t_1_value = /*choice*/ ctx[46] + "";
+	let t_1_value = /*choice*/ ctx[46].label + "";
 	let t_1;
 	let option_value_value;
 
@@ -31071,7 +31579,7 @@ function create_each_block_1$2(ctx) {
 		c() {
 			option = element("option");
 			t_1 = text(t_1_value);
-			option.__value = option_value_value = /*choice*/ ctx[46];
+			option.__value = option_value_value = /*choice*/ ctx[46].value;
 			option.value = option.__value;
 		},
 		m(target, anchor) {
@@ -31079,9 +31587,9 @@ function create_each_block_1$2(ctx) {
 			append(option, t_1);
 		},
 		p(ctx, dirty) {
-			if (dirty[0] & /*$pandocTemplates*/ 1024 | dirty[1] & /*item*/ 1024 && t_1_value !== (t_1_value = /*choice*/ ctx[46] + "")) set_data(t_1, t_1_value);
+			if (dirty[0] & /*$pandocTemplates*/ 1024 | dirty[1] & /*item*/ 1024 && t_1_value !== (t_1_value = /*choice*/ ctx[46].label + "")) set_data(t_1, t_1_value);
 
-			if (dirty[0] & /*$pandocTemplates, allWorkflowNames*/ 33792 | dirty[1] & /*item*/ 1024 && option_value_value !== (option_value_value = /*choice*/ ctx[46])) {
+			if (dirty[0] & /*$pandocTemplates, allWorkflowNames*/ 33792 | dirty[1] & /*item*/ 1024 && option_value_value !== (option_value_value = /*choice*/ ctx[46].value)) {
 				option.__value = option_value_value;
 				option.value = option.__value;
 			}
@@ -31092,12 +31600,12 @@ function create_each_block_1$2(ctx) {
 	};
 }
 
-// (333:12) {#each step.description.options as option}
+// (334:12) {#each step.description.options as option}
 function create_each_block$6(ctx) {
 	let div;
 	let t0;
 	let p;
-	let t1_value = /*option*/ ctx[43].description + "";
+	let t1_value = optionDescription(/*option*/ ctx[43], /*step*/ ctx[42].optionValues, /*$pandocTemplates*/ ctx[10]) + "";
 	let t1;
 	let t2;
 
@@ -31143,7 +31651,7 @@ function create_each_block$6(ctx) {
 				}
 			}
 
-			if (dirty[1] & /*item*/ 1024 && t1_value !== (t1_value = /*option*/ ctx[43].description + "")) set_data(t1, t1_value);
+			if (dirty[0] & /*$pandocTemplates*/ 1024 | dirty[1] & /*item*/ 1024 && t1_value !== (t1_value = optionDescription(/*option*/ ctx[43], /*step*/ ctx[42].optionValues, /*$pandocTemplates*/ ctx[10]) + "")) set_data(t1, t1_value);
 		},
 		d(detaching) {
 			if (detaching) detach(div);
@@ -31152,7 +31660,7 @@ function create_each_block$6(ctx) {
 	};
 }
 
-// (189:2) <SortableList items={rows} {sortableOptions} on:orderChanged={onReorder} let:item>
+// (190:2) <SortableList items={rows} {sortableOptions} on:orderChanged={onReorder} let:item>
 function create_default_slot$2(ctx) {
 	let div6;
 	let div0;
@@ -31701,7 +32209,7 @@ function create_fragment$e(ctx) {
 			if (dirty[0] & /*rows*/ 2) sortablelist_changes.items = /*rows*/ ctx[1];
 			if (dirty[0] & /*sortableOptions*/ 128) sortablelist_changes.sortableOptions = /*sortableOptions*/ ctx[7];
 
-			if (dirty[0] & /*running, $pandocTemplates, $t, openError, rows, hovered*/ 1635 | dirty[1] & /*$$scope, item*/ 16778240) {
+			if (dirty[0] & /*$pandocTemplates, running, $t, openError, rows, hovered*/ 1635 | dirty[1] & /*$$scope, item*/ 16778240) {
 				sortablelist_changes.$$scope = { dirty, ctx };
 			}
 
@@ -34574,195 +35082,6 @@ function unzipSync(data, opts) {
     return files;
 }
 
-/**
- * The Pandoc asset marketplace: types + pure logic for a machine-readable index
- * of downloadable Pandoc assets (recipes / filters / templates / CSL) and bundles,
- * hosted as a single `index.json` in an external assets repository. This module is
- * pure and unit-tested (no obsidian import); fetching (`fetchMarketIndex`) and
- * installing live in `pandoc-assets.ts`, the browse UI in `src/view/pandoc-market/`.
- * See docs/ASSET_MARKETPLACE_SPEC.md for the repo spec.
- */
-/**
- * Default marketplace index — the `index.json` published as a release asset of the
- * assets repo. `releases/latest/download/…` always resolves to the newest release,
- * so this URL is stable across versions. Overridable in settings.
- */
-const DEFAULT_MARKET_INDEX_URL = "https://github.com/PaperBell-Org/paperout-assets-market/releases/latest/download/index.json";
-/** The index schema version this plugin understands. */
-const MARKET_SCHEMA_VERSION = 1;
-/** File name of the install manifest, written at the assets root. */
-const INSTALLED_MANIFEST_NAME = "installed.json";
-/** Validate a parsed index against the schema this plugin supports. Throws on mismatch. */
-function validateIndex(parsed) {
-    const idx = parsed;
-    if (!idx || typeof idx !== "object") {
-        throw new Error("Marketplace index is empty or not an object.");
-    }
-    if (idx.schemaVersion !== MARKET_SCHEMA_VERSION) {
-        throw new Error(`Unsupported marketplace schemaVersion ${idx.schemaVersion} (this plugin supports ${MARKET_SCHEMA_VERSION}). Update the plugin or the index.`);
-    }
-    if (!Array.isArray(idx.assets) || !Array.isArray(idx.bundles)) {
-        throw new Error("Marketplace index must have `assets` and `bundles` arrays.");
-    }
-    return idx;
-}
-/**
- * Normalize an index entry from the assets repo's published shape into the shape
- * the plugin consumes. The `build-index.mjs` output uses `title`, a single `url` +
- * `sourcePath` (+ `extraFiles`), and bundle `url`; internally we use `name` and a
- * `files[]` array with a `download` URL each. Already-internal entries pass through.
- */
-function normalizeAssetFiles(raw) {
-    var _a;
-    if (Array.isArray(raw.files))
-        return raw.files;
-    const files = [];
-    const src = ((_a = raw.sourcePath) !== null && _a !== void 0 ? _a : raw.path);
-    const url = raw.url;
-    if (src && url) {
-        files.push({ path: src, download: url, sha256: raw.sha256 });
-        // extraFiles are bare repo-relative paths; derive their URL from the main
-        // one's base (the `.../<tag>/` prefix before sourcePath).
-        const extra = raw.extraFiles;
-        if (Array.isArray(extra) && url.endsWith(src)) {
-            const base = url.slice(0, url.length - src.length);
-            for (const ef of extra)
-                files.push({ path: ef, download: base + ef });
-        }
-    }
-    return files;
-}
-/** Pick a localized string from a plain string or a `{ locale: string }` map. */
-function pickLocalized(v, locale) {
-    var _a, _b;
-    if (v == null)
-        return undefined;
-    if (typeof v === "string")
-        return v;
-    if (typeof v === "object") {
-        const o = v;
-        return (_b = (_a = o[locale]) !== null && _a !== void 0 ? _a : o.en) !== null && _b !== void 0 ? _b : Object.values(o)[0];
-    }
-    return String(v);
-}
-function normalizeIndex(idx, locale = "en") {
-    const raw = idx;
-    const repo = raw.repo;
-    const tag = raw.tag;
-    const rawBase = repo && tag ? `https://raw.githubusercontent.com/${repo}/${tag}/` : "";
-    const url = (path) => typeof path === "string" && rawBase ? rawBase + path : undefined;
-    const asset = (a) => {
-        var _a, _b, _c;
-        return ({
-            id: a.id,
-            type: a.type,
-            name: (_b = pickLocalized((_a = a.title) !== null && _a !== void 0 ? _a : a.name, locale)) !== null && _b !== void 0 ? _b : a.id,
-            description: pickLocalized(a.description, locale),
-            version: ((_c = a.version) !== null && _c !== void 0 ? _c : "0.0.0"),
-            author: a.author,
-            tags: a.tags,
-            files: normalizeAssetFiles(a),
-            requires: a.requires,
-            systemDeps: a.systemDeps,
-            tier: a.tier,
-            reviewed: a.reviewed,
-            readmePath: a.readmePath,
-            previewPath: a.previewPath,
-            readmeUrl: url(a.readmePath),
-            previewUrl: url(a.previewPath),
-        });
-    };
-    const assets = idx.assets.map((a) => asset(a));
-    // A bundle is a recipe's packaging and shares its id. Upstream only localizes
-    // recipes (bundle title/description stay English), so reuse the same-id recipe's
-    // localized name/description when present; fall back to the bundle's own.
-    const recipeName = new Map();
-    const recipeDesc = new Map();
-    for (const a of assets)
-        if (a.type === "recipe") {
-            recipeName.set(a.id, a.name);
-            recipeDesc.set(a.id, a.description);
-        }
-    const bundle = (b) => {
-        var _a, _b, _c, _d, _e, _f;
-        const id = b.id;
-        return {
-            id,
-            name: (_c = (_a = recipeName.get(id)) !== null && _a !== void 0 ? _a : pickLocalized((_b = b.title) !== null && _b !== void 0 ? _b : b.name, locale)) !== null && _c !== void 0 ? _c : id,
-            description: (_d = recipeDesc.get(id)) !== null && _d !== void 0 ? _d : pickLocalized(b.description, locale),
-            version: ((_e = b.version) !== null && _e !== void 0 ? _e : "0.0.0"),
-            author: b.author,
-            tags: b.tags,
-            download: ((_f = b.download) !== null && _f !== void 0 ? _f : b.url),
-            sha256: b.sha256,
-            assets: b.assets,
-            workflows: b.workflows,
-            tier: b.tier,
-            reviewed: b.reviewed,
-            readmePath: b.readmePath,
-            previewPath: b.previewPath,
-            readmeUrl: url(b.readmePath),
-            previewUrl: url(b.previewPath),
-        };
-    };
-    return Object.assign(Object.assign({}, idx), { assets, bundles: idx.bundles.map((b) => bundle(b)) });
-}
-/**
- * Expand an asset id into the ordered install set: its `requires` closure first,
- * then the asset itself, deduplicated. Throws on an unknown dependency id; cycles
- * are tolerated (each id installs once). Used to auto-install a recipe's
- * filters/template/csl alongside it.
- */
-function resolveInstallSet(index, assetId) {
-    const byId = new Map(index.assets.map((a) => [a.id, a]));
-    const out = [];
-    const seen = new Set();
-    const visit = (id) => {
-        var _a;
-        if (seen.has(id))
-            return;
-        const asset = byId.get(id);
-        if (!asset)
-            throw new Error(`Unknown asset id referenced as a dependency: ${id}`);
-        seen.add(id); // mark before recursing so a cycle back to `id` short-circuits
-        for (const dep of (_a = asset.requires) !== null && _a !== void 0 ? _a : [])
-            visit(dep);
-        out.push(asset);
-    };
-    visit(assetId);
-    return out;
-}
-/**
- * Minimal numeric semver compare (ignores pre-release tags): returns -1 / 0 / 1
- * for a < / = / > b. Used to flag "update available".
- */
-function compareVersions(a, b) {
-    var _a, _b;
-    const norm = (v) => v
-        .split("-")[0]
-        .split(".")
-        .map((n) => parseInt(n, 10) || 0);
-    const pa = norm(a);
-    const pb = norm(b);
-    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-        const d = ((_a = pa[i]) !== null && _a !== void 0 ? _a : 0) - ((_b = pb[i]) !== null && _b !== void 0 ? _b : 0);
-        if (d !== 0)
-            return d < 0 ? -1 : 1;
-    }
-    return 0;
-}
-function installStateFor(manifest, id, marketVersion, presentIds) {
-    const rec = manifest[id];
-    if (rec) {
-        return compareVersions(rec.version, marketVersion) < 0
-            ? "update-available"
-            : "installed";
-    }
-    if (presentIds === null || presentIds === void 0 ? void 0 : presentIds.has(id))
-        return "present";
-    return "not-installed";
-}
-
 function ensureFolder$1(adapter, folder) {
     return __awaiter(this, void 0, void 0, function* () {
         const parts = folder.split("/").filter((p) => p.length > 0);
@@ -34876,7 +35195,7 @@ function fetchMarketReadme(url) {
  * a bundle when all its listed files exist.
  */
 function detectPresentIds(app, index, destFolder) {
-    var _a, _b, _c;
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         const adapter = app.vault.adapter;
         const paths = new Set();
@@ -34890,12 +35209,11 @@ function detectPresentIds(app, index, destFolder) {
         })));
         const ids = new Set();
         for (const a of index.assets) {
-            const files = (_b = a.files) !== null && _b !== void 0 ? _b : [];
-            if (files.length > 0 && files.every((f) => onDisk.has(f.path)))
+            if (assetFilesAllIn(a, onDisk))
                 ids.add(a.id);
         }
         for (const b of index.bundles) {
-            const assets = (_c = b.assets) !== null && _c !== void 0 ? _c : [];
+            const assets = (_b = b.assets) !== null && _b !== void 0 ? _b : [];
             if (assets.length > 0 && assets.every((p) => onDisk.has(p)))
                 ids.add(b.id);
         }
@@ -34966,6 +35284,7 @@ function installAssetWithDeps(app, index, assetId, destFolder) {
                 kind: "asset",
                 files,
                 installedAt: new Date().toISOString(),
+                presetDeps: presetSystemDeps([asset]),
             };
             manifest[asset.id] = rec;
             records.push(rec);
@@ -34974,8 +35293,13 @@ function installAssetWithDeps(app, index, assetId, destFolder) {
         return records;
     });
 }
-/** Install a bundle zip (reusing the zip downloader) and record it in the manifest. */
-function installMarketBundle(app, bundle, destFolder) {
+/**
+ * Install a bundle zip (reusing the zip downloader) and record it in the
+ * manifest. `index` is required because the recipes inside the zip have to keep
+ * the `systemDeps` they declare there: that record is all export-time preflight
+ * ever gets to see of them.
+ */
+function installMarketBundle(app, bundle, destFolder, index) {
     return __awaiter(this, void 0, void 0, function* () {
         const { files } = yield downloadPandocAssets(app, bundle.download, destFolder);
         const manifest = yield readInstalledManifest(app, destFolder);
@@ -34985,6 +35309,7 @@ function installMarketBundle(app, bundle, destFolder) {
             kind: "bundle",
             files,
             installedAt: new Date().toISOString(),
+            presetDeps: presetSystemDeps(bundledAssets(index, bundle)),
         };
         manifest[bundle.id] = rec;
         yield writeInstalledManifest(app, destFolder, manifest);
@@ -36851,7 +37176,7 @@ function instance$c($$self, $$props, $$invalidate) {
 			const n = new obsidian.Notice($t("market.installing") + " " + b.name, 0);
 
 			try {
-				const rec = yield installMarketBundle(app, b, destFolder);
+				const rec = yield installMarketBundle(app, b, destFolder, index);
 				$$invalidate(3, manifest[rec.id] = rec, manifest);
 
 				if ((_a = b.workflows) === null || _a === void 0
@@ -48394,6 +48719,35 @@ function mergeMissingWorkflows(existing, incoming) {
     }
     return { workflows, added };
 }
+/**
+ * Fix option values older defaults saved with the wrong type, so the compile
+ * view shows them correctly. Today: the Supplementary Information step's text
+ * option `abstract`, once stored as the boolean `true` (#43), which the step
+ * already reads as blank but the Abstract field still displays as "true".
+ * Returns the input unchanged (same object) when nothing needed fixing.
+ */
+function repairWorkflowOptions(workflows) {
+    const repaired = [];
+    const out = {};
+    for (const [key, wf] of Object.entries(workflows)) {
+        let changed = false;
+        const steps = wf.steps.map((step) => {
+            var _a;
+            const abstract = (_a = step.optionValues) === null || _a === void 0 ? void 0 : _a["abstract"];
+            if (step.id !== "supplementary-info" ||
+                abstract === undefined ||
+                typeof abstract === "string") {
+                return step;
+            }
+            changed = true;
+            return Object.assign(Object.assign({}, step), { optionValues: Object.assign(Object.assign({}, step.optionValues), { abstract: "" }) });
+        });
+        out[key] = changed ? Object.assign(Object.assign({}, wf), { steps }) : wf;
+        if (changed)
+            repaired.push(key);
+    }
+    return { workflows: repaired.length > 0 ? out : workflows, repaired };
+}
 
 const DEBOUNCE_SCRIPT_LOAD_DELAY_MS = 10000;
 /**
@@ -49435,6 +49789,21 @@ const EXAMPLE_DATA_XLSX_BASE64 = "UEsDBBQAAAAIABFv4VxGx01IlQAAAM0AAAAQAAAAZG9jUH
 function json(value) {
     return JSON.stringify(value, null, 2) + "\n";
 }
+/**
+ * The lead author entry both `metadata.json` files carry. One shape, so the
+ * supplementary deposit never drifts from the main one — Zenodo reads them as
+ * two records of the same paper.
+ *
+ * ORCID stays a placeholder: it is the one field nothing upstream knows.
+ */
+function leadCreator(ctx) {
+    return {
+        name: ctx.author,
+        affiliation: ctx.affiliation,
+        orcid: "0000-0000-0000-0000",
+        email: ctx.email,
+    };
+}
 /** Characters safe to write bare in YAML — no quoting, no escaping, no ambiguity. */
 const PLAIN_YAML_SCALAR = /^[A-Za-z0-9][A-Za-z0-9 ._-]*$/;
 /**
@@ -49666,7 +50035,7 @@ manuscript: ${ctx.title}
 acronym: ${ctx.acronym}
 ${projectLine(ctx)}date:
 to: Dear Editor,
-corresponding: ${ctx.author} (you@example.com)
+corresponding: ${ctx.author} (${ctx.email})
 ---
 
 We are pleased to submit our manuscript, *{{manuscript}}*, for consideration for publication in *{{JournalName}}*.
@@ -49687,14 +50056,7 @@ function supplementaryMetadata(ctx) {
         upload_type: "publication",
         publication_type: "article",
         description: "Supplementary information for the paper. Shares the main manuscript's metadata but adds supplementary: true so figures and tables receive an S prefix.",
-        creators: [
-            {
-                name: ctx.author,
-                affiliation: "Your Institution",
-                orcid: "0000-0000-0000-0000",
-                email: "you@example.com",
-            },
-        ],
+        creators: [leadCreator(ctx)],
         keywords: ["keyword-one", "keyword-two"],
         journal_title: "Target Journal",
         version: "v1.0",
@@ -49888,10 +50250,13 @@ function scenesBeforeIndexes(entries) {
 }
 
 /**
- * Stand-in for the lead author. Left as a placeholder for the user to replace in
- * metadata.json, which is the single authority for publication metadata.
+ * Stand-ins for the lead author, used whenever the host has not told us who that
+ * is. Left as placeholders for the user to replace in metadata.json, which is the
+ * single authority for publication metadata.
  */
 const PLACEHOLDER_AUTHOR = "Lastname, Firstname";
+const PLACEHOLDER_AFFILIATION = "Your Institution";
+const PLACEHOLDER_EMAIL = "you@example.com";
 /** Initials of a title, upper-cased, digits kept — "Sea Level Memory" → "SLM". */
 function acronymFromTitle(title) {
     const initials = (title || "")
@@ -49904,32 +50269,25 @@ function acronymFromTitle(title) {
         .slice(0, 6);
     return initials || "PAPER";
 }
-function mainMetadata(title, acronym, author) {
+function mainMetadata(ctx) {
     return json({
-        title,
+        title: ctx.title,
         publication_date: "",
         upload_type: "publication",
         publication_type: "article",
         description: "One-paragraph summary of the paper. Fill this in — it is emitted into the compiled manuscript's frontmatter and (for Zenodo) the deposit description.",
-        creators: [
-            {
-                name: author,
-                affiliation: "Your Institution",
-                orcid: "0000-0000-0000-0000",
-                email: "you@example.com",
-            },
-        ],
+        creators: [leadCreator(ctx)],
         keywords: ["keyword-one", "keyword-two"],
         journal_title: "Target Journal",
         version: "v1.0",
         _longform: {
-            acronym,
+            acronym: ctx.acronym,
             csl: "nature",
             template: "paperbell",
             lineno: true,
             figures_at_end: false,
-            corresponding: [author],
-            extra_yaml: "corresponding_email: you@example.com\nnumbersections: true\n",
+            corresponding: [ctx.author],
+            extra_yaml: `corresponding_email: ${ctx.email}\nnumbersections: true\n`,
         },
     });
 }
@@ -50044,7 +50402,7 @@ function commonScaffoldFiles(ctx) {
     return [
         {
             path: "metadata.json",
-            text: mainMetadata(ctx.title, ctx.acronym, ctx.author),
+            text: mainMetadata(ctx),
         },
         { path: "results.json", text: RESULTS_JSON },
         { path: "references.bib", text: REFERENCES_BIB },
@@ -50059,12 +50417,17 @@ function exampleAssetFiles() {
 }
 /** Normalize the caller's options into the context every part builder takes. */
 function scaffoldContext(opts) {
-    var _a;
+    var _a, _b, _c, _d;
+    const profile = opts.profile;
     return {
         title: opts.title.trim(),
         acronym: (opts.acronym || acronymFromTitle(opts.title.trim())).trim(),
-        author: PLACEHOLDER_AUTHOR,
-        project: ((_a = opts.project) === null || _a === void 0 ? void 0 : _a.trim()) || undefined,
+        // Each field falls back on its own: a host that knows a name but no
+        // institution should still save the user from retyping the name.
+        author: ((_a = profile === null || profile === void 0 ? void 0 : profile.name) === null || _a === void 0 ? void 0 : _a.trim()) || PLACEHOLDER_AUTHOR,
+        affiliation: ((_b = profile === null || profile === void 0 ? void 0 : profile.institution) === null || _b === void 0 ? void 0 : _b.trim()) || PLACEHOLDER_AFFILIATION,
+        email: ((_c = profile === null || profile === void 0 ? void 0 : profile.email) === null || _c === void 0 ? void 0 : _c.trim()) || PLACEHOLDER_EMAIL,
+        project: ((_d = opts.project) === null || _d === void 0 ? void 0 : _d.trim()) || undefined,
         examples: opts.examples,
         present: new Set(opts.parts),
     };
@@ -50242,6 +50605,11 @@ class NewPaperModal extends obsidian.Modal {
          * one-way door — the text field offers a button back to the list.
          */
         this.hostProjects = [];
+        /**
+         * Who the host says the user is, when it can tell us without a consent prompt.
+         * Null until it answers — and it may never answer, which is the no-host case.
+         */
+        this.hostProfile = undefined;
         /** Main is mandatory — see the note on the toggle below. */
         this.parts = new Set(["main"]);
         this.examples = true;
@@ -50301,6 +50669,7 @@ class NewPaperModal extends obsidian.Modal {
             .setDesc(translate("scaffold.projectDesc"));
         this.renderProjectTextInput();
         void this.loadHostProjects();
+        void this.loadHostProfile();
         contentEl.createEl("h4", { text: translate("scaffold.partsHeading") });
         for (const part of PAPER_PARTS) {
             const setting = new obsidian.Setting(contentEl)
@@ -50363,6 +50732,27 @@ class NewPaperModal extends obsidian.Modal {
             if (this.projectEdited)
                 return;
             this.renderProjectDropdown();
+        });
+    }
+    /**
+     * Ask the host who the user is, to pre-fill the lead author instead of leaving
+     * `Lastname, Firstname` for them to correct. Fire-and-forget like the project
+     * list, and silent in every failure: `profileIfGranted` returns null rather than
+     * prompt for the `config` scope, so opening this modal still costs no consent
+     * dialog. Nothing here can delay or fail the create — a profile that lands after
+     * the user clicked simply misses this paper.
+     */
+    loadHostProfile() {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const profile = yield ((_a = this.plugin.paperBell) === null || _a === void 0 ? void 0 : _a.profileIfGranted());
+            if (!profile)
+                return;
+            this.hostProfile = {
+                name: profile.name,
+                institution: profile.institution,
+                email: profile.email,
+            };
         });
     }
     /** Swap the project field's control, keeping `projectValue` as the source of truth. */
@@ -50438,6 +50828,7 @@ class NewPaperModal extends obsidian.Modal {
                     project: this.projectValue.trim() || undefined,
                     parts: [...this.parts],
                     examples: this.examples,
+                    profile: this.hostProfile,
                 });
                 selectedDraftVaultPath.set(primaryPath);
                 selectedTab.set("Scenes");
@@ -51544,6 +51935,11 @@ const PPB_SCHEMA_VERSION = 2;
  * 握手」两个职责,必须常驻:握手成功后摘掉监听,PaperBell 更新一次就再也连不回来。
  */
 const PPB_READY_EVENT = "paperbell:ready";
+/**
+ * 已注册子插件名单变化时在 `app.workspace` 上 trigger 的事件名(宿主内部使用,
+ * 供其设置页刷新入口卡片列表)。子插件通常无需订阅 —— 仅为契约完整性而保留。
+ */
+const PPB_PLUGINS_CHANGED_EVENT = "paperbell:plugins-changed";
 
 /** PaperBell host plugin id (the parent). */
 const HOST_PLUGIN_ID = "paperbell";
@@ -51606,6 +52002,17 @@ class PaperBellClient {
                 this.attach(api);
             }
         })));
+        // The host broadcasts this when its registered sub-plugin list changes — a
+        // sibling loading or unloading. Its own use is refreshing the settings card
+        // list, but it is also the only consent-free push we get between host
+        // reloads, so we take it as a cue to re-read plugin-info: capabilities the
+        // host gained or dropped in the meantime would otherwise stay stale until
+        // the next ready event. Cheap, and it prompts for nothing.
+        this.plugin.registerEvent(this.app.workspace.on(PPB_PLUGINS_CHANGED_EVENT, (() => {
+            const host = this.client ? this.lookupHost() : null;
+            if (host)
+                this.refreshCapabilities(host);
+        })));
     }
     lookupHost() {
         var _a, _b, _c;
@@ -51623,7 +52030,6 @@ class PaperBellClient {
      * redundant re-register costs one unregister and one register.
      */
     attach(host) {
-        var _a, _b;
         const reconnecting = this.client !== null;
         this.releaseHandle();
         let handle;
@@ -51645,19 +52051,11 @@ class PaperBellClient {
             return;
         }
         this.client = handle;
-        // plugin-info is consent-free; use it to gate features (e.g. llm-invoke).
-        let capabilities = DISCONNECTED.capabilities;
-        try {
-            capabilities = (_b = (_a = host.getPluginInfo()) === null || _a === void 0 ? void 0 : _a.capabilities) !== null && _b !== void 0 ? _b : [];
-        }
-        catch (e) {
-            console.warn("[PaperOut] Could not read PaperBell plugin info:", e);
-        }
-        this.capabilities = capabilities;
         // Keep whatever config we already had: on a reconnect it is the last value the host
         // gave us, and dropping it would flip the UI back to the fallback language for as
         // long as it takes to fetch a fresh one.
-        paperbell.update((s) => (Object.assign(Object.assign({}, s), { connected: true, capabilities })));
+        paperbell.update((s) => (Object.assign(Object.assign({}, s), { connected: true })));
+        this.refreshCapabilities(host);
         console.log(reconnecting
             ? "[PaperOut] Reconnected to PaperBell host after it reloaded."
             : "[PaperOut] Connected to PaperBell host.");
@@ -51677,6 +52075,23 @@ class PaperBellClient {
                 console.warn("[PaperOut] Could not refresh PaperBell config:", e);
             });
         }
+    }
+    /**
+     * Re-read the host's advertised scopes and mirror them into the store; they gate
+     * features (e.g. llm-invoke). plugin-info needs no consent, so this is safe to
+     * call on any host signal.
+     */
+    refreshCapabilities(host) {
+        var _a, _b;
+        let capabilities = DISCONNECTED.capabilities;
+        try {
+            capabilities = (_b = (_a = host.getPluginInfo()) === null || _a === void 0 ? void 0 : _a.capabilities) !== null && _b !== void 0 ? _b : [];
+        }
+        catch (e) {
+            console.warn("[PaperOut] Could not read PaperBell plugin info:", e);
+        }
+        this.capabilities = capabilities;
+        paperbell.update((s) => (Object.assign(Object.assign({}, s), { capabilities })));
     }
     /** Whether the user has already granted us `scope`, per the host's grant list. */
     hasGrant(host, scope) {
@@ -51703,6 +52118,38 @@ class PaperBellClient {
                 paperbell.update((s) => (Object.assign(Object.assign({}, s), { config })));
             }
             return config;
+        });
+    }
+    /**
+     * The host's user profile — **only if reading it costs no consent prompt**: the
+     * store's last pushed config, else a fresh fetch when `listGrants()` says the user
+     * already granted `config`. Returns null for a missing host, an older host, a
+     * profile the user never filled in, and (deliberately) an ungranted `config`.
+     *
+     * That last case is the point. The one caller is the new-paper modal, where a
+     * prompt would fire on open, for a field the user may not care about, and could
+     * outlive the modal — the contract has no way to cancel it (see
+     * docs/PROPOSAL_PROJECTS_SCOPE.md §3). Pre-filling an author is not worth that;
+     * the placeholder it falls back to is what everyone gets today.
+     */
+    profileIfGranted() {
+        var _a, _b, _c;
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.client)
+                return null;
+            const known = (_a = get_store_value(paperbell).config) === null || _a === void 0 ? void 0 : _a.profile;
+            if (known)
+                return known;
+            const host = this.lookupHost();
+            if (!host || !this.hasGrant(host, "config"))
+                return null;
+            try {
+                return (_c = (_b = (yield this.fetchSharedConfig())) === null || _b === void 0 ? void 0 : _b.profile) !== null && _c !== void 0 ? _c : null;
+            }
+            catch (e) {
+                console.warn("[PaperOut] Could not read the PaperBell profile:", e);
+                return null;
+            }
         });
     }
     /** Request the host's account info (scope: `account`). First call prompts for consent. */
@@ -52282,6 +52729,11 @@ class LongformPlugin extends obsidian.Plugin {
                 if (added.length > 0) {
                     console.log(`[PaperOut] Adding missing built-in workflows: ${added.join(", ")}.`);
                     _workflows = merged;
+                }
+                const { workflows: repairedWorkflows, repaired } = repairWorkflowOptions(_workflows);
+                if (repaired.length > 0) {
+                    console.log(`[PaperOut] Repaired option values in workflows: ${repaired.join(", ")}.`);
+                    _workflows = repairedWorkflows;
                 }
             }
             const deserializedWorkflows = {};
